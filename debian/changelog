@@ -1,0 +1,22 @@
+sam2p (0.43-3) unstable; urgency=low
+
+  * Merged with CVS, created Debian source packages.
+
+ -- Szabó Péter <pts@math.bme.hu>  Wed, 12 Feb 2003 20:51:58 +0100
+
+sam2p (0.43-2) unstable; urgency=low
+
+  * Added proper Description:, Depends: and Build-Depends: to
+    debian/changelog, modified the Makefile to respect $(DESTDIR) etc.
+
+ -- Szabó Péter <pts@winter>  Fri,  7 Feb 2003 14:16:56 +0100
+
+sam2p (0.43-1) unstable; urgency=low
+
+  * Initial Debian release.
+
+ -- Szabó Péter <pts@winter>  Fri,  7 Feb 2003 14:04:44 +0100
+
+Local variables:
+mode: debian-changelog
+End:
