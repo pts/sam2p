@@ -3,6 +3,7 @@ by pts@fazekas.hu
 at Sun Dec 30 19:30:17 CET 2001 -- Fri Mar 22 19:25:03 CET 2002
 Sat Apr 27 00:39:12 CEST 2002
 Wed Jul  3 01:20:40 CEST 2002
+Wed Feb  5 19:46:51 CET 2003
 
 This is the README file for sam2p, a raster to PostScript/PDF image
 conversion program. This file contains a 5-minute turbo tutorial for new and
@@ -384,16 +385,24 @@ Compilation and installation
 External software required for running sam2p:
 
 -- a UNIX system with a fairly standard BSD or POSIX C library (C++
-   libraries are not required)
--- optionally: the GNU `gzip' utility for alternative /Compression/ZIP
--- optionally: the Info-ZIP `zip' utility for alternative /Compression/ZIP
+   libraries are not required), or a Win32 system with MSVCRT.DLL (install
+   Wordpad to get MSVCRT.DLL)
 -- optionally: the libjpeg `cjpeg' utility for /Compression/IJG
 -- optionally: the libjpeg `djpeg' utility for reading JPEG files
+-- optionally: tif22pnm (uses libtiff) from the author of sam2p
+-- optionally: png22pnm (uses libpng) from the author of sam2p
 -- optionally: the Ghostscript `gs' utility for /Compression/DCT
 -- optionally: the Ghostscript `gs' utility for /Compression/Fax
--- optionally: the `lzw_codec' utility for alternative /Compression/LZW
 
-Software required for compilation:
+These do not work yet:
+
+-- optionally: the `lzw_codec' utility for alternative /Compression/LZW
+-- optionally: the GNU `gzip' utility for alternative /Compression/ZIP
+-- optionally: the Info-ZIP `zip' utility for alternative /Compression/ZIP
+
+For Win32 compilation, see later.
+
+Software required for UNIX compilation:
 
 -- a UNIX system
 -- a working, GNU-compatible C++ compiler (preferably GNU G++ >=2.91. Known
@@ -461,6 +470,8 @@ sam2p is quite portable on UNIX systems. It runs on:
 	SunOS 5.7 Generic_106541-17 sun4u sparc SUNW,Ultra-2 gcc-2.95.2 
 	SunOS 5.8 Generic_108528-12 sun4u sparc gcc-3.0.4
 
+Also it runs on Win32 in command line and GUI mode.
+
 It should work on any Linux or BSD system without modification. Porting to
 other Unices should be quite easy. The author welcomes portability patches.
 
@@ -497,6 +508,122 @@ sam2p 0.38 has been compiled and run successfully on:
 -- SunOS 5.8 Generic_108528-15 sun4u sparc, gcc version 3.1.1
    (some: warning: cast from `char*' to `int*' increases required alignment of target type)
    Compilation took 1:26, executable size: 437kB.
+
+sam2p 0.42 has been compiled and run successfully on:
+
+-- Windows 98, Visual C++ 6.0
+-- Windows 98, MSYS, MingGW, G++ 3.2
+
+Win32 compilation instructions for command-line mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To compile sam2p.exe, the Win32 equivalent of the UNIX utility sam2p, you
+have to install these build dependencies first:
+
+-- MinGW and MSYS, available from http://www.mingw.org
+
+-- Perl 5.004 or newer (only perl.exe and perl5*.dll is required), available
+   from http://www.perl.com. Note that this will be a long download and a
+   bloated install, but after that, just copy perl.exe and the single
+   perl5*.dll to your C:\WINDOWS directory, and uninstall the rest.
+
+To build sam2p:
+
+1. Install all the build dependencies.
+
+2. Open the MSYS terminal window from the start menu.
+
+3. Run `explorer .' to figure out what is the current working directory.
+   Let's call this directory the MSYS home.
+
+4. Download the sam2p sources into the MSYS home:
+
+	http://www.inf.bme.hu/~pts/sam2p-latest.tar.gz
+
+5. Unpack the sources. Run:
+
+	tar xzvf sam2p-latest.tar.gz
+	tar xvf sam2p-latest.tar.gz # if the previous one doesn't work
+
+6. Run `cd sam2p-*.*' to enter the sam2p source directory. It should contain
+   a newer version of this README and the file sam2p_main.cpp.
+
+7. Run `perl -edie' to check whether Perl is correctly installed. It should
+   print a line beginning with `Died '. If no such line appears (or you get
+   a `command not found' error message), go and install Perl first. Run
+   `echo $PATH' to find out where MSYS is searching for perl.exe. Copy
+   perl.exe to one of those directories.
+
+8. Run
+
+	./configure --enable-gif --enable-lzw
+	make
+
+9. The file sam2p.exe is now created in the current directory. Use it. You
+   may copy it to another directory right now:
+
+	cp sam2p.exe 'C:\Program Files'
+
+10. You should invoke sam2p.exe from the command line (COMMAND.COM or
+    CMD.EXE) with the _appropriate_
+    arguments, described elsewhere in this document. Don't put it into the
+    Start menu, it won't work (a window will flash in, showing an error
+    message that you haven't supplied the right arguments).
+
+11. The file bts2.tth is also created. It is an important file, because it
+    is required for the GUI compilation.
+
+12. Don't forget to install tif22pnm.exe to load TIFF files, djpeg.exe to
+    load JPEG files, cjpeg.exe to save JPEG files, and png22pnm.exe to load
+    PNG files. The installation instructions for these programs are not
+    given here.
+
+Win32 compilation instructions for GUI mode
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+vcsam2p.exe is a preliminary, alpha-stage attempt to provide a Win32 GUI for
+sam2p.exe. Currently it can load and display images, but not cannot save
+them. vcsam2p.exe is not ready for production use.
+
+You'll need Visual Studio 6.0 installed.
+
+1. Download the sam2p sources:
+
+	http://www.inf.bme.hu/~pts/sam2p-latest.tar.gz
+
+2. Download untarka.exe to be able to unpack the sources:
+
+	http://www.inf.bme.hu/~pts/untarka.exe
+
+3. Unpack the sources. Run:
+
+	untarka.exe sam2p-latest.tar.gz
+
+   A directory sam2p-*.* will be created, containing a newer version of this
+   README and the file config-vc6.h
+
+4. You'll need bts2.tth. You can get an old, possibly outdated and buggy
+   version directly:
+
+	http://www.inf.bme.hu/~pts/bts2.tth
+
+   Or, you may compile sam2p under Linux (or Win32 command-line), and copy
+   the generated bts2.tth from there.
+
+   Copy bts2.tth to the same directory as config-vc6.h
+
+5. Start the Visual C++ 6.0 environment.
+
+6. File / Open Workspace / File type: Projects
+                           Filename: vcsam2p.dsp
+   Build / Set Active Configuration: vcsam2p - Win32 Release
+   Build / Build vcsam2p.exe
+   Build / Execute vcsam2p.exe
+
+7. Don't forget to install tif22pnm.exe to load TIFF files, djpeg.exe to
+   load JPEG files, cjpeg.exe to save JPEG files, and png22pnm.exe to load
+   PNG files. The installation instructions for these programs are not
+   given here.
+
+Please report and fix bugs in vcsam2p.exe
 
 Copyright
 ~~~~~~~~~
@@ -1605,6 +1732,21 @@ Q23. How do I do a `make dist' without running configure again?
 A23. Just issue
 
 	make MAKE_DIST=1 dist
+
+Q24. I cannot open a JPEG file in the Win32 version.
+
+A24. Make sure you have djpeg.exe on your PATH. Simply copy it to your
+     C:\WINDOWS directory.
+
+Q25. I cannot open a TIFF file in the Win32 version.
+
+A25. Make sure you have tif22pnm.exe on your PATH. Simply copy it to your
+     C:\WINDOWS directory.
+
+Q26. I cannot open a PNG file in the Win32 version.
+
+A26. Make sure you have png22pnm.exe on your PATH. Simply copy it to your
+     C:\WINDOWS directory.
 
 Upsampling
 ~~~~~~~~~~
