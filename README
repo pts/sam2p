@@ -1961,6 +1961,35 @@ Q42. Can sam2p convert a multi-page TIFF to a multi-page PDF?
 
 A42. No. There are two main problems: See also Q40 and Q41.
 
+Q43. How do I convert a TIFF image to a 1-bit black-and-white PDF? Should I
+     use `sam2p -c:fax test.tif test.pdf'?
+
+     This above will ensure that fax compression is used. What you need for
+     ensuring that the output is 1-bit black-and-white is:
+
+        sam2p -s:gray1:stop test.tif test.pdf
+
+     You can also specify compression algorithm (I recommend -c:zip):
+
+        sam2p -c:fax -s:gray1:stop test.tif test.pdf
+        sam2p -c:lzw -s:gray1:stop test.tif test.pdf
+        sam2p -c:zip -s:gray1:stop test.tif test.pdf
+
+     If you get the error message
+
+        sam2p: Error: applyProfile: invalid combination, no applicable OutputRule
+
+     then your input test.tif is not really black-and-white. Open it in an
+     image editing program and ensure that the colors are #000000 and
+     #ffffff only.
+
+     > The tiff is black and white, bilevel - I just want to avoid the 
+     > test.pdf from using 8bpp by default (like it does in imagemagick)
+
+     The default for sam2p is not 8bpp. To see what the default is, run sam2p
+     with the `-j' option and check `OutputRule #1' on the console output.
+     What you are interested in is the /SampleFormat field.
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
