@@ -1,3 +1,10 @@
+sam2p (0.44-4) unstable; urgency=low
+
+  * Some glitches of g++-3.4 avoided. Now sam2p compiles fine.
+  * -l:gs=-r216 support for PDF.
+
+ -- Szabó Péter <pts@math.bme.hu>  Thu,  6 Jan 2005 10:59:50 +0100
+
 sam2p (0.44-3) unstable; urgency=low
 
   * minor fixes, documentation addons

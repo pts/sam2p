@@ -1,5 +1,5 @@
 /*
- * in_ps.cpp -- read PS files using GS
+ * in_ps.cpp -- read PS and PDF files using GS
  * by pts@fazekas.hu at Tue Sep 30 12:33:11 CEST 2003
  */
 
@@ -9,7 +9,7 @@
 
 #include "image.hpp"
 
-#if USE_IN_PS
+#if USE_IN_PS || USE_IN_PDF
 
 #include "error.hpp"
 #include "gensio.hpp"
@@ -17,17 +17,38 @@
 #include <string.h> /* memchr() */
 #include <stdio.h> /* printf() */
 
-/* float DPI ?? */
-/* !! PDF -r... */
-/* !! -r144 and scale back..., also for PDF */
-
 #if OS_COTY==COTY_WIN9X || OS_COTY==COTY_WINNT
 #  define GS "gswin32c"
 #else
 #  define GS "gs"
 #endif
 
-static char const cmd[]=GS " -r00072 -q -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dLastPage=1 -sDEVICE=pnmraw -dDELAYSAFER -dBATCH -dNOPAUSE -sOutputFile=%D -s_IFN=%S -- %*";
+#endif /* USE_IN_PS || USE_IN_PDF */
+
+/** Adds a Ghostscript invocation command. Works for both PS and PDF. */
+static void add_gs_cmd(SimBuffer::B &cmd, SimBuffer::Flat const& hints) {
+  cmd << GS " -r72 -q -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dLastPage=1 -sDEVICE=pnmraw -dDELAYSAFER -dBATCH -dNOPAUSE -sOutputFile=%D ";
+  char const *p=hints(), *r;
+  /* Dat: hints ends by ',' '\0' */
+  // Files::FILEW(stdout) << hints << ";;\n";
+  while (*p!=',') p++; /* Dat: safe, because hints is assumed to start and end by ',' */
+  while (1) {
+    assert(*p==',');
+    if (*++p=='\0') break;
+    if (p[0]=='g' && p[1]=='s' && p[2]=='=') {
+      r=p+=3;
+      while (*p!=',') p++;
+      cmd.vi_write(r, p-r); /* Dat: -r... in here overrides -r72 above */
+      cmd << ' ';
+    } else {
+      while (*p!=',') p++;
+    }
+  }
+}
+
+#if USE_IN_PS
+
+/* !! -r144 and scale back..., also for PDF -- to enhance image quality */
 
 static Image::Sampled *in_ps_reader_low(Image::Loader::UFD* ufd, char const*bboxline, SimBuffer::Flat const& hints) {
   SimBuffer::B mainfn;
@@ -44,25 +65,9 @@ static Image::Sampled *in_ps_reader_low(Image::Loader::UFD* ufd, char const*bbox
   /* !! keep only 1st page, without setpagedevice for PS files */
   /* Dat: -dSAFER won't let me open the file with `/' under ESP Ghostscript 7.05.6 (2003-02-05) */
   /* Imp: win9X command line too long? */
-  SimBuffer::B cmd(GS " -r72 -q -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dLastPage=1 -sDEVICE=pnmraw -dDELAYSAFER -dBATCH -dNOPAUSE -sOutputFile=%D -s_IFN=%S ");
-  { char const *p=hints(), *r;
-    /* Dat: hints ends by ',' '\0' */
-    // Files::FILEW(stdout) << hints << ";;\n";
-    while (*p!=',') p++; /* Dat: safe, because hints is assumed to start and end by ',' */
-    while (1) {
-      assert(*p==',');
-      if (*++p=='\0') break;
-      if (p[0]=='g' && p[1]=='s' && p[2]=='=') {
-        r=p+=3;
-        while (*p!=',') p++;
-        cmd.vi_write(r, p-r);
-        cmd << ' ';
-      } else {
-        while (*p!=',') p++;
-      }
-    }
-  }
-  cmd << "-- %*";
+  SimBuffer::B cmd;
+  add_gs_cmd(cmd,hints);
+  cmd << " -s_IFN=%S -- %*";
   HelperE helper(cmd.term0()(), mainfn()); /* Run external process GS */
   Filter::UngetFILED* ufdd=(Filter::UngetFILED*)ufd;
   int i=ufdd->vi_getcc();
@@ -125,8 +130,9 @@ static Image::Loader::reader_t in_ps_checker(char buf[Image::Loader::MAGIC_LEN],
   while (p!=pend && *p!=' ' && *p!='\t') p++;
   while (p!=pend && (*p==' ' || *p=='\t')) p++;
   /* Imp: option to accept BoundingBox for non-EPS PS */
-  if (0!=strncmp(p,"EPSF-",5)) return in_eps_reader; /* BUGFIX at Fri Nov 26 12:13:58 CET 2004 */
-  return in_ps_reader;
+  return (0==strncmp(p,"EPSF-",5)) ? in_eps_reader : in_ps_reader;
+  /* ^^^ BUGFIX at Fri Nov 26 12:13:58 CET 2004 */
+  /* ^^^ BUGFIX again at Thu Jan  6 10:25:54 CET 2005 */
 }
 
 #else
@@ -134,3 +140,29 @@ static Image::Loader::reader_t in_ps_checker(char buf[Image::Loader::MAGIC_LEN],
 #endif /* USE_IN_PS */
 
 Image::Loader in_ps_loader = { "PS", in_ps_checker, 0 };
+
+#if USE_IN_PDF
+
+static Image::Sampled *in_pdf_reader(Image::Loader::UFD* ufd, SimBuffer::Flat const& hints) {
+  // Error::sev(Error::EERROR) << "Cannot load PDF images yet." << (Error*)0;
+  SimBuffer::B cmd;
+  add_gs_cmd(cmd,hints);
+  cmd << " -- %S";
+  /* Dat: -dSAFER won't let me open the file with `/' under ESP Ghostscript 7.05.6 (2003-02-05) */
+  /* Imp: win9X command line too long? */
+  fprintf(stderr, "gs_cmd=(%s)\n", cmd.term0()());
+  HelperE helper(cmd.term0()()); /* Run external process GS */
+  Encoder::writeFrom(*(Filter::PipeE*)&helper, *(Filter::UngetFILED*)ufd);
+  ((Filter::PipeE*)&helper)->vi_write(0,0); /* Signal EOF */
+  return helper.getImg();
+}
+
+static Image::Loader::reader_t in_pdf_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::Loader::UFD*) {
+  return 0==memcmp(buf,"%PDF-",5) ? in_pdf_reader : 0;
+}
+
+#else
+#define in_pdf_checker (Image::Loader::checker_t)NULLP
+#endif /* USE_IN_PDF */
+
+Image::Loader in_pdf_loader = { "PDF", in_pdf_checker, 0 };

@@ -59,7 +59,7 @@ void __pure_virtual() { abort(); }
 #  warning REQUIRES: in_bmp.o
 #  warning REQUIRES: in_pnm.o
 #  warning REQUIRES: in_tga.o
-#  warning REQUIRES: in_pdf.o
+/*#  warning REQUIRES: in_pdf.o Dat: no more, integrated to in_ps.o */
 #  warning REQUIRES: in_ps.o
 #endif
 extern Image::Loader in_tiff_loader;

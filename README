@@ -1923,11 +1923,12 @@ A38. Yes, if you have Ghostscript installed, and your input EPS file is not
      run a2ping.pl written by the author of sam2p to make your EPS file more
      compatible.
 
-Q39. Can sam2p load and and EPS file with an arbitrary resoultion?
+Q39. Can sam2p load an EPS or PDF file with an arbitrary resoultion?
 
-A39. Yes. For example use
+A39. Yes. For example use one of
 
 	sam2p -l:gs=-r216 in.eps out.png
+	sam2p -l:gs=-r216 in.pdf out.png
 
      to have resoultion 216 DPI (image scaled 3 times to both directions).
      Without scaling, 72 DPI is the default.
