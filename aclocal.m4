@@ -42,20 +42,20 @@ AC_DEFINE_UNQUOTED(SIZEOF_SHORT, $ac_cv_sizeof_short)
 AC_DEFINE_UNQUOTED(SIZEOF_INT, $ac_cv_sizeof_int)
 AC_DEFINE_UNQUOTED(SIZEOF_LONG, $ac_cv_sizeof_long)
 fi
-dnl AC_CHECK_SIZEOF(char, -1)
+dnl AC_PTS_CHECK_SIZEOF(char, -1)
 
 if test $ac_cv_sizeof_char = -1; then
   AC_MSG_ERROR(cross compiling not supported by .._PTS_CHECK_INTEGRALS)
 fi
-AC_CHECK_SIZEOF(short, -1)
-AC_CHECK_SIZEOF(int, -1)
-AC_CHECK_SIZEOF(long, -1)
-AC_CHECK_SIZEOF(long long, -1)
+AC_PTS_CHECK_SIZEOF(short, -1)
+AC_PTS_CHECK_SIZEOF(int, -1)
+AC_PTS_CHECK_SIZEOF(long, -1)
+AC_PTS_CHECK_SIZEOF(long long, -1)
 if test $ac_cv_sizeof_long_long = 8
 then ac_cv_sizeof___int64=0; ac_cv_sizeof_very_long=0; fi
-AC_CHECK_SIZEOF(very long, -1)
+AC_PTS_CHECK_SIZEOF(very long, -1)
 if test $ac_cv_sizeof_very_long = 8; then ac_cv_sizeof___int64=0; fi
-AC_CHECK_SIZEOF(__int64, -1)
+AC_PTS_CHECK_SIZEOF(__int64, -1)
 dnl ^^^ very long type doesn't exit in any C standard.
 
 dnl Imp: make these cached
@@ -111,11 +111,39 @@ fi
 AC_DEFINE_UNQUOTED(PTS_INT128_T, $ac_cv_pts_int128_t)
 ])
 
+dnl ripped from autoconf-2.13 (ruined by autoconf-2.50)
+dnl by pts@fazekas.hu at Wed Dec 11 12:33:53 CET 2002
+dnl AC_PTS_CHECK_SIZEOF(TYPE [, CROSS-SIZE])
+AC_DEFUN(AC_PTS_CHECK_SIZEOF,
+[changequote(<<, >>)dnl
+dnl The name to #define.
+define(<<AC_TYPE_NAME>>, translit(sizeof_$1, [a-z *], [A-Z_P]))dnl
+dnl The cache variable name.
+define(<<AC_CV_NAME>>, translit(ac_cv_sizeof_$1, [ *], [_p]))dnl
+changequote([, ])dnl
+AC_MSG_CHECKING(size of $1)
+AC_CACHE_VAL(AC_CV_NAME,
+[AC_TRY_RUN([#include <stdio.h>
+#include <sys/types.h>
+main()
+{
+  FILE *f=fopen("conftestval", "w");
+  if (!f) exit(1);
+  fprintf(f, "%d\n", sizeof($1));
+  exit(0);
+}], AC_CV_NAME=`cat conftestval`, AC_CV_NAME=0, ifelse([$2], , , AC_CV_NAME=$2))])dnl
+AC_MSG_RESULT($AC_CV_NAME)
+AC_DEFINE_UNQUOTED(AC_TYPE_NAME, $AC_CV_NAME)
+undefine([AC_TYPE_NAME])dnl
+undefine([AC_CV_NAME])dnl
+])
+
+
 
 AC_DEFUN([AC_PTS_CHECK_POINTERS],[
 AC_REQUIRE([AC_PTS_CHECK_INTEGRALS])
-AC_CHECK_SIZEOF(char *, -1)
-AC_CHECK_SIZEOF(void *, -1)
+AC_PTS_CHECK_SIZEOF(char *, -1)
+AC_PTS_CHECK_SIZEOF(void *, -1)
 dnl no need for checking for -1, AC_PTS_CHECK_INTEGRALS already did it
 AC_MSG_CHECKING(for an integral type to hold a ptr)
 AC_CACHE_VAL(ac_cv_pts_intp_t, [
@@ -261,6 +289,24 @@ AC_DEFUN([AC_PTS_HAVE_PROTOTYPES], [
     AC_DEFINE(HAVE_PROTOTYPES)
   fi
 ])
+
+dnl by pts@fazekas.hu at Wed Dec 11 12:09:14 CET 2002
+AC_DEFUN([AC_PTS_HAVE_STATIC_CONST], [
+  AC_CACHE_CHECK(whether c++ supports static const, ac_cv_pts_have_static_const, [
+    AC_TRY_COMPILE(
+      [#undef const
+class A { public: static const int i=1; };], [return A::i==0;],
+      ac_cv_pts_have_static_const=yes,
+      ac_cv_pts_have_static_const=no
+    )
+  ])
+  if test x"$ac_cv_pts_have_static_const" = xyes; then
+    AC_DEFINE(HAVE_STATIC_CONST)
+  fi
+])
+class A { static const int i=1; };
+
+
 
 dnl by pts@fazekas.hu at Fri Nov  2 13:15:27 CET 2001
 AC_DEFUN([AC_PTS_HAVE_STDC], [
@@ -837,8 +883,9 @@ AC_DEFUN([AC_PTS_GCC_LINKS_CXX], [
       /* vvv (B*) cast added for gcc-3.1 */
       B *p=(ferror(stderr))?(B*)new C1():(B*)new C2(); /* Imp: argc... */
       /* if (p==0) throw long(42); */ /* doesn't work with -fno-rtti */
+      int ok2=p->x()==2;
       delete p;
-      return !(p->x()==2 && global.x()==1);
+      return !(ok2 && global.x()==1);
     ],[
       case x"$CC" in
         xgcc-*) CXX="$CC" ;; # gcc-3.2
@@ -1033,9 +1080,11 @@ fi
 ])
 
 dnl by pts@fazekas.hu at Sat Jun  1 15:00:44 CEST 2002
+dnl ac_n=... autoconf2.13 -> autoconf2.50
 dnl Usage: AC_PTS_RUN_OK(CMDLINE, ACTION-OF-EXITCODE-0, ACTION-IF-ERROR)
 AC_DEFUN(AC_PTS_RUN_OK,
-[echo $ac_n "running $1""... $ac_c" 1>&AC_FD_MSG
+[ac_n="${ac_n:-$ECHO_N}"
+echo $ac_n "running $1""... $ac_c" 1>&AC_FD_MSG
 echo "configure:__oline__: running $1" >&AC_FD_CC
 if >&AC_FD_CC 2>&AC_FD_CC $1; then :
   AC_MSG_RESULT(ok)

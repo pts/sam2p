@@ -89,7 +89,7 @@ my $R="$GCCP -DOBJDEP -M -MG -E 2>&1 @DSQ";
 print "+ $R\n";
 $R=`$R`;
 
-die $R;
+## die $R;
 
 #** $pro{"x.ds"} is the list of features provided by "x.ds"; multiplicity
 my %pro;

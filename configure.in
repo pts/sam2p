@@ -115,12 +115,13 @@ dnl ^^^ as of 0.37, touch is not required
 
 #AC_CHECK_PROG(ac_pts_cjpeg, cjpeg, yes)
 
-dnl Checks for C language features
+dnl Checks for C/C++ language features
 AC_PTS_HAVE_STDC
 AC_PTS_HAVE_SWITCH_ENUM_BUG
 AC_PTS_ENSURE_ASCII_SYSTEM
 AC_C_CONST
 AC_PTS_C_VOLATILE
+AC_PTS_HAVE_STATIC_CONST
 
 dnl Checks for libraries.
 

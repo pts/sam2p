@@ -20,7 +20,7 @@
 #define HAVE_ALLOCA 1
 
 /* Define if you have <alloca.h> and it should be used (not on Ultrix).  */
-/* #undef HAVE_ALLOCA_H */
+#define HAVE_ALLOCA_H 1
 
 /* Define if you have the ANSI # stringizing operator in cpp. */
 /* #undef HAVE_STRINGIZE */
@@ -129,13 +129,13 @@
 #define HAVE_sprintf_in_stdio 1
 #define HAVE_write_in_unistd 1
 #define HAVE_system_in_stdlib 1
-/* #undef HAVE_PTS_STDC */
+#define HAVE_PTS_STDC 1
 /* #undef HAVE_SWITCH_ENUM_BUG */
 #define HAVE_ASCII_SYSTEM 1
-#define PTS_CFG_P_TMPDIR 0
+#define PTS_CFG_P_TMPDIR "/tmp"
 
 /* Is the file c_gcc.cpp required for gcc when linking C++ programs? */
-#define HAVE_PTS_C_LGCC_CPP_REQUIRED 1
+/* #undef HAVE_PTS_C_LGCC_CPP_REQUIRED */
 
 /** Does the C library have a working vsnprintf()? */
 /* #undef HAVE_PTS_VSNPRINTF */
@@ -146,7 +146,7 @@
 /* #undef HAVE_PTS_POPEN_B */
 
 /** popen("...","w") and "r" works binary */
-/* #undef HAVE_PTS_POPEN_ */
+#define HAVE_PTS_POPEN_ 1
 
 /* The number of bytes in a __int64.  */
 #define SIZEOF___INT64 0
@@ -178,9 +178,12 @@
 /* The number of bytes in a void *.  */
 #define SIZEOF_VOID_P 4
 
+/* Can have static const int VARNAME=1; inside a class { ... } ? */
+#define HAVE_STATIC_CONST 1
+
 /* sam2p-specific */
 #define USE_BUILTIN_ZIP 1
 #define USE_BUILTIN_FAXE 1
-#define USE_BUILTIN_LZW 1
-#define USE_IN_GIF 1
-#define USE_OUT_GIF 1
+/* #undef USE_BUILTIN_LZW */
+/* #undef USE_IN_GIF */
+/* #undef USE_OUT_GIF */
