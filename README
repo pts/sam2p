@@ -133,15 +133,18 @@ To convert an image to be included as EPS (Encapsulated PostScript) into
 (La)TeX documents, call:
 
 	./sam2p <INPUT.IMG> <OUTPUT.eps>
-	Example ./sam2p examples/pts2.pbm test.eps
+	Example: ./sam2p examples/pts2.pbm test.eps
+	In file.tex: \usepackage{graphicx} ... \includegraphics{test}
 
 To convert an image to be included as PDF into pdf(La)TeX documents, call:
 
 	./sam2p <INPUT.IMG> <OUTPUT.pdf>
-	Example ./sam2p examples/pts2.pbm test.pdf
+	Example: ./sam2p examples/pts2.pbm test.pdf
+	In file.tex: \usepackage{graphicx} ... \includegraphics{test}
 
 If you have a large image file (possibly originating from dumb software),
-you can reduce the image size and keep the same filename. Call:
+you can reduce the image size and keep the same filename. (Please note that
+some meta-information may be lost using this method.) Call:
 
 	./sam2p <INPUT-OUTPUT.IMG> --
 	Example: ./sam2p test.tiff --
