@@ -72,7 +72,7 @@ static Image::Loader::reader_t in_gif_checker(char buf[Image::Loader::MAGIC_LEN]
 #include "error.hpp"
 #define in_gif_name (char const*)NULLP
 /* #define in_gif_checker (Image::Loader::checker_t)NULLP */
-static Image::Loader::reader_t in_gif_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&) {
+static Image::Loader::reader_t in_gif_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::Loader::UFD*) {
   if (0==memcmp(buf,"GIF87a",6) || 0==memcmp(buf,"GIF89a",6)) {
     Error::sev(Error::WARNING) << "loader: please `configure --enable-gif' for loading GIF files" << (Error*)0;
   }
