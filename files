@@ -147,3 +147,9 @@ l1zip.psm
 l1lzw.psm
 psmlib.psm
 ps_tiny.c
+debian/README.debian
+debian/changelog
+debian/control
+debian/copyright
+debian/dirs
+debian/rules

@@ -573,8 +573,9 @@ class SimBuffer {
      * Under Win32, the filename is surrounded by double quotes. Double quotes
      * inside the filename are skipped. Other systems than Win32 are treated
      * like UNIX.
+     * @param preminus prefix filenames starting with `-' with `./' ?
      */
-    B& appendFnq(const Flat &other);
+    B& appendFnq(const Flat &other, bool preminus=false);
     /**
      * Name: Quote::NonPathOctal; from quote.rb
      * Input: any binary

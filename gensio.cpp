@@ -226,7 +226,7 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
       // *pp << ext;
       pp->term0();
       if ((unsigned char)(s[-1]-'A')<(unsigned char)('Z'-'A'))
-        redir_cmd.appendFnq(*pp); /* Capital letter: quote from the shell */
+        redir_cmd.appendFnq(*pp, /*preminus:*/ true); /* Capital letter: quote from the shell */
         else redir_cmd << *pp;
       break;
      case 'e': case 'E': /* temporary file for error messages */

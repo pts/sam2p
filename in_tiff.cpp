@@ -37,7 +37,17 @@ static Image::Sampled *in_tiff_reader(Image::filep_t file_, SimBuffer::Flat cons
   // Error::sev(Error::EERROR) << "Cannot load TIFF images yet." << (Error*)0;
   // HelperE helper("tifftopnm %S"); /* Cannot extract alpha channel */
   // HelperE helper("tif22pnm -rgba %S"); /* tif22pnm <= 0.07 */
-  HelperE helper("tif22pnm -rgba %S pnm:"); /* Wants to seek in the file. */
+  char const *cmd=
+  #if OS_COTY==COTY_WIN9X || OS_COTY==COTY_WINNT
+    "tifftonm <%S >%D\ntif22pnm -rgba %S pnm: %D"; /* slow but safe */
+  #else
+    #if OS_COTY==COTY_UNIX
+      "(tif22pnm -rgba %S pnm: || tifftopnm %S)";
+    #else
+      "tif22pnm -rgba %S pnm:"; /* Wants to seek in the file. */
+    #endif
+  #endif
+  HelperE helper(cmd);
   Encoder::writeFrom(*(Filter::PipeE*)&helper, (FILE*)file_);
   ((Filter::PipeE*)&helper)->vi_write(0,0); /* Signal EOF */
   return helper.getImg();

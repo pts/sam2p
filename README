@@ -1045,10 +1045,10 @@ Output rule entries:
      DamagedRowsBeforeError=0)
    /DCT -- DCT (PSL2 PDF1.0 DCTEncode, options in JPEG
      stream)
-   /IJG /JPEG /JPG /JFIF -- IJG (PSL2 PDF1.0 DCTEncode, options in JPEG stream; the IJG libjpeg
-     library is used for compression, respecting the quality value 0..100).
-     This requires /SampleFormat/Rgb8 or /SampleFormat/Gray8. This doesn't
-     work with /SampleFormat/Asis.
+   /IJG /JPEG /JPG /JFIF -- IJG (PSL2 PDF1.0 DCTEncode, options in JPEG
+     stream; the IJG libjpeg library is used for compression, respecting the
+     quality value 0..100). This requires /SampleFormat/Rgb8 or
+     /SampleFormat/Gray8. This doesn't work with /SampleFormat/Asis.
    /JAI -- JAI (PSL2 PDF1.0 DCTEncode, options in JPEG stream; JPEG-as-is: the
      input file must be a JPEG file -- its contents are transferred
      unmodified into the /DCTDecode JPEG stream). This requires
@@ -1748,6 +1748,65 @@ Q26. I cannot open a PNG file in the Win32 version.
 A26. Make sure you have png22pnm.exe on your PATH. Simply copy it to your
      C:\WINDOWS directory.
 
+Q27. What is tif22pnm?
+
+A27. tif22pnm is a TIFF -> PNM converter written by the author of sam2p. It
+     can load more TIFF files correctly than tifftopnm, ImageMagick convert,
+     xv and The GIMP. The TIFF loader code is based on GIMP 1.3, but has
+     many bugfixes and improvements. sam2p uses tif22pnm to load TIFF files.
+     You can download tif22pnm from
+
+	http://www.inf.bme.hu/~pts/tif22pnm-latest.tar.gz
+
+Q28. What is png22pnm?
+
+A28. png22pnm is a PNG -> PNM converter compiled by the author of sam2p. It
+     is based on the excellent pngtopnm utility, but doesn't depend on the
+     NetPBM library (only libpng). sam2p png22pnm (or, as a fallback:
+     pngtopm) to load PNG files. png22pnm is part of the tif22pnm package,
+     so you can download it from
+
+	http://www.inf.bme.hu/~pts/tif22pnm-latest.tar.gz
+
+Q29. Can sam2p convert a transparent GIF to PDF?
+
+A29. The PDF-1.3 file format supports transparent images, but sam2p doesn't.
+     However, if the image contains at most two colors (including the
+     transparent pixel), sam2p can create a working PDF-1.2 file; use
+     Ghostscript to view it, because Acrobat Reader 5.0 is buggy. However,
+     sam2p supports generating transparent EPS, GIF, PNG, PNM, XPM and TIFF
+     files up to 256 colors.
+
+Q30. How do I build my own sam2p debian package?
+
+A30. Please download the newest sources from
+
+	http://www.inf.bme.hu/~pts/sam2p-latest.tar.gz
+
+     As root, run
+
+	apt-get update
+	apt-get install debmake fakeroot dpkg
+	apt-get install make g++ gcc perl sed
+
+     As normal user, run (in the directory containing sam2p_main.cpp):
+
+	debian/rules clean
+	rm -f build*
+	debian/rules build
+	fakeroot debian/rules binary
+	ls -l ../sam2p_*.deb
+
+     As root, substitute X and Y, and run:
+
+	dpkg -i sam2p_X_Y.deb
+
+     Please also install the tif22pnm and png22pnm packages from the author
+     of sam2p (and the Debian standard libjpeg-progs package), available as
+     Debian source form from
+
+	http://www.inf.bme.hu/~pts/tif22pnm-latest.tar.gz
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
@@ -1864,7 +1923,16 @@ Compatibility notes
 by pts@fazekas.hu at Wed Nov 14 12:14:15 CET 2001
 Fri Mar 22 11:48:36 CET 2002
 Sat Apr 20 19:57:44 CEST 2002
+Fri Feb  7 11:15:39 CET 2003
 
+-- Ghostscript 6.50 has problems with /FileFormat/PDFB1.0
+   /SampleFormat/JAI|/IJG/DCT
+   (Error: /syntaxerror in ID). The problem has been fixed in Ghostscript
+   7.04. With the buggy Ghostscript use /FileFormat/PDF1.0 instead.
+-- /FileFormat/PDF[B]1.0 /SampleFormat/Mask|/Indexed1 doesn't
+   work on Acrobat Reader 5.0 on Linux: a fully opaque, one-color rectangle is
+   painted. This works fine on gs 6.50 and xpdf 1.0, so Acrobat Reader is
+   assumed to be buggy.
 -- The GIMP 1.0 cannot load PlanarConfig Separated TIFF images of type
    GrayA. (But can load PlanarConfig Contiguous GrayA.)
 -- xv cannot display gray TIFF images with transparency.
@@ -2247,6 +2315,7 @@ History
 0.41 GIF and XPM load bugfixes
      synchronized to GIMP tif22pnm
      transparent(+?) TIFF output, really
+     better tif22pnm support
 
 0.42 Wed Feb  5 18:40:12 CET 2003
      vcsam2p.exe (graphic .exe with Visual Studio 6.0), merged
@@ -2254,9 +2323,15 @@ History
      png22pnm support
      Debian Slink pdfTeX integration
 
+0.43 Fri Feb  7 11:32:10 CET 2003
+     PDF generation bugfixes
+     PDF /MediaBox is output into a separate line near the beginning of file (graphicP compatibility)
+
+Missing feature list
+~~~~~~~~~~~~~~~~~~~~
 ??
      (expected) !!
-     transparent(+?) TIFF output,
+     --invert option, for tif22pnm users
      complete turbo tutorial,
      MIFF input, _output_
      full BMP output compressed,
@@ -2264,12 +2339,8 @@ History
      normal `image' instead of `colorimage'
      CUPS raster input and output,
      PS and PDF input,
-     GIMP tif22pnm
      /Background option (-bg) to change transparent pixels -> bg color
      LZW and ZIP compressed for indexed etc.
-
-Missing feature list
-~~~~~~~~~~~~~~~~~~~~
 /* Imp: avoid 3 warnings in: ./sam2p examples/pts2.pbm t.ppm */
 /* OK : margins for all PS, EPS and PDF (Sat Sep  7 16:17:58 CEST 2002 */
 /* Imp: howto in pts_defl.h */

@@ -945,7 +945,7 @@ SimBuffer::B& SimBuffer::B::appendDumpC  (const SimBuffer::Flat &other, bool dq)
   return*this;
 }
 
-SimBuffer::B& SimBuffer::B::appendFnq(const SimBuffer::Flat &other) {
+SimBuffer::B& SimBuffer::B::appendFnq(const SimBuffer::Flat &other, bool preminus) {
   slen_t rlen=0;
   register char c; register char const*p;
   char const *pend; char *dst;
@@ -954,8 +954,11 @@ SimBuffer::B& SimBuffer::B::appendFnq(const SimBuffer::Flat &other) {
       if ('\0'==(c=*p) || c=='"') break;
       rlen++;
     }
+    if (preminus && rlen!=0 && other.beg[0]=='-') rlen+=2; /* .\ */
     vi_grow2(0, rlen+2, 0, &dst);
     *dst++='"'; /* Dat: "ab"c" ""def" is perfectly legal and parses to: `abc def' */
+    p=other.beg;
+    if (other.beg[0]=='-') { *dst++='.'; *dst++='\\'; }
     for (p=other.beg,pend=p+other.len; p!=pend; p++) {
       if ('\0'==(c=*p) || c=='"') break;
       *dst++=c;
@@ -966,7 +969,9 @@ SimBuffer::B& SimBuffer::B::appendFnq(const SimBuffer::Flat &other) {
       if ('\0'==(c=*p)) break;
       rlen+=is_path(c)?1: c=='\n'?3:2;
     }
+    if (preminus && rlen!=0 && other.beg[0]=='-') rlen+=2; /* ./ */
     vi_grow2(0, rlen, 0, &dst);
+    if (other.beg[0]=='-') { *dst++='.'; *dst++='/'; }
     for (p=other.beg,pend=p+other.len; p!=pend; p++) {
       if ('\0'==(c=*p)) break;
       if (is_path(c)) *dst++=c;
