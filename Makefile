@@ -5,7 +5,10 @@
 # ccdep.pl at Sat Jun  1 15:51:36 CEST 2002
 #
 
+ifndef MAKE_DIST
 include Makehelp
+endif
+
 BASH=bash
 PERL_BADLANG=x
 export PERL_BADLANG
@@ -31,10 +34,12 @@ CXDFAL=$(CXXFLAGS) $(CXXFLAGSB) $(LDFLAGS) $(LIBS)
 .PHONY: clean dist dist-noautoconf allclean distclean
 .PHONY: most all1 install
 
-most: sam2p
-Makedep: ccdep.pl config.h; perl -x -S ./ccdep.pl --FAL=assert,no,yes,checker $(CXX)
+ifndef MAKE_DIST
+  most: sam2p
+  Makedep: ccdep.pl config.h; perl -x -S ./ccdep.pl --FAL=assert,no,yes,checker $(CXX)
+  include Makedep
+endif
 
-include Makedep
 all1: $(ALL)
 # vvv for Epsilon at Thu Oct 31 09:58:58 CET 2002
 IDE_MODES := release debug
@@ -125,6 +130,7 @@ bts2.ttt: bts.ttt $(L1_LIST)
 clean:
 	rm -f *~ a.out DEADJOE core *.o *.tth .rgd *.rgd tmp.pin tmp.i tmp.ps0 tmp.h tmp.pst
 	rm -f $(ALL) $(ALL:=.yes) $(ALL:=.no) $(ALL:=.assert) $(ALL:=.checker)
+	-rmdir -f autom4te.cache
 allclean: clean
 	rm -f configure config.h Makehelp config.cache config.log \
 	  config.status test.eps test.pdf
@@ -132,6 +138,7 @@ distclean: allclean
 	-autoconf
 dist: distclean dist-noautoconf
 dist-noautoconf:
+	chmod 755 configure
 	$(BASH) -c 'NEED=encoder.cpp; source ./mkdist.sh'
 
 install: sam2p

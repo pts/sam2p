@@ -38,7 +38,7 @@
 /* #undef STACK_DIRECTION */
 
 /* Define if you have the ANSI C header files.  */
-/* #undef STDC_HEADERS */
+#define STDC_HEADERS 1
 
 /* A type name of a signed integral type of exactly 16 bits. Always defined.
  */
@@ -129,6 +129,7 @@
 #define HAVE_sprintf_in_stdio 1
 #define HAVE_write_in_unistd 1
 #define HAVE_system_in_stdlib 1
+#define HAVE_lstat_in_sys_stat 1
 #define HAVE_PTS_STDC 1
 /* #undef HAVE_SWITCH_ENUM_BUG */
 #define HAVE_ASCII_SYSTEM 1
@@ -136,7 +137,7 @@
 
 /* Is the file c_gcc.cpp required for gcc when linking C++ programs? */
 /* #undef HAVE_PTS_C_LGCC_CPP_REQUIRED */
-#define HAVE_PTS_C_LGCC3_CPP_REQUIRED 1
+/* #undef HAVE_PTS_C_LGCC3_CPP_REQUIRED */
 
 /** Does the C library have a working vsnprintf()? */
 /* #undef HAVE_PTS_VSNPRINTF */

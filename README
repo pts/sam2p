@@ -1593,6 +1593,18 @@ A21. This means that sam2p doesn't know how to do the conversion you've
 
      See {FAQ question Q11} for more information.
 
+Q22. How do I compile with G++ 3.2?
+
+A22. See the answer in section {Compilation and installation}. Don't forget
+
+	export CC=gcc-3.2 CXX=g++-3.2
+
+Q23. How do I do a `make dist' without running configure again?
+
+A23. Just issue
+
+	make MAKE_DIST=1 dist
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
