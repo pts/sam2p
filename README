@@ -4,11 +4,12 @@ at Sun Dec 30 19:30:17 CET 2001 -- Fri Mar 22 19:25:03 CET 2002
 Sat Apr 27 00:39:12 CEST 2002
 Wed Jul  3 01:20:40 CEST 2002
 Wed Feb  5 19:46:51 CET 2003
+grammatical corrections by Steve Turner at Mon Jan 10 00:53:46 CET 2005
 
 This is the README file for sam2p, a raster to PostScript/PDF image
 conversion program. This file contains a 5-minute turbo tutorial for new and
 impatient users (search for the phrase `Turbo tutorial' in your text editor).
-As of now, this README file is the only, and definitive documentation of sam2p.
+As of now, this README file is the only, and definitive, documentation of sam2p.
 
 sam2p is a UNIX command line utility written in ANSI C++ that converts many
 raster (bitmap) image formats into Adobe PostScript or PDF files and several
@@ -23,27 +24,30 @@ thanks for writing the sam2p utility which I am using to create EPS figures
 of photographs for my thesis -- it works very well producing image sizes
 that are some 3% of the ones produced by ImageMagick.
 
-The author of sam2p recommends his program over other image image converts
+Many thanks to Steve Turner for reviewing and making corrections to this
+documentation.
+
+The author of sam2p recommends his program over other image converters
 because of the following reasons:
 
 -- sam2p produces much smaller output
 -- sam2p gives the user complete control over the data layout of the output
-   image, including Compression, SampleFormat and TransferEncoding
+   image. This includes Compression, SampleFormat and TransferEncoding.
 -- sam2p is fast
--- sam2p doesn't depend on external libraries. (But it depends on external
+-- sam2p doesn't depend on external libraries. (But it does depend on external
    programs for _reading_ JPEG, TIFF and PNG files.)
 -- sam2p supports the mainstream image formats of today without compromise.
    sam2p has many file format fine-tuning features that are missing from
    most other converter utilities. For example:
    TIFF ZIP compression, TIFF LZW compression, TIFF
    JPEG compression, transparent PNG files, BMP RLE-4 and RLE-8
-   compression etc.
--- sam2p supports all levels (versions) of the PostScript language, and
+   compression, etc.
+-- sam2p supports all levels (versions) of the PostScript language and
    output images have the smallest file size allowed by the LanguageLevel.
 -- PostScript ZIP, RLE and LZW compression is provided for _all_
-   LanguageLevels (!), even for PSL1 appeared in 1980. You can print your
-   ZIP-compressed images onto your ancient printer of the 1980s.
--- sam2p supports all versions of PDF, and
+   LanguageLevels (!), even for PSL1 (which appeared in 1980). You can print
+   your ZIP-compressed images onto your ancient printer of the 1980s.
+-- sam2p supports all versions of PDF, and as with PostScript,
    output images have the smallest file size allowed by the version.
 -- output images of sam2p are always compliant to the standard selected by
    the user
@@ -62,10 +66,10 @@ because of the following reasons:
 Long-term limitations:
 
 -- only DeviceRGB color space, with the Indexed, Gray and RGB image types
--- Indexed images can have 0..256 colors
+-- Indexed images are limited to a maximum of 256 colors
 -- alpha channel and transparency supported only for Indexed images: only
    one color may be transparent
--- the entire input image is read into memory. During operation, both the
+-- the entire input image is read into memory. During operation both the
    input and the output images may be held in memory.
  
 Status
@@ -79,15 +83,15 @@ sam2p is currently beta software. It is available from:
 The documentation is incomplete, but -- together with the examples -- it is
 quite useful. Please have a look at the home page to find articles and more
 documentation (the PDF docs are much more eye-pleasing than this README).
-The source code contains valuable comments, but they may be
-hard to find unless you're deeply developing sam2p.
+The source code contains valuable comments, but they may be hard to find 
+unless you're deeply into developing sam2p.
 
 The author is developing sam2p in his free time. (He is studying and
 working in non-free time.)
 
-The imaging model is complete, and image output routines are stable and
+The imaging model is complete. Image output routines are stable and
 adequate. Reasonable defaults are provided for all command line options.
-sam2p can find the best SampleFormat automatically, and there is
+sam2p can usually find the best SampleFormat automatically. There is
 an educated (but not perfect) default guess for the Compression.
 
 See subsection {OutputRule combinations} about all planned formats.
@@ -177,10 +181,10 @@ without quality loss.
 From the list of ``Available Appliers'' one can derive the supported output
 image file formats. XWD, BMP, PNG, TIFF6, JPEG, PNM, GIF89a and XPM are
 self-explanatory. TIFF6-JAI, JPEG-JAI, PDF-JAI and PSL2-JAI are JPEG
-variants into which JAI files (see above) can be saved. The names of the
-remaining appliers are quite cryptic for the beginner user; most of those
-appliers provide sam2p's excellent support for writing PS, EPS and PDF
-files.
+variants into which JAI files (see above) can be saved. While the names of 
+the remaining appliers may be quite cryptic to the beginner user; most of 
+those appliers provide sam2p's excellent support for writing PS, EPS and 
+PDF files.
 
 sam2p operation modes
 ~~~~~~~~~~~~~~~~~~~~~
@@ -196,12 +200,12 @@ its STDERR can be redirected to a log file quite easily.
 There are three modes sam2p can operate in:
 
 -- one-liner mode: (since sam2p 0.37)
-   the user has to type a long command line, specifying the input and output
-   file name, output file format, compression options etc. Most of the
-   functionality of sam2p is available in a quite intuitive way in one-liner
-   mode. Users of the `convert' utility from ImageMagick and `tiff2ps' and
-   `tiffcp' will find that one-liner mode of sam2p is very similar to all
-   these. This mode is recommended for impatient users.
+   the user, perhaps, has to type a long command line, specifying the input 
+   and the output file name, output file format, compression options, etc. 
+   Most of the functionality of sam2p is available in a quite intuitive way 
+   in one-liner mode. Users of the `convert' utility from ImageMagick and 
+   `tiff2ps' and `tiffcp' will find that one-liner mode of sam2p is very 
+   similar to them. This mode is recommended for impatient users.
 
    Due to the nature of sam2p development, some new functionality of job mode
    might be missing from one-liner mode. Please report this as a bug.
@@ -209,171 +213,189 @@ There are three modes sam2p can operate in:
 -- job mode: the user has to write a ``job'' file (recommended extension:
    .job), which specifies all conversion parameters, including the input and
    output file name. The name of the job file must be passed to sam2p. This
-   mode is recommended for expert users, who want to retain full control of
+   mode is recommended for expert users who want to retain full control of
    all aspects of the final output. All functionality is available in job
-   mode.
+   mode. This is especially useful in repetative but time separated jobs.
 
 -- GUI mode: This is completely experimental, and will be very probably
    dropped in the near future. Try executing sam2p.tk (TCL/Tk is required).
-   Please don't use GUI mode, use one-liner mode instead!
+   Please don't use GUI mode, use one-liner mode instead! The flexability
+   of a one-liner (or job) mode is nearly imposible to encompas in a GUI.
    No more documentation is provided for GUI mode.
    
-   There will be a Micro$oft Windoze version of sam2p available in the near
+   There might be a Micro$oft Windoze version of sam2p available in the near
    future, but very probably you won't get real GUI with radio boxes, lists
    and file selection dialogs. You'll have to start sam2p from the DOS
    prompt...
 
 One-liner mode
 ~~~~~~~~~~~~~~
-This section contains a reference-style summary of one-liner mode.
+This section contains a reference-style summary for the one-liner mode.
 The author knows that this section is quite incomprehensible, and a bit old.
 He is planning to completely rewrite it to be readable for the novice user. 
 
 The order of the arguments and options is significant.
 
-Input file extension is discarded, the file format is recognised by its
+Input file extension is discarded. The file format is recognised by its
 magic number.
 
 Output file extension gives a hint for /FileFormat:
 
-.ps .eps .epsi .epsf: EPS: PSL3|PSL2 PSLC PSL1
-.pdf: PDF: PDFB1.2|PDFB1.0 PDF1.0 PDF1.2
-.gif; GIF89a
-.pnm; PNM (for use with transparency)
-.pbm: PNM /SampleFormat/Gray1
-.pgm: PNM /SampleFormat/Gray8
-.ppm: PNM /SampleForamt/Rgb8
-.pam: PAM
-.pip: PIP
-.empty: Empty
-.meta: Meta
-.jpeg .jpg: JPEG
-.tiff .tif: TIFF
-.png: PNG
-.xpm: XPM
-.bmp: BMP /Compression/RLE
-.rle: BMP /Compression/RLE
+.ps    :\
+ .eps  :  \                        where PS: implies scale to fit page
+ .epsi :   >  PSL1 PSLC PSL2 PSL3                     and 
+ .epsf :  /                             EPS: implies no scale changes
+ [E]PS::/                               also see Q9 in FAQs below 
+.pdf   : \  PDF1.0 PDF1.2 (and)
+  PDF: : /    PDFB1.0 PDFB1.2
+.gif   : GIF89a
+.pnm   : PNM (for use with transparency)
+.pbm   : PNM /SampleFormat/Gray1
+.pgm   : PNM /SampleFormat/Gray8
+.ppm   : PNM /SampleForamt/Rgb8
+.pam   : PAM
+.pip   : PIP
+.empty : Empty
+.meta  : Meta
+.jpeg  : JPEG
+ .jpg  :  "
+.tiff  : TIFF
+ .tif  :  "
+.png   : PNG
+.xpm   : XPM
+.bmp   : BMP /Compression/RLE
+.rle   : BMP /Compression/RLE
 
 Options (case insensitive):
 
--- -j -j:job : display in-memory .job file
--- -j:warn : be verbose and display warnings about impossible combinations in
-   the .job file
+-- -j -j:job   : display in-memory .job file
+-- -j:warn     : be verbose and display warnings about impossible combinations in
+                 the .job file
 -- -s:Indexed1:Indexed4:Indexed8: Try /SampleFormats in this order, and try
-   all others after these. Can be
-   specified separately (e.g `-s Indexed1 -s Indexed2:Indexed8')
+                 all others after these. Can be specified separately 
+                 (e.g `-s Indexed1 -s Indexed2:Indexed8')
 -- -s:Indexed1:Indexed4:Indexed8:stop: Try only these /SampleFormats in
-   this order. Can be
-   specified separately (e.g `-s Indexed1:Indexed2 -s Indexed8:stop')
+                 this order. Can be specified separately 
+                 (e.g `-s Indexed1:Indexed2 -s Indexed8:stop')
 -- -s:Indexed1:Indexed4:Indexed8:stopq: Try only these /SampleFormats in
-   this order, be quiet (no warnings on failures). Can be
-   specified separately (e.g `-s Indexed1:Indexed2 -s Indexed8:stop')
--- -s:tr equivalent to `-s Transparent:Opaque:Mask:Transparent2:Transparent4:Transparent8'
--- -l:...: /LoadHints(...)
+                 this order, be quiet (no warnings on failures). Can be
+                 specified separately (e.g `-s Indexed1:Indexed2 -s Indexed8:stop')
+-- -s:tr         equivalent to `-s Transparent:Opaque:Mask:Transparent2:Transparent4:Transparent8'
+-- -l:...      : /LoadHints(...)
 -- disabled: -a: /LoadHints(asis) extra /Compression/JAI; load JPEG files (and others as-is)
 
--- -1  -ps:1 PSL1:: [tiff2ps] hint /FileFormat/PSL1 among /PSL*
--- -1c -ps:1c -ps:c PSLC:: [pts] hint /FileFormat/PSLC among /PSL*
--- -2  -ps:2 PSL2: EPS2::: [tiff2ps,imagemagick] default hint /FileFormat/PSL2 among /PSL*
--- -3  -ps:3 PSL3:: [pts] hint /FileFormat/PSL3 among /PSL*
--- -pdf:b0 PDFB1.0:: [pts] hint /FileFormat/PDFB1.0 among /PDF*
--- -pdf:b2 PDFB1.2:: [pts] default hint /FileFormat/PDFB1.2 among /PDF*
--- -pdf:x PDB1.2:: [pts] default hint /FileFormat/PDF1.2 among /PDF*
--- -pdf:0 PDF1.0:: [pts] hint /FileFormat/PDF1.0 among /PDF*
--- -pdf:2 PDF1.2:: [pts] hint /FileFormat/PDF1.2 among /PDF*
--- EPS: EPSF:: [pts] hint /FileFormat/PSL2 or /FileFormat/PSL3 (for /Compression/ZIP)
--- PDF:: [pts] hint /FileFormat/PDFB1.0 or /FileFormat/PDFB1.2 (for /Compression/ZIP)
--- PS:: [pts] hint /Scale/RotateOK /FileFormat/PSL2 or /FileFormat/PSL3 (for /Compression/ZIP)
--- PS2:: [imagemagick] hint /Scale/RotateOK /FileFormat/PSL2. Deprecated,
-   please use PS:.
+-- -1  -ps:1 PSL1:         : [tiff2ps] hint /FileFormat/PSL1 among /PSL*
+-- -1c -ps:1c -ps:c PSLC:  : [pts] hint /FileFormat/PSLC among /PSL*
+-- -2  -ps:2 PSL2: EPS2:   : [tiff2ps,imagemagick] default hint /FileFormat/PSL2 among /PSL*
+-- -3  -ps:3 PSL3:         : [pts] hint /FileFormat/PSL3 among /PSL*
+-- -pdf:b0 PDFB1.0:        : [pts] hint /FileFormat/PDFB1.0 among /PDF*
+-- -pdf:b2 PDFB1.2:        : [pts] default hint /FileFormat/PDFB1.2 among /PDF*
+-- -pdf:0 PDF1.0:          : [pts] hint /FileFormat/PDF1.0 among /PDF*
+-- -pdf:2 PDF1.2:          : [pts] hint /FileFormat/PDF1.2 among /PDF*
+--  EPS: EPSF:             : [pts] hint /FileFormat/PSL2 or 
+                                        /FileFormat/PSL3 (for /Compression/ZIP)
+--  PDF:                   : [pts] hint /FileFormat/PDFB1.0 or 
+                                        /FileFormat/PDFB1.2 (for /Compression/ZIP)
+--  PS:                    : [pts] hint /Scale/RotateOK /FileFormat/PSL2 or 
+                                        /FileFormat/PSL3 (for /Compression/ZIP)
+--  PS2:                   : [imagemagick] hint /Scale/RotateOK 
+                                                /FileFormat/PSL2. Deprecated, please use PS:.
 
--- -e:0 -e:none: /Scale/None
--- -e -e:1 -e:scale: /Scale/OK
--- -e:rot -e:rotate: /Scale/RotateOK
+-- -e:0 -e:none            : /Scale/None
+-- -e -e:1 -e:scale        : /Scale/OK
+-- -e:rot -e:rotate        : /Scale/RotateOK
 
--- GIF: GIF89a:: [imagemagick,pts] /FileFormat/GIF89a
--- JPEG: JPG:: [imagemagick,pts] /FileFormat/JPEG
--- TIFF: TIF:: [imagemagick,pts] /FileFormat/TIFF
--- PNG:: [imagemagick] /FileFormat/PNG
--- XPM:: [imagemagick] /FileFormat/XPM
--- BMP:: [imagemagick] /FileFormat/BMP
--- Empty:: [pts] /FileFormat/Empty
--- Meta:: [pts] /FileFormat/Meta
--- PIP:: [pts] /FileFormat/PIP
--- PAM:: [pts] /FileFormat/PAM
--- PNM:: [imagemagick] /FileFormat/PNM (for use with transparency)
--- PBM:: [imagemagick] /FileFormat/PNM /SampleFormat/Gray1
--- PGM:: [imagemagick] /FileFormat/PNM /SampleFormat/Gray8
--- PPM:: [imagemagick] /FileFormat/PNM /SampleFormat/Rgb8
+-- GIF: GIF89a: : [imagemagick,pts] /FileFormat/GIF89a
+-- JPEG: JPG:   : [imagemagick,pts] /FileFormat/JPEG
+-- TIFF: TIF:   : [imagemagick,pts] /FileFormat/TIFF
+-- PNG:         : [imagemagick] /FileFormat/PNG
+-- XPM:         : [imagemagick] /FileFormat/XPM
+-- BMP:         : [imagemagick] /FileFormat/BMP
+-- Empty:       : [pts] /FileFormat/Empty
+-- Meta:        : [pts] /FileFormat/Meta
+-- PIP:         : [pts] /FileFormat/PIP
+-- PAM:         : [pts] /FileFormat/PAM
+-- PNM:         : [imagemagick] /FileFormat/PNM (for use with transparency)
+-- PBM:         : [imagemagick] /FileFormat/PNM /SampleFormat/Gray1
+-- PGM:         : [imagemagick] /FileFormat/PNM /SampleFormat/Gray8
+-- PPM:         : [imagemagick] /FileFormat/PNM /SampleFormat/Rgb8
 
--- -t:bin: [pts] hint /TransferEncoding/Binary (default unless /PS*)
--- -t:hex: [pts] hint /TransferEncoding/Hex (default for /PSL1 /PSLC)
--- -t:a85: [pts] hint /TransferEncoding/A85 (default for /PSL2 /PSL3)
--- -t:ascii: [pts] hint /TransferEncoding/ASCII
--- -t:lsb1 -f:lsb2msb: [pts,tiffcp] hint /TransferEncoding/LSBfirst
--- -t:msb1 -f:msb2lsb: [pts,tiffcp] hint /TransferEncoding/MSBfirst
+-- -t:bin             : [pts] hint /TransferEncoding/Binary (default unless /PS*)
+-- -t:hex             : [pts] hint /TransferEncoding/Hex (default for /PSL1 /PSLC)
+-- -t:a85             : [pts] hint /TransferEncoding/A85 (default for /PSL2 /PSL3)
+-- -t:ascii           : [pts] hint /TransferEncoding/ASCII
+-- -t:lsb1 -f:lsb2msb : [pts,tiffcp] hint /TransferEncoding/LSBfirst
+-- -t:msb1 -f:msb2lsb : [pts,tiffcp] hint /TransferEncoding/MSBfirst
 
--- -c:none: [pts,tiffcp] non-default hint /Compression/None
--- -c:lzw: [pts,tiffcp] hint /Compression/LZW
--- -c:lzw:(1..99): [pts] hint /Compression/LZW /Predictor ...
--- -c:zip: [pts,tiffcp] hint /Compression/ZIP
--- -c:zip:(1..99): [pts] hint /Compression/ZIP /Predictor ...
--- -c:zip:(1..99):(-1..9): [pts] hint /Compression/ZIP /Predictor ... /Effort ...
--- -c:(rle|packbits): [pts,tiffcp] hint /Compression/RLE
--- -c:(rle|packbits):(0..): [pts] hint /Compression/RLE /RecordSize ...
--- -c:fax: [pts] hint /Compression/Fax
--- -c:fax:(-1..): [pts] hint /Compression/Fax /K ...
--- -c:dct: [pts] hint /Compression/DCT /DCT<<>>
--- -c:dct:...: [pts] hint /Compression/DCT /DCT<<...>>
--- -c:jpeg: [pts,tiffcp] hint /Compression/JAI, /Compression/IJG
--- -c:jpeg:(0..100): [pts] hint /Compression/JAI, /Compression/IJG /Quality ...
--- -c:ijg: [pts,tiffcp] hint /Compression/IJG
--- -c:ijg:(0..100): [pts] hint /Compression/IJG /Quality ...
--- -c:g4: [pts] equivalent to -c:fax:-1
--- -c:g3 -c:g3:1d: [pts] equivalent to -c:fax:0, -c:fax
--- -c:g3:2d: [pts] equivalent to -c:fax:-2
--- -c:jai: [pts] hint /Compression/JAI
+-- -c:none                 : [pts,tiffcp] non-default hint /Compression/None
+-- -c:lzw                  : [pts,tiffcp] hint /Compression/LZW
+-- -c:lzw:(1..99)          : [pts] hint /Compression/LZW /Predictor ...
+-- -c:zip                  : [pts,tiffcp] hint /Compression/ZIP
+-- -c:zip:(1..99)          : [pts] hint /Compression/ZIP /Predictor ...
+-- -c:zip:(1..99):(-1..9)  : [pts] hint /Compression/ZIP /Predictor ... /Effort ...
+-- -c:(rle|packbits)       : [pts,tiffcp] hint /Compression/RLE
+-- -c:(rle|packbits):(0..) : [pts] hint /Compression/RLE /RecordSize ...
+-- -c:fax                  : [pts] hint /Compression/Fax
+-- -c:fax:(-1..)           : [pts] hint /Compression/Fax /K ...
+-- -c:dct                  : [pts] hint /Compression/DCT /DCT<<>>
+-- -c:dct:...              : [pts] hint /Compression/DCT /DCT<<...>>
+-- -c:jpeg                 : [pts,tiffcp] hint /Compression/JAI, /Compression/IJG
+-- -c:jpeg:(0..100)        : [pts] hint /Compression/JAI, /Compression/IJG /Quality ...
+-- -c:ijgi                 : [pts,tiffcp] hint /Compression/IJG
+-- -c:ijg:(0..100)         : [pts] hint /Compression/IJG /Quality ...
+-- -c:g4                   : [pts] equivalent to -c:fax:-1
+-- -c:g3 -c:g3:1d          : [pts] equivalent to -c:fax:0, -c:fax
+-- -c:g3:2d                : [pts] equivalent to -c:fax:-2
+-- -c:jai                  : [pts] hint /Compression/JAI
 
--- -m:(dimen) -m:all:(dimen) -m:a:(dimen): set all margins (/TopMargin,
-   /BottomMargin, /LeftMargin, /RightMargin) to `dimen'
--- -m:horiz:(dimen) -m:h:(dimen) -m:x:(dimen): set /LeftMargin and
-   /Rightmargin to `dimen'
--- -m:vert:(dimen) -m:v:(dimen) -m:y:(dimen): set /TopMargin and
-   /BottomMargin to `dimen'
--- -m:left:(dimen) -m:l:(dimen): set /LeftMargin to `dimen'
--- -m:right:(dimen) -m:r:(dimen): set /LeftMargin to `dimen'
--- -m:top:(dimen) -m:t:(dimen) -m:up:(dimen) -m:u:(dimen): set /TopMargin to
-   `dimen'
--- -m:bottom:(dimen) -m:b:(dimen) -m:down:(dimen) -m:d:(dimen): set
-   /BottomMargin to `dimen'
+-- -m:(dimen) \        : set all margins (/TopMargin,/BottomMargin, /LeftMargin, /RightMargin) to `dimen'
+   -m:all:(dimen) \    :                  /LeftMargin, /RightMargin) to `dimen'
+   -m:a:(dimen)        :
+-- -m:horiz:(dimen) \  : set /LeftMargin and /RightMargin to `dimen'
+   -m:h:(dimen) \      :
+   -m:x:(dimen)        : 
+-- -m:vert:(dimen) \   : set /TopMargin and /BottomMargin to `dimen'
+   -m:v:(dimen) \      :
+   -m:y:(dimen)        :
+-- -m:left:(dimen) \   : set /LeftMargin to `dimen'
+   -m:l:(dimen)        :
+-- -m:right:(dimen) \  : set /RightMargin to `dimen'
+   -m:r:(dimen)        :
+-- -m:top:(dimen) \    : set /TopMargin to `dimen'
+   -m:t:(dimen) \      :
+   -m:up:(dimen) \     :
+   -m:u:(dimen)        :
+-- -m:bottom:(dimen) \ : set /BottomMargin to `dimen'
+    -m:b:(dimen) \     :
+    -m:down:(dimen) \  :
+    -m:d:(dimen)       :
 
+-- --                  : if given as last arg, then   OutputFile:=InputFile
+-- --                  : if given earlier than last arg, then    treat other args as filenames
 -- -transparent:(rgb) Change the all pixels having the specified RGB color
    to transparent. Previously transparent pixels are not changed. See FAQ
    answer A44 for an exampe.
 
--- -- as last arg: OutputFile:=InputFile
--- -- earlier: treat other args as filenames
-
 Default and fallback compression types for each file format:
 
--- PSL1 PSLC: /RLE
--- PSL2 PDFB1.0 PDF1.0: /JAI /RLE
--- PSL3 PDFB1.2 PDF1.2: /JAI /ZIP
--- GIF89a: /LZW
--- XPM PNM PAM PIP Empty Meta: )/None)
--- JPEG: /JAI /IJG
--- TIFF: /JAI /LZW? /RLE
--- PNG: /ZIP
--- BMP: /RLE
+-- PSL1 PSLC                  : /RLE
+-- PSL2 PDFB1.0 PDF1.0        : /JAI /RLE
+-- PSL3 PDFB1.2 PDF1.2        : /JAI /ZIP
+-- GIF89a                     : /LZW
+-- XPM PNM PAM PIP Empty Meta : )/None)
+-- JPEG                       : /JAI /IJG
+-- TIFF                       : /JAI /LZW? /RLE
+-- PNG                        : /ZIP
+-- BMP                        : /RLE
 
 Overview of job mode
 ~~~~~~~~~~~~~~~~~~~~
-In ``job mode'', sam2p doesn't accept any command line options: it must be
-controlled from ``job'' files. sam2p expects a single command line
-argument: the name of the Job file (file format described in section
+In the ``job mode'' sam2p doesn't accept any command line options. It must be
+controlled from the ``job'' files. In ''job mode'' sam2p expects a single command 
+line argument: the name of the Job file (file format described in section
 {Jobs}). sam2p runs that single job, prints debug, info, notice, warning and
 error messages (etc.), and creates a single output file: a PS or a PDF. For
-multiple jobs and multiple output files, one has to run sam2p multiple
+multiple jobs and/or multiple output files, one has to run sam2p multiple
 times.
 
 The details about the output file format (including standards-compliance,
@@ -407,7 +429,7 @@ External software required for running sam2p:
 -- optionally: the Ghostscript `gs' utility for /Compression/DCT
 -- optionally: the Ghostscript `gs' utility for /Compression/Fax
 
-These do not work yet:
+These do not work yet (in version 0.44):
 
 -- optionally: the `lzw_codec' utility for alternative /Compression/LZW
 -- optionally: the GNU `gzip' utility for alternative /Compression/ZIP
@@ -438,6 +460,11 @@ Compilation:
 	# the stand-alone utility `./sam2p' is now built
 	make install  # optional, may not work
 
+If installation doesn't work, please copy the file `sam2p' to somewhere in
+your $PATH, for example /usr/local/bin. Please also copy the README to a
+directory like /usr/share/doc/sam2p. There is no man page -- the
+documentation is the readme.
+
 Testing:
 
 	./sam2p
@@ -453,13 +480,13 @@ following packages for compilation:
 	apt-get install libc6-dev gcc-3.0 g++-3.0
 	apt-get install libc6-dev gcc-3.1 g++-3.1
 	apt-get install libc6-dev gcc-3.2 g++-3.2
+	apt-get install libc6-dev gcc-3.3 g++-3.3
+	apt-get install libc6-dev gcc-3.4 g++-3.4
 
 Please also run any of the following before ./configure:
 
 	export CC=gcc-2.95 CXX=g++-2.95
-	export CC=gcc-3.0 CXX=g++-3.0
-	export CC=gcc-3.1 CXX=g++-3.1
-	export CC=gcc-3.2 CXX=g++-3.2
+	export CC=gcc-3.0 CXX=g++-3.0 # or g++-3.1 etc.
 
 Optionally, you may install any of
 
@@ -480,10 +507,12 @@ sam2p is quite portable on UNIX systems. It runs on:
 	Debian GNU/Linux Potato 2.2.18 glibc-2.1.3
 	Debian GNU/Linux Sid    2.4.17 glibc-2.2.5
 	Digital OSF1 V4.0 1229 alpha
+        Slackware 8.0/8.1       2.4.5  libc-2.2.3  gcc-2.95.3
 	SunOS 5.7 Generic_106541-17 sun4u sparc SUNW,Ultra-2 gcc-2.95.2 
 	SunOS 5.8 Generic_108528-12 sun4u sparc gcc-3.0.4
 
-Also it runs on Win32 in command line and GUI mode.
+Also it runs on Win32 in command line (sam2p.exe) and GUI mode (vcsam2p.exe).
+Command line mode is stable and it is recommended on this platform.
 
 It should work on any Linux or BSD system without modification. Porting to
 other Unices should be quite easy. The author welcomes portability patches.
@@ -491,8 +520,8 @@ other Unices should be quite easy. The author welcomes portability patches.
 Porting to non-UNIX systems may be hard. Reasons:
 
 -- Those systems might not have GNU Make, Perl or a Bourne-compatible shell
-   installed. So the Makefile supplied won't work, and many human work would
-   be necessary.
+   installed. So the Makefile supplied won't work, and many man hours of extra
+   work would be necessary.
 -- sam2p uses the popen(3) library call to communicate with external
    processes. This call might not be available on non-UNIX systems.
 -- sam2p expects that the $PATH contains the external binaries. Some systems
@@ -521,6 +550,7 @@ sam2p 0.38 has been compiled and run successfully on:
 -- SunOS 5.8 Generic_108528-15 sun4u sparc, gcc version 3.1.1
    (some: warning: cast from `char*' to `int*' increases required alignment of target type)
    Compilation took 1:26, executable size: 437kB.
+-- Slackware 8.0/8.1, kernel 2.4.5, libc.6.so (libc-2.2.3)  gcc-2.95.3
 
 sam2p 0.42 has been compiled and run successfully on:
 
@@ -534,7 +564,7 @@ have to install these build dependencies first:
 
 -- MinGW and MSYS, available from http://www.mingw.org
 
--- Perl 5.004 or newer (only perl.exe and perl5*.dll is required), available
+-- Perl 5.004 or newer (only perl.exe and perl5*.dll are required), available
    from http://www.perl.com. Note that this will be a long download and a
    bloated install, but after that, just copy perl.exe and the single
    perl5*.dll to your C:\WINDOWS directory, and uninstall the rest.
@@ -577,10 +607,10 @@ To build sam2p:
 	cp sam2p.exe 'C:\Program Files'
 
 10. You should invoke sam2p.exe from the command line (COMMAND.COM or
-    CMD.EXE) with the _appropriate_
-    arguments, described elsewhere in this document. Don't put it into the
-    Start menu, it won't work (a window will flash in, showing an error
-    message that you haven't supplied the right arguments).
+    CMD.EXE) with the _appropriate_ arguments, described elsewhere in 
+    this document. Don't put it into the Start menu, it won't work.
+    (a window will flash in and disappear, showing an error message that you
+    haven't supplied the right arguments).
 
 11. The file bts2.tth is also created. It is an important file, because it
     is required for the GUI compilation.
@@ -594,7 +624,8 @@ Win32 compilation instructions for GUI mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 vcsam2p.exe is a preliminary, alpha-stage attempt to provide a Win32 GUI for
 sam2p.exe. Currently it can load and display images, but not cannot save
-them. vcsam2p.exe is not ready for production use.
+them. vcsam2p.exe is not ready for production use.  Feel free to enhance the
+code. Just remember to semd me copies.
 
 You'll need Visual Studio 6.0 installed.
 
@@ -663,20 +694,19 @@ Supported input formats
 -- baseline JPEG JFIF (limited by /Compression/JAI)
 -- PCX
 -- JPEG, is supported with libjpeg/djpeg
--- TIFF, is supported with the author's tif22pnm; with transparency
--- PNG, is supported with libpng/pngtopnm (Debian package
-   graphics/pnmtopng); with transparency
+-- TIFF, is supported with the author's tif22pnm, with transparency; also
+   works in a limited way with tifftopnm (Debian package libtiff-tools)
+-- PNG, is supported with the author's png22pnm, with transparency
+   (part of the tif22pnm sources); also works in a limited way with
+    libpng/pngtopnm (Debian package graphics/pnmtopng); with transparency
+-- PS, EPS, PDF: Ghostscript is needed (`gs' or `gswin32c.exe'), see also FAQ
+   question Q39.
 
 Note that only the major features of these file formats are supported. sam2p
 is able to load most of these files, but not all of them.
 
 Important, but unsupported input formats:
 
--- PS/EPS/PDF, may be supported with gs in the future (Note: EPS and PDF
-   _output_ is already supported.)
--- TIFF, may be supported with libtiff/tiff2ps(!)/tifftopnm in the future
--- PNG, may be supported without libpng/pngtopnm (Debian package
-   graphics/pnmtopng) in the future
 -- XBM
 -- XWD
 -- Utah RLE
@@ -685,11 +715,11 @@ Input image model
 ~~~~~~~~~~~~~~~~~
 A (sampled, raster, bitmap) image is a rectangular array of pixels (dots)
 plus some metadata. Each pixel is represented by an unsigned integer which
-is BPC (BitsPerComponent) this CPP (ComponentsPerPixel) wide. The image
-coordinate system (X,Y): upper left corner is (0,0), upper right corner is
-(Width-1,0), lower right corner is (Width-1,Height-1). (Note that this is
-the natural, traditional top->down, left->right system, and it is different
-from PostScript and PDF!).
+is BPC (BitsPerComponent) and CPP (ComponentsPerPixel) wide. The image
+coordinate system (X,Y) is defined as: upper left corner is (0,0), upper 
+right corner is (Width-1,0), lower right corner is (Width-1,Height-1). 
+(Note that this is the natural, traditional top->down, left->right system,
+and it is different from PostScript and PDF!).
 
 Some pixels of the image may be without color: they're transparent. A
 transparent pixel is not painted, so whatever was left under it on the
@@ -987,15 +1017,14 @@ Output rule entries:
 
 -- FileFormat: enum (see section {Standards} for detailed information), no
    default
-   /PSL1 -- PostScript Level1
-   /PSLC -- PostScript Level1 with the CMYK and `colorimage' extension
-   /PSL2 -- PostScript Level2 (default)
-   /PSL3 -- PostScript Level3
-   /PDFB1.0 -- PDF version 1.0, BI inline image, see 4.8.6 in PDFRef.pdf
-   /PDFB1.2 -- PDF version 1.2, BI inline image, see 4.8.6 in PDFRef.pdf
-   /PDF1.0 -- PDF version 1.0, XObject image, see 4.8.4 in PDFRef.pdf (takes
-     more space on disk than BI inline image)
-   /PDF1.2 -- PDF version 1.2, XObject image, see 4.8.4 in PDFRef.pdf
+   /PSL1      -- PostScript Level1
+   /PSLC      -- PostScript Level1 with the CMYK and `colorimage' extension
+   /PSL2      -- PostScript Level2 (default)
+   /PSL3      -- PostScript Level3
+   /PDFB1.0   -- PDF version 1.0, BI inline image, see 4.8.6 in PDFRef.pdf
+   /PDFB1.2   -- PDF version 1.2, BI inline image, see 4.8.6 in PDFRef.pdf
+   /PDF1.0    -- PDF version 1.0, XObject image, see 4.8.4 in PDFRef.pdf
+   /PDF1.2    -- PDF version 1.2, XObject image, see 4.8.4 in PDFRef.pdf
    /GIF89a
    /Empty
    /Meta
@@ -1026,8 +1055,8 @@ Output rule entries:
    /Indexed8
    /Rgb4
    /Rgb8
-   /Asis -- accept contents of the JAI file
-   /Bbox -- no image, only bounding box information
+   /Asis       -- accept contents of the JAI file
+   /Bbox       -- no image, only bounding box information
 -- WarningOK: boolean; this Output Rule is enabled iff WarningOK is true or
    SampleFormat causes no warnings, default: true
 -- TransferEncoding: enum, no default
@@ -1086,56 +1115,51 @@ Output rule entries:
 The Hints member of the Output Rule contains a dict with the following
 elements:
 
--- TopMargin: dimen; desired vertical gap between the top line of the page
-   and the top line of the raster. Default: 0. Ignored unless for PS and PDF
-   output. See docs about `dimen' elsewhere in this document.
--- BottomMargin: dimen; desired vertical gap between the bottom line of the
-   raster and the bottom line of the page. Default: 0. Ignored unless for PS
-   and PDF output. See docs about `dimen' elsewhere in this document.
--- LeftMargin: dimen; desired horizontal gap between the left line of the page
-   and the left line of the raster. Default: 0. Ignored unless for PS and PDF
-   output. See docs about `dimen' elsewhere in this document.
--- RightMargin: dimen; desired horizontal gap between the right line of the
-   raster and the right line of the page. Default: 0. Ignored unless for PS
-   and PDF output. See docs about `dimen' elsewhere in this document.
--- Scale: enum
-   /None -- don't scale (zoom, magnify) the image (default)
-   /OK -- scale PS image to fit page (x factor == y factor)
-   /RotateOK -- scale and/or rotate PS image to fit page (x factor == y factor)
--- EncoderBPL: int >=1 (bits per scanline, <= rlen)
--- EncoderCoumns: int >=1 (pixels per scanline)
--- EncoderRows: int >=1
--- EncoderColors: int >=1
--- PredictorColumns: uint; also used if compression is /Fax (reasonable
-   default)
--- PredictorColors: 1..3; number of color _components_ (reasonable default)
--- PredictorBPC: 1, 2, 4, 8 (reasonable default),
-   /BitsPerComponent entry in PS and PDF
--- Effort: -1..9, must be -1 unless Compression is /ZIP (-1 means
-   5, default)
--- RecordSize: uint, default: 0. Compression must be /RLE
--- K: int, default: 0 (-2..infty). Compression must be /Fax. -1 means G4
-   1d encoding, 0 meangs G3 1D encoding, -2 means G3 2D encoding with
-   arbitrary height, positive value means G3 2D encoding with that height.
--- Quality: 0..100, used by IJG libjpeg when compression is
-   /IJG. default: 75
--- ColorTransform: 0..2. For IJG, this _must_ be 0 for Gray and 1 for RGB,
-   so its value is ignored. For DCT, its value is respected: use 0 or 1
-   only.
-   See DCTEncode in subsubsection 3.13.3 in PLRM.pdf, and for a better
-   documentation: see the sources and docs of libjpeg.
--- TransferCPL: number of data characters per line. Must be positive
-   when TransferEncoding is /Hex or /A85, and must be zero otherwise.
-   Default: 78
--- DCT: dict, default: <<>>. Additional parameters for the /DCTEncode filter
--- Comment: string, default: empty
--- Title: string, default: empty
--- Subject: string, default: empty
--- Author: string, default: empty
--- Creator: string, default: empty
--- Producer: string, default: empty
--- Created: string, default: now
--- Produced: string: default: now
+-- TopMargin           : dimen; desired vertical gap between the top line of the page
+                           and the top line of the raster. Default: 0. Ignored unless for PS
+                           and PDF output. See docs about `dimen' elsewhere in this document.
+-- BottomMargin        : dimen; desired vertical gap between the bottom line of the
+                           raster and the bottom line of the page. Default: 0. Ignored unless 
+                           for PS and PDF output. See docs about `dimen' elsewhere in this document.
+-- LeftMargin          : dimen; desired horizontal gap between the left line of the page and 
+                           the left line of the raster. Default: 0. Ignored unless for PS and PDF 
+                           output. See docs about `dimen' elsewhere in this document.
+-- RightMargin         : dimen; desired horizontal gap between the right line of the raster and 
+                           the right line of the page. Default: 0. Ignored unless for PS and PDF 
+                           output. See docs about `dimen' elsewhere in this document.
+-- Scale               : enum /None -- don't scale (zoom, magnify) the image (default) 
+                              /OK -- scale PS image to fit page (x factor == y factor) 
+                              /RotateOK -- scale and/or rotate PS image to fit page (x factor == y factor)
+-- EncoderBPL          : int >=1 (bits per scanline, <= rlen)
+-- EncoderCoumns       : int >=1 (pixels per scanline)
+-- EncoderRows         : int >=1
+-- EncoderColors       : int >=1
+-- PredictorColumns    : uint; also used if compression is /Fax (reasonable default)
+-- PredictorColors     : 1..3; number of color _components_ (reasonable default)
+-- PredictorBPC        : 1, 2, 4, 8 (reasonable default), /BitsPerComponent entry in PS and PDF
+-- Effort              : -1..9, must be -1 unless Compression is /ZIP (-1 means 5, default)
+-- RecordSize          : uint, default: 0. Compression must be /RLE
+-- K                   : int, default:  0 (-2..infty). Compression must be /Fax. 
+                                       -1 means G4 1d encoding,
+                                        0 meangs G3 1D encoding, 
+                                       -2 means G3 2D encoding with  arbitrary height, positive value 
+                                       means G3 2D encoding with that height.
+-- Quality             : 0..100, used by IJG libjpeg when compression is /IJG. default: 75
+-- ColorTransform      : 0..2. For IJG, this _must_ be 0 for Gray and 1 for RGB, so its value 
+                           is ignored. For DCT, its value is respected: use 0 or 1 only.  See DCTEncode 
+                           in subsubsection 3.13.3 in PLRM.pdf, and for a better documentation: see the 
+                           sources and docs of libjpeg.
+-- TransferCPL         : number of data characters per line. Must be positive when TransferEncoding is 
+                           /Hex or /A85, and must be zero otherwise.  Default: 78
+-- DCT                 : dict, default: <<>>. Additional parameters for the /DCTEncode filter
+-- Comment             : string, default: empty
+-- Title               : string, default: empty
+-- Subject             : string, default: empty
+-- Author              : string, default: empty
+-- Creator             : string, default: empty
+-- Producer            : string, default: empty
+-- Created             : string, default: now
+-- Produced            : string: default: now
 
 Metric units
 """"""""""""
@@ -1151,6 +1175,12 @@ in any of the following real-word distance metric units:
 --  1 sp = 72/72.27/65536 bp (scaled point)
 --  1 cm = 72/2.54 bp (centimeter)
 --  1 mm = 7.2/2.54 bp (millimeter)
+
+Note: If it helps: American typesetters use 72 points per US inch,
+thus  10 pt text will yield 72 chars per normal line of US Letter
+      (like an IBM Selectric)
+      12 pt text will yield 65 chars per normal line of US Letter
+     (US normal typewritter).
 
 Each image pixel is assumed to be 1 bp wide and 1 bp tall. A dimen is an
 integer or real number, followed by optional whitespace and an optional unit
@@ -1197,6 +1227,8 @@ files). The TTM file must contain a single MiniPS array.
 The elements of the array are called chunks. Each chunk causes some bytes
 to be appended to the output file. Data is appended in the order the
 chunks are listed in the TTM file, but the data calculation order may be
+different. This way it is possible to write (calc) the length of a chunk 
+not written (filled in) yet. The very first chunk has number zero.
 different. This way it is possible to write the length of a chunk not
 written yet. The very first chunk has number zero.
 
@@ -1394,7 +1426,7 @@ A5. No, it isn't invalid, but most of the programs (including those found in
 
     -- tifftopnm from libtiff-tools 3.4beta037-5.1: `unknown photometric:
        6'. Ditto. (Unfortunately tifftopnm doesn't call TIFFRGBAImageGet(),
-       but it tries to re-implement an obsolete version of the function.)
+       it just tries to re-implement an obsolete version of the function.)
 
     -- `tiffcp -c jpeg' from libtiff-tools 3.4beta037-5.1 creates a
        perfectly legal TIFF/JPEG file.
@@ -1525,10 +1557,10 @@ A9. To print an image as a full PostScript page, call:
        << /FileFormat/PSL2 /SampleFormat/Rgb8 /TransferEncoding/A85
           /Compression/None /Predictor 1
           /Hints << /Scale/OK % or /Scale/RotateOK
-                    /LeftMargin 12 % measured in inch/72
-                    /Rightargin 12 % measured in inch/72
-                    /TopMargin 12 % measured in inch/72
-                    /BottomMargin 12 % measured in inch/72
+                    /LeftMargin 12 % measured as number/72 inches
+                    /Rightargin 12 % measured as number/72 inches
+                    /TopMargin 12 % measured as number/72 inches
+                    /BottomMargin 12 % measured as number/72 inches
                  >>
        >>
       ]
@@ -1536,7 +1568,7 @@ A9. To print an image as a full PostScript page, call:
 
 Q10. Do the EPS files created by sam2p conform to some specifications?
 
-     The EPS output of sam2p conforms the following Adobe specifications:
+     The EPS output of sam2p conforms to the following Adobe specifications:
 
 	5001.DSC_Spec.pdf
 	5002.EPSF_Spec.pdf
@@ -1586,21 +1618,36 @@ A11. This error message means you have requested an invalid combination of
      please read on.
 
      Example 1:
-     /Compression/Fax is not allowed in /PSL1. Example 2: /Compression/IJG
-     requires /SampleFormat/Gray8 or /SampleFormat/Rgb8. Please have a look
-     at the messages `sam2p: Warning: check_rule: ...' to get more specific
-     information. After that, correct your request. Solution 1: specify
-     /FileFormat/PSL2 /Compression/Fax. Solution 2: specify /Compression/IJG
-     /SampleFormat/Rgb8.
+       /Compression/Fax is not allowed in /PSL1. 
 
-     An other cause for this message is that your request cannot be applied
+     Solution 1:
+       specify /FileFormat/PSL2 /Compression/Fax.
+
+     Example 2: 
+       /Compression/IJG requires /SampleFormat/Gray8 or /SampleFormat/Rgb8. 
+       Please have a look at the messages `sam2p: Warning: check_rule: ...' 
+       to get more specific information. After that, correct your request. 
+
+     Solution 2: 
+       specify /Compression/IJG /SampleFormat/Rgb8.
+
+     Another cause for this message is that your request cannot be applied
      to the image you've specified. In this case, there is no relevant
      `sam2p: Warning: check_rule: ...' message.
-     Example 1: you've requested
-     /SampleFormat/Indexed4, but the input image has more than 16 colors.
-     Example 2: you've requested /SampleFormat/Indexed4, but the input image
-     has transparency. Solution 1: specify /SampleFormat/Rgb8. Solution 2:
-     specify /SampleFormat/Transparent8.
+
+     Example 1: 
+       you've requested /SampleFormat/Indexed4, 
+       but the input image has more than 16 colors.
+
+     Solution 1: 
+       specify /SampleFormat/Rgb8.
+
+     Example 2: 
+       you've requested /SampleFormat/Indexed4, 
+       but the input image has transparency. 
+
+     Solution 2:
+       specify /SampleFormat/Transparent8.
 
      It is possible, but very unlikely that this error message is caused by
      a bug in sam2p.
@@ -1682,7 +1729,8 @@ Q18. I want to create an RGB PostScript image, but sam2p creates a Gray one,
 
 A18. /PSL1 doesn't support RGB images. There are two solutions:
 
-     -- Use /PSLC or /PSLC instead. Examples:
+     -- Use /PSLC or /PSL2 or /PSL3 instead or drop the '-1'
+        alltogether. Examples:
 
 	./sam2p -1c -s:rgb1 examples/ptsbanner.gif test.eps  # /PSLC
 	./sam2p -2  -s:rgb1 examples/ptsbanner.gif test.eps  # /PSL2
@@ -1694,7 +1742,7 @@ A18. /PSL1 doesn't support RGB images. There are two solutions:
 	./sam2p -1 -s:tr:stop examples/ptsbanner.gif test.eps  # /PSL1
 
      You can get more (and more useful) error messages from sam2p if you
-     specify to `-j:warn' options. You may also try specifying
+     specify the `-j:warn' option. You may also try specifying
      `-s:rgb1:stop' instead of `-s:rgb1' to force sam2p try /SampleFormat/Rgb1
      only.
 
@@ -1704,9 +1752,9 @@ Q19. sam2p doesn't allow me to use /Compression /Fax. For example:
 
 A19. /Compression/Fax is intended to be used with images with 1 bit per
      pixel. However, in PostScript and PDF, you can use it for any image
-     data, but compression ratio will be very poor for other than
-     /Gray1, /Indexed1 or /Mask, of course. You can force sam2p to use /Fax
-     by specifying the desired SampleFormat in option `-s'. Examples:
+     data, but compression ratio will be very poor for other than /Gray1, 
+     /Indexed1 or /Mask, of course. You can force sam2p to use /Fax by 
+     specifying the desired SampleFormat in option `-s'. Examples:
 
 	sam2p -s:Indexed8 -c:fax test.gif test.pdf   # OK
 	sam2p -s:Indexed8 -c:fax test.gif test.eps   # OK
@@ -1776,7 +1824,7 @@ Q28. What is png22pnm?
 
 A28. png22pnm is a PNG -> PNM converter compiled by the author of sam2p. It
      is based on the excellent pngtopnm utility, but doesn't depend on the
-     NetPBM library (only libpng). sam2p png22pnm (or, as a fallback:
+     NetPBM library (only libpng). sam2p uses png22pnm (or, as a fallback:
      pngtopm) to load PNG files. png22pnm is part of the tif22pnm package,
      so you can download it from
 
@@ -1817,14 +1865,15 @@ A30. Please download the newest sources from
 
      Please also install the tif22pnm and png22pnm packages from the author
      of sam2p (and the Debian standard libjpeg-progs package), available as
-     Debian source form from
+     Debian source from:
 
 	http://www.inf.bme.hu/~pts/tif22pnm-latest.tar.gz
 
-Q31. Why don't use libjpeg/libtiff/libpng/zlib or any other library with
+Q31. Why not use libjpeg/libtiff/libpng/zlib or any other library with
      sam2p?
 
-A31. -- library and .h incompatibilities
+A31. -- library and .h incompatibilities (they binary would be less portable
+        across Linux systems)
      -- to avoid forced dependencies
      -- checkergcc wouldn't work
 
@@ -1837,7 +1886,43 @@ A32. You cannot. (Use -m to specify the margins.) The page size is
      margins will be all right on all of them.
 
      If you really have to specify the page size, edit the .ps file and
-     insert the `a4 ' or `letter ' command after the last %% line.
+     insert the `a4 ' or `letter ' command after the last line of the
+     first block of lines starting with %%. You may also use something like
+     `1 dict dup /PageSize [ 595 842 ] put setpagedevice ' to exactly specify
+     the page width and height in 1/72 inches.
+
+     For example, change to PostScript file
+
+       %!PS-Adobe-3.0
+       %%Pages: 1
+       %%DocumentData: Clean7Bit
+       %%LanguageLevel: 1
+       %%EndComments
+       %%Page: 1 1
+       save
+       ... % many lines omitted
+       %%Trailer
+       %%EOF
+
+     to
+
+       %!PS-Adobe-3.0
+       %%Pages: 1
+       %%DocumentData: Clean7Bit
+       %%LanguageLevel: 1
+       %%EndComments
+       %%Page: 1 1
+       1 dict dup /PageSize [ 595 842 ] put setpagedevice
+       save
+       ... % many lines omitted
+       %%Trailer
+       %%EOF
+
+     Please note that PostScript is a programming language, so your changes
+     might be undone by instructions later in the file. You might find the
+     a2ping.pl utility (written by the author of sam2p) useful:
+
+       a2ping.pl -v --papersize=a4 in.ps out.ps
 
 Q33. How do I control ZIP compression ratio?
 
@@ -1848,6 +1933,9 @@ A33. Use
 	sam2p -c:zip:1:9 in.img out.png  # maximum compression
 
 Q34. ImageMagick convert creates smaller PNGs. Why?
+
+A34. I don't know the real reason.  Probably because ImageMagick uses libpng,
+     which is smarter than sam2p.
 
      You are probably trying to convert a JPEG or other true color photo to
      PNG. Try one of the following compression options:
@@ -1860,7 +1948,7 @@ Q34. ImageMagick convert creates smaller PNGs. Why?
 	sam2p -c:zip:15:9   # 453080 bytes
 	convert -quality ?  # 454438 bytes
 
-Q35. Can can sam2p create convert large JPEGs to smaller ones (with loss of
+Q35. Can sam2p convert large JPEGs to smaller ones (with loss of
      quality and resolution)?
 
 A35. sam2p cannot resize or scale images. So the pixel width and height of
@@ -1872,10 +1960,10 @@ A35. sam2p cannot resize or scale images. So the pixel width and height of
 	convert -scale "10%" -quality 50 in.jpg out.jpg  # specify scale ratio
 
      However, it is possible to specify the quality of the JPEG output of
-     sam2p. The
-     quality of 0 means ugly output with small file size, and the quality of
-     100 means nice output with big file sizes. You can specify intermediate
-     integer quality values (50 and 75 are recommended). For example:
+     sam2p. The quality of 0 means ugly output with small file size, and the 
+     quality of 100 means nice output with big file sizes. You can specify 
+     intermediate integer quality values (50 and 75 are recommended). 
+     For example:
 
 	 sam2p -c ijg:10 large_input.jpg small_output.jpg
 
@@ -1886,8 +1974,9 @@ A35. sam2p cannot resize or scale images. So the pixel width and height of
 
 Q36. Can sam2p convert JPEG to GIF?
 
-A36. Yes, it can, but usually not directly. GIF allows maximum 256 different
-     colors in an image. A typical RGB JPEG image contains much more colors,
+A36. Yes, it can, but usually not directly. GIF allows a maximum of 256
+     different
+     colors in an image. A typical RGB JPEG image contains many more colors,
      so it has to be quantized down to 256 colors first. For example, if the
      console output of ``sam2p in.jpg out.gif'' contains ``applyProfile:
      invalid combination, no applicable OutputRule'', then in.jpg must be
@@ -1913,8 +2002,8 @@ A36. Yes, it can, but usually not directly. GIF allows maximum 256 different
 
      , and try again.
 
-Q37. I need transform gif 15 colors images to BMP 256 colors not
-     compressed. sam2p convert it to BMP 16 colors...
+Q37. I need to transform GIF images of 15 colors to BMPs of 256 colors not
+     compressed. sam2p converts it to BMP 16 colors...
 
 A37. Use
 
@@ -1945,14 +2034,15 @@ A39. Yes. For example use one of
 Q40. Can sam2p emit a multi-page PDF or a multi-page PS?
 
 A40. No it can't. Emitting a multi-page document would need a fundamental
-     change of the sam2p architecture. (Should the 2nd page compressed with
+     change of the sam2p architecture. (Should the 2nd page be compressed with
      a different method? What if the 2nd contains too many colors? Should we
      keep all previous pages in memory?)
 
      I think another program should be written that is able to concatenate
-     EPS/PS or PDF files. I've already written PDF-merger (not released
-     yet), and an EPS-merger would be even easier. But I don't have time to
-     implement these features soon.
+     EPS/PS or PDF files. I've already written a PDF-merger called pdfconcat,
+     available from http://www.inf.bme.hu/~pts/pdfconcat.c .
+     An EPS-merger would be even easier. But I don't have time to
+     implement these features directly into sam2p soon.
 
 Q41. Can sam2p read a multi-page TIFF?
 
@@ -1974,12 +2064,12 @@ A42. No. There are two main problems: See also Q40 and Q41.
 Q43. How do I convert a TIFF image to a 1-bit black-and-white PDF? Should I
      use `sam2p -c:fax test.tif test.pdf'?
 
-A43. This above will ensure that fax compression is used. What you need for
+A43. The above will ensure that fax compression is used. What you need for
      ensuring that the output is 1-bit black-and-white is:
 
         sam2p -s:gray1:stop test.tif test.pdf
 
-     You can also specify compression algorithm (I recommend -c:zip):
+     You can also specify a compression algorithm (I recommend -c:zip):
 
         sam2p -c:fax -s:gray1:stop test.tif test.pdf
         sam2p -c:lzw -s:gray1:stop test.tif test.pdf
@@ -1990,8 +2080,8 @@ A43. This above will ensure that fax compression is used. What you need for
         sam2p: Error: applyProfile: invalid combination, no applicable OutputRule
 
      then your input test.tif is not really black-and-white. Open it in an
-     image editing program and ensure that the colors are only #000000 and
-     #ffffff.
+     image editing program and ensure that the colors are #000000 and
+     #ffffff only.
 
      > The tiff is black and white, bilevel - I just want to avoid the 
      > test.pdf from using 8bpp by default (like it does in imagemagick)
@@ -2090,6 +2180,8 @@ Standards
    Supersedes PDF1.2.
 -- PDF1.4 is PDF version 1.4, as defined by Adobe's PDF Reference
    (PDFRef.pdf). Supersedes PDF1.3.
+-- PDF1.5 is PDF version 1.4, as defined by Adobe's PDF Reference
+   (PDFRef.pdf). Supersedes PDF1.4.
 -- PBM is Portable Bitmap file format, as defined in NetPBM's pbm(5) UNIX
    manual page.
 -- PGM is Portable Graymap file format, as defined in NetPBM's pgm(5) UNIX
@@ -2446,8 +2538,8 @@ print STDERR "C=$C\n"' | sort | uniq
 $Y=""; for (split" ",$X) { $_=" $_ " if length($_)>=2; $Y.=$_ }; $Y=~s@
 /@/@g; print $Y' >t
 
-How tiff2ps display gray version of PSLC Rgb8 image on PSL1
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+How tiff2ps displays a gray version of a PSLC Rgb8 image on PSL1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 gsave
 100 dict begin
 1495.000000 935.000000 scale
@@ -2503,7 +2595,7 @@ pts_deflate_init
 
 Answers from Taco
 """""""""""""""""
-Are the problems I'm dealing about already solved?
+Are the problems I'm concerned about already solved?
 
    -- Is there a pixel image converter that can create small and compatible
       EPS documents with all the RunLength, CCITTFax, LZW and Flate
@@ -2513,7 +2605,7 @@ Are the problems I'm dealing about already solved?
       and assebling PDF files? Is there a utility for changing text labels
       inside a PDF file?
 
-   -- Is there a utility for creating a (semi-)transparent EPS or PDF files
+   -- Is there a utility for creating (semi-)transparent EPS or PDF files
       from pixel images?
 
 Compilation problems
@@ -2522,7 +2614,7 @@ Mårten Svantesson wrote:
 
 > Another problem was that the configure script didn't realise that it
 > couldn't use the forte CC-compiler. This lead to several errors. For
-> example it don't accept the option -ansi, so several tests fails of
+> example it doesn't accept the option -ansi, so several tests fail for
 > this reason.
 
 I don't have access to the a forte CC-compiler. The configure script has
