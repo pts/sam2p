@@ -599,10 +599,10 @@ Rule::OutputRule* Rule::buildProfile(MiniPS::VALUE Profile, bool quiet) {
     #endif
     while (p!=NULLP) {
       if (p->check_rule!=0/*NULLP*/) switch (p->check_rule(or_)) {
-       case p->BAD:
+       case Applier::BAD:
         Error::sev(Error::WARNING_DEFER) << "buildProfile: ^^^ thus ignoring impossible OutputRule #" << c << (Error*)0;
         goto end_appliers;
-       case p->MAYBE: case p->OK:
+       case Applier::MAYBE: case Applier::OK:
         if (p->work!=0/*NULLP*/) { or_++; goto end_appliers; }
         Error::sev(Error::WARNING_DEFER) << "buildProfile: ^^^ ignoring unimplemented OutputRule #" << c << (Error*)0;
        // case p->DONT_KNOW: ;
@@ -634,15 +634,15 @@ void Rule::applyProfile(GenBuffer::Writable& out, OutputRule*rule_list, Image::S
         if (p->check_rule!=0/*NULLP*/ && p->work!=0/*NULLP*/) {
           // tryc++;
           switch (p->work(out, or_, sf)) {
-           case p->BAD:
+           case Applier::BAD:
             Error::sev(Error::WARNING) << "applyProfile: ^^^ thus cannot apply OutputRule #" << or_->c << (Error*)0;
             goto end_appliers;
-           case p->OK:
+           case Applier::OK:
             // if (or_->c!=0) {
             delete Error::getRecorded(); Error::popPolicy();
             Error::sev(Error::NOTICE) << "applyProfile: applied OutputRule #" << or_->c << (Error*)0;
             return;
-           /* case p->MAYBE: impossible */
+           /* case Applier::MAYBE: impossible */
            // case p->DONT_KNOW: ;
           }
         }
@@ -931,12 +931,12 @@ void Rule::writeTTE(
                              << ' ' << MiniPS::RVALUE(or_->cacheHints.LowerMargin)
                      << " cm"; /* translate */
       } else switch (or_->cacheHints.Scale) {
-       case or_->cacheHints.SC_None:
+       case Rule::CacheHints::SC_None:
         if (nzp) out << '\n' << MiniPS::RVALUE(or_->cacheHints.LeftMargin)
                      << ' '  << MiniPS::RVALUE(or_->cacheHints.LowerMargin)
                      << " translate";
         break;
-       case or_->cacheHints.SC_OK:
+       case Rule::CacheHints::SC_OK:
         /* from pshack/big.ps */
         out <<"\n6 dict begin currentpagedevice/PageSize get dup 0 get\n " << MiniPS::RVALUE(or_->cacheHints.LeftMargin) << " sub " << MiniPS::RVALUE(or_->cacheHints.RightMargin) << " sub/w exch\n"
                " def 1 get " << MiniPS::RVALUE(or_->cacheHints.TopMargin) << " sub " << MiniPS::RVALUE(or_->cacheHints.BottomMargin) << " sub/h exch\n"
@@ -944,7 +944,7 @@ void Rule::writeTTE(
                " mul y w mul gt{w x 0 h y w mul x div sub 2 div}{h y w x h mul y div sub 2 div\n"
                " 0}ifelse translate div dup scale\nend";
         break;
-       case or_->cacheHints.SC_RotateOK:
+       case Rule::CacheHints::SC_RotateOK:
         /* from pshack/big.ps */
         out <<"\n6 dict begin currentpagedevice/PageSize get dup 0 get\n " << MiniPS::RVALUE(or_->cacheHints.LeftMargin) << " sub " << MiniPS::RVALUE(or_->cacheHints.RightMargin) << " sub/w exch\n"
                " def 1 get " << MiniPS::RVALUE(or_->cacheHints.TopMargin) << " sub " << MiniPS::RVALUE(or_->cacheHints.BottomMargin) << " sub/h exch\n"

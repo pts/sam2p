@@ -782,7 +782,7 @@ FILE *Files::open_tmpnam(SimBuffer::B &dir, char const*open_mode, char const*ext
           ((FILE*)NULLP!=(f=try_dir(dir, fname, "..", 0, open_mode))) ||
           ((FILE*)NULLP!=(f=try_dir(dir, fname, "../..", 0, open_mode))) );
   return f;
-};
+}
 
 bool Files::find_tmpnam(SimBuffer::B &dir)  {
   FILE *f=open_tmpnam(dir);

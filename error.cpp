@@ -73,7 +73,7 @@ GenBuffer::Writable& Error::sev(level_t level) {
   }
   return *err << (argv0==(char const*)NULLP?"??argv0":argv0) << ": " << level2str(level) << ": ";
   /* Processing will continue soon by GenBuffer::Writable& operator <<(GenBuffer::Writable& gb,Error*) */
-};
+}
 
 GenBuffer::Writable& operator <<(GenBuffer::Writable& err,Error*) {
   err << '\n';

@@ -780,7 +780,7 @@ MiniPS::VALUE MiniPS::Parser::parse1(int closer, int sev) {
   // fprintf(stderr, "i=%d i='%c'\n", i, i);
 
   switch (i) {
-   case tok->EOFF: case ']': case '>':
+   case Tokenizer::EOFF: case ']': case '>':
     if (closer==i) return Qundef; /* EOF */
     Error::sev((Error::level_t)sev) << "MiniPS::Parser: premature EOF (early closer: " << (int)i << ')' << (Error*)0;
     return Qerror; /* parse error */

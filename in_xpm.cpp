@@ -235,7 +235,7 @@ static Image::Sampled *in_xpm_reader(Image::Loader::UFD *ufd, SimBuffer::Flat co
   // }
   Image::Sampled::dimen_t transp=colors; /* No transparent colors yet. */
   /* vvv Dat: last cpp bytes of tab are used for storing current pixel. */
-  char *tab=new char[cpp*(colors+1)], *p, *pend;
+  char *tab=new char[cpp*(colors+1)], *p, *pend; /* BUGFIX: unsinged at Fri Nov 26 12:18:21 CET 2004 */
   Image::Sampled::rgb_t *rgb=new Image::Sampled::rgb_t[colors], *rp;
   for (rp=rgb,p=tab,pend=tab+cpp*colors; p!=pend; p+=cpp,rp++) {
     tok.read(p,cpp);
@@ -268,7 +268,7 @@ static Image::Sampled *in_xpm_reader(Image::Loader::UFD *ufd, SimBuffer::Flat co
     memset(bin, 255, sizeof(bin)); /* Make bin[*]=-1 */
     for (i=0;(unsigned)i<colors;i++) {
       iimg->setPal(i, rgb[i]);
-      bin[tab[i]]=i;
+      bin[(unsigned char)tab[i]]=i;
     }
     assert(p==pend);
     while (ht--!=0) {

@@ -59,7 +59,7 @@ static char *l1fa85g_tte=
 Rule::Applier::cons_t out_l1fa85g_check_rule(Rule::OutputRule* or_) {
   Rule::Cache *cache=&or_->cache;
   if (!cache->isPS()
-   || cache->Compression!=cache->CO_ZIP
+   || cache->Compression!=Rule::Cache::CO_ZIP
    || cache->hasPredictor()
    || !cache->isGray()
    || cache->TransferEncoding!=cache->TE_A85
@@ -96,7 +96,7 @@ Rule::Applier out_l1fa85g_applier = { "l1fa85g", out_l1fa85g_check_rule, out_l1f
 Rule::Applier::cons_t out_l2jbin_check_rule(Rule::OutputRule* or_) {
   Rule::Cache *cache=&or_->cache;
   if ((!cache->isPS() && !cache->isPDF())
-   || cache->Compression!=cache->CO_JAI
+   || cache->Compression!=Rule::Cache::CO_JAI
      ) return Rule::Applier::DONT_KNOW;
   /* Dat: not unrequired anymore: cache->TransferEncoding!=cache->TE_Binary  */
   bool badp=false;
@@ -149,7 +149,7 @@ Rule::Applier out_l2jbin_applier = { "PSL2+PDF-JAI", out_l2jbin_check_rule, out_
 Rule::Applier::cons_t out_p0jbin_check_rule(Rule::OutputRule* or_) {
   Rule::Cache *cache=&or_->cache;
   if (!cache->isPDF()
-   || cache->Compression!=cache->CO_JAI
+   || cache->Compression!=Rule::Cache::CO_JAI
      ) return Rule::Applier::DONT_KNOW;
   /* Dat: not unrequired anymore: cache->TransferEncoding!=cache->TE_Binary  */
   bool badp=false;
@@ -211,7 +211,7 @@ Rule::Applier out_p0jbin_applier = { "PDF-JAI", out_p0jbin_check_rule, out_p0jbi
 Rule::Applier::cons_t out_l23_check_rule(Rule::OutputRule* or_) {
   Rule::Cache *cache=&or_->cache;
   unsigned char sf=cache->SampleFormat;
-  if (cache->hasPredictor() && cache->Compression!=cache->CO_ZIP && cache->Compression!=cache->CO_LZW) {
+  if (cache->hasPredictor() && cache->Compression!=Rule::Cache::CO_ZIP && cache->Compression!=Rule::Cache::CO_LZW) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: real /Predictor requires /ZIP or /LZW" << (Error*)0;
     return Rule::Applier::BAD;
   }
@@ -228,7 +228,7 @@ Rule::Applier::cons_t out_l23_check_rule(Rule::OutputRule* or_) {
    || !cache->isZIPOK()
      ) return Rule::Applier::DONT_KNOW;
   #if !HAVE_LZW
-    if (cache->Compression==cache->CO_LZW) return Rule::Applier::DONT_KNOW;
+    if (cache->Compression==Rule::Cache::CO_LZW) return Rule::Applier::DONT_KNOW;
   #endif
 
   // if (cache->isDCTE() && !cache->isRGB() && !cache->isGray()) {
@@ -254,7 +254,7 @@ Rule::Applier::cons_t out_l23_work(GenBuffer::Writable& out, Rule::OutputRule*or
   // assert(0);
   if (out_l23_check_rule(or_)!=Rule::Applier::OK) return Rule::Applier::DONT_KNOW;
   or_->doSampleFormat(sf, true);
-  if (cache->Compression==cache->CO_ZIP) {
+  if (cache->Compression==Rule::Cache::CO_ZIP) {
     if (!cache->isPDF()) LanguageLevel[0]='3';
   } else if (cache->isPDF()) LanguageLevel[0]='0';
   if (cache->isIndexed() || cache->isTransparentM()) {
@@ -292,19 +292,19 @@ Rule::Applier::cons_t out_l23_work(GenBuffer::Writable& out, Rule::OutputRule*or
   
   GenBuffer::Writable *cp=tp;
   switch (cache->Compression) {
-   case cache->CO_None: break;
-   case cache->CO_ZIP: cp=PSEncoder::newFlateEncode(*tp, or_->cacheHints.Effort); break;
-   case cache->CO_LZW: cp=PSEncoder::newLZWEncode(*tp); break;
-   case cache->CO_RLE: cp=PSEncoder::newRunLengthEncode(*tp, or_->cacheHints.RecordSize); break;
-   case cache->CO_Fax: cp=PSEncoder::newCCITTFaxEncode(*tp, or_->cacheHints.K, or_->cacheHints.EncoderBPL, /*EndOfLine:*/ or_->cacheHints.K>0); break;
+   case Rule::Cache::CO_None: break;
+   case Rule::Cache::CO_ZIP: cp=PSEncoder::newFlateEncode(*tp, or_->cacheHints.Effort); break;
+   case Rule::Cache::CO_LZW: cp=PSEncoder::newLZWEncode(*tp); break;
+   case Rule::Cache::CO_RLE: cp=PSEncoder::newRunLengthEncode(*tp, or_->cacheHints.RecordSize); break;
+   case Rule::Cache::CO_Fax: cp=PSEncoder::newCCITTFaxEncode(*tp, or_->cacheHints.K, or_->cacheHints.EncoderBPL, /*EndOfLine:*/ or_->cacheHints.K>0); break;
    /* ^^^ getBpp() BUGFIX at Wed Jul  3 20:00:30 CEST 2002 */
    /* ^^^ EndOfLine BUGFIX at Wed Jul  3 21:12:54 CEST 2002
     * With EndOfLine==false, `sam2p -c:fax:1', acroread triggers the bug.
     * With EndOfLine==false, `sam2p -c:fax:2', acroread and gs trigger the bug.
     */
 
-   case cache->CO_IJG: cp=PSEncoder::newDCTIJGEncode(*tp, or_->cacheHints.EncoderColumns, or_->cacheHints.EncoderRows, or_->cacheHints.EncoderColors, or_->cacheHints.Quality); break;
-   case cache->CO_DCT: { SimBuffer::B other_parameters;
+   case Rule::Cache::CO_IJG: cp=PSEncoder::newDCTIJGEncode(*tp, or_->cacheHints.EncoderColumns, or_->cacheHints.EncoderRows, or_->cacheHints.EncoderColors, or_->cacheHints.Quality); break;
+   case Rule::Cache::CO_DCT: { SimBuffer::B other_parameters;
     or_->cacheHints.DCT->dump(other_parameters, 0, false);
     cp=PSEncoder::newDCTEncode(*tp, or_->cacheHints.EncoderColumns, or_->cacheHints.EncoderRows, or_->cacheHints.EncoderColors, or_->cacheHints.ColorTransform, other_parameters);
     break; }
@@ -409,9 +409,9 @@ Rule::Applier out_l1tr_applier = { "P-TrOpBb", out_l1tr_check_rule, out_l1tr_wor
 Rule::Applier::cons_t out_l1c_check_rule(Rule::OutputRule* or_) {
   Rule::Cache *cache=&or_->cache;
   if ((cache->FileFormat!=cache->FF_PSL1 && cache->FileFormat!=cache->FF_PSLC && cache->FileFormat!=cache->FF_PSL2)
-   || (cache->FileFormat==cache->FF_PSL2 && cache->Compression!=cache->CO_ZIP)
+   || (cache->FileFormat==cache->FF_PSL2 && cache->Compression!=Rule::Cache::CO_ZIP)
    || (cache->TransferEncoding!=cache->TE_Binary && cache->TransferEncoding!=cache->TE_Hex && cache->TransferEncoding!=cache->TE_A85)
-   || (cache->Compression!=cache->CO_None && cache->Compression!=cache->CO_RLE && cache->Compression!=cache->CO_ZIP && cache->Compression!=cache->CO_LZW)
+   || (cache->Compression!=Rule::Cache::CO_None && cache->Compression!=Rule::Cache::CO_RLE && cache->Compression!=Rule::Cache::CO_ZIP && cache->Compression!=Rule::Cache::CO_LZW)
    || cache->hasPredictor()
    || !(cache->isTransparentM() || cache->isIndexed() || cache->isGray() || cache->isRGB())
      ) return Rule::Applier::DONT_KNOW;
@@ -437,9 +437,9 @@ Rule::Applier::cons_t out_l1c_work(GenBuffer::Writable& out, Rule::OutputRule*or
   else if (cache->TransferEncoding==cache->TE_Hex) { tkey[3]='h'; tp=PSEncoder::newASCIIHexEncode(out, or_->cacheHints.TransferCPL); }
   else tkey[3]='b';
   GenBuffer::Writable *cp=tp;
-       if (cache->Compression==cache->CO_RLE) { tkey[4]='r'; cp=PSEncoder::newRunLengthEncode(*tp, or_->cacheHints.RecordSize); }
-  else if (cache->Compression==cache->CO_ZIP) { tkey[4]='z'; cp=PSEncoder::newFlateEncode(*tp, or_->cacheHints.Effort); }
-  else if (cache->Compression==cache->CO_LZW) { tkey[4]='l'; cp=PSEncoder::newLZWEncode(*tp); }
+       if (cache->Compression==Rule::Cache::CO_RLE) { tkey[4]='r'; cp=PSEncoder::newRunLengthEncode(*tp, or_->cacheHints.RecordSize); }
+  else if (cache->Compression==Rule::Cache::CO_ZIP) { tkey[4]='z'; cp=PSEncoder::newFlateEncode(*tp, or_->cacheHints.Effort); }
+  else if (cache->Compression==Rule::Cache::CO_LZW) { tkey[4]='l'; cp=PSEncoder::newLZWEncode(*tp); }
   else tkey[4]='n';
   /* vvv removed 'm' and '1' at Sun Sep 22 17:53:08 CEST 2002 */
   tkey[2]=// cache->SampleFormat==Image::SF_Mask     ? 'm' :
@@ -480,7 +480,7 @@ Rule::Applier::cons_t out_lcr_check_rule(Rule::OutputRule* or_) {
   if (!cache->isPS()
    || cache->FileFormat==cache->FF_PSL1
    || (cache->TransferEncoding!=cache->TE_Binary && cache->TransferEncoding!=cache->TE_Hex && cache->TransferEncoding!=cache->TE_A85)
-   || cache->Compression!=cache->CO_None
+   || cache->Compression!=Rule::Cache::CO_None
    || cache->hasPredictor()
    || !cache->isRGB()
      ) return Rule::Applier::DONT_KNOW;
@@ -518,7 +518,7 @@ Rule::Applier::cons_t out_gif89a_check_rule(Rule::OutputRule* or_) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /GIF89a requires /Binary" << (Error*)0;
     badp=true;
   }
-  if (cache->Compression!=cache->CO_None && cache->Compression!=cache->CO_LZW) {
+  if (cache->Compression!=Rule::Cache::CO_None && cache->Compression!=Rule::Cache::CO_LZW) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /GIF89a requires /LZW" << (Error*)0;
     badp=true;
   }
@@ -576,7 +576,7 @@ Rule::Applier::cons_t out_xpm_check_rule(Rule::OutputRule* or_) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /XPM requires /TransferEncoding/ASCII" << (Error*)0;
     badp=true;
   }
-  if (cache->Compression!=cache->CO_None) {
+  if (cache->Compression!=Rule::Cache::CO_None) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /XPM requires /Compression/None" << (Error*)0;
     badp=true;
   }
@@ -699,7 +699,7 @@ Rule::Applier::cons_t out_pnm_check_rule(Rule::OutputRule* or_) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /PNM requires /Binary or /ASCII" << (Error*)0;
     badp=true;
   }
-  if (cache->Compression!=cache->CO_None) {
+  if (cache->Compression!=Rule::Cache::CO_None) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /PNM requires /Compression/None" << (Error*)0;
     badp=true;
   }
@@ -832,7 +832,7 @@ Rule::Applier::cons_t out_xwd_check_rule(Rule::OutputRule* or_) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /XWD requires /Binary" << (Error*)0;
     badp=true;
   }
-  if (cache->Compression!=cache->CO_None) {
+  if (cache->Compression!=Rule::Cache::CO_None) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /XWD requires /Compression/None" << (Error*)0;
     badp=true;
   }
@@ -946,7 +946,7 @@ Rule::Applier out_x11_applier = { "X11", 0/*out_x11_check_rule*/, 0/*out_x11_wor
 Rule::Applier::cons_t out_jpeg_check_rule(Rule::OutputRule* or_) {
   Rule::Cache *cache=&or_->cache;
   if (cache->FileFormat!=cache->FF_JPEG
-   || cache->Compression==cache->CO_JAI
+   || cache->Compression==Rule::Cache::CO_JAI
      ) return Rule::Applier::DONT_KNOW;
   bool badp=false;
   if (cache->SampleFormat!=Image::SF_Rgb8 && cache->SampleFormat!=Image::SF_Gray8) {
@@ -957,7 +957,7 @@ Rule::Applier::cons_t out_jpeg_check_rule(Rule::OutputRule* or_) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /JPEG requires /Binary" << (Error*)0;
     badp=true;
   }
-  if (cache->Compression!=cache->CO_None && cache->Compression!=cache->CO_DCT && cache->Compression!=cache->CO_IJG) {
+  if (cache->Compression!=Rule::Cache::CO_None && cache->Compression!=Rule::Cache::CO_DCT && cache->Compression!=Rule::Cache::CO_IJG) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /JPEG requires /DCT or /IJG" << (Error*)0;
     badp=true;
   }
@@ -976,12 +976,12 @@ Rule::Applier::cons_t out_jpeg_work(GenBuffer::Writable& out, Rule::OutputRule*o
   or_->doSampleFormat(sf);
   // GenBuffer::Writable *tp=&out; /* always binary */
   GenBuffer::Writable *cp=&out;
-  if (cache->Compression==cache->CO_DCT) {
+  if (cache->Compression==Rule::Cache::CO_DCT) {
     SimBuffer::B other_parameters;
     or_->cacheHints.DCT->dump(other_parameters, 0, false);
     cp=PSEncoder::newDCTEncode(out, or_->cacheHints.EncoderColumns, or_->cacheHints.EncoderRows, or_->cacheHints.EncoderColors, or_->cacheHints.ColorTransform, other_parameters);
   } else {
-    assert(cache->Compression==cache->CO_None || cache->Compression==cache->CO_IJG);
+    assert(cache->Compression==Rule::Cache::CO_None || cache->Compression==Rule::Cache::CO_IJG);
     cp=PSEncoder::newDCTIJGEncode(out, or_->cacheHints.EncoderColumns, or_->cacheHints.EncoderRows, or_->cacheHints.EncoderColors, or_->cacheHints.Quality);
   }
   Rule::writePalData(out, *cp, sf);
@@ -996,7 +996,7 @@ Rule::Applier out_jpeg_applier = { "JPEG", out_jpeg_check_rule, out_jpeg_work, 0
 Rule::Applier::cons_t out_jpegjai_check_rule(Rule::OutputRule* or_) {
   Rule::Cache *cache=&or_->cache;
   if (cache->FileFormat!=cache->FF_JPEG
-   || cache->Compression!=cache->CO_JAI
+   || cache->Compression!=Rule::Cache::CO_JAI
      ) return Rule::Applier::DONT_KNOW;
   bool badp=false;
   if (cache->SampleFormat!=Image::SF_Asis) {
@@ -1211,7 +1211,7 @@ void TIFFPrinter::dirClose() {
 Rule::Applier::cons_t out_tiffjai_check_rule(Rule::OutputRule* or_) {
   Rule::Cache *cache=&or_->cache;
   if (cache->FileFormat!=cache->FF_TIFF
-   || cache->Compression!=cache->CO_JAI
+   || cache->Compression!=Rule::Cache::CO_JAI
      ) return Rule::Applier::DONT_KNOW;
   bool badp=false;
   if (cache->SampleFormat!=Image::SF_Asis) {
@@ -1233,7 +1233,7 @@ Rule::Applier::cons_t out_tiffjai_work(GenBuffer::Writable& out, Rule::OutputRul
   if (out_tiffjai_check_rule(or_)!=Rule::Applier::OK) return Rule::Applier::DONT_KNOW;
   Image::Sampled *img=sf->getImg();
   unsigned char cs=img->getCs(); /* color space */
-  if (cs!=img->CS_GRAYSCALE && cs!=img->CS_RGB && cs!=img->CS_YCbCr && cs!=img->CS_CMYK) {
+  if (cs!=Image::Sampled::CS_GRAYSCALE && cs!=Image::Sampled::CS_RGB && cs!=Image::Sampled::CS_YCbCr && cs!=Image::Sampled::CS_CMYK) {
     /* Dat: CS_YCCK is supported by JPEG, but unsupported by TIFF-JPEG */
     Error::sev(Error::WARNING_DEFER) << "check_rule: /FileFormat/TIFF /Compression/JAI doesn't support this color space" << (Error*)0;
     return Rule::Applier::BAD;
@@ -1255,10 +1255,10 @@ Rule::Applier::cons_t out_tiffjai_work(GenBuffer::Writable& out, Rule::OutputRul
   
   unsigned phot=0;  bool inks=false, refe=false;
   switch (cs) {
-    case img->CS_GRAYSCALE: phot=tp.PHOTOMETRIC_MINISBLACK; break;
-    case img->CS_RGB: phot=tp.PHOTOMETRIC_RGB; break;
-    case img->CS_YCbCr: phot=tp.PHOTOMETRIC_YCBCR; refe=true; break; /* preferred to RGB */
-    case img->CS_CMYK: phot=tp.PHOTOMETRIC_SEPARATED; inks=true; break; /* preferred to RGB */
+    case Image::Sampled::CS_GRAYSCALE: phot=tp.PHOTOMETRIC_MINISBLACK; break;
+    case Image::Sampled::CS_RGB: phot=tp.PHOTOMETRIC_RGB; break;
+    case Image::Sampled::CS_YCbCr: phot=tp.PHOTOMETRIC_YCBCR; refe=true; break; /* preferred to RGB */
+    case Image::Sampled::CS_CMYK: phot=tp.PHOTOMETRIC_SEPARATED; inks=true; break; /* preferred to RGB */
     default: Error::sev(Error::EERROR) << "TIFF6-JAI: color space " << (unsigned)cs << " not supported in TIFF-JPEG" << (Error*)0;
   }
 
@@ -1281,7 +1281,7 @@ Rule::Applier::cons_t out_tiffjai_work(GenBuffer::Writable& out, Rule::OutputRul
   if (inks) tp.dirSL(tp.InkSet, 1); /* SHORT */
   tp.dirUNDEFINED(tp.JPEGTables, databeg-img->getHeadp()-2, img->getHeadp(), 2, "\xFF\xD9");
   unsigned char hvs=img->end_()[-1];
-  if (hvs!=0x22 && cs==img->CS_YCbCr) {
+  if (hvs!=0x22 && cs==Image::Sampled::CS_YCbCr) {
     // printf("hvs=0x%02X\n", hvs);
     unsigned short horiz_vert[2]={ hvs>>4, hvs&15 };
     tp.dirSHORT(tp.YCbCrSubsampling, 2, horiz_vert);
@@ -1359,7 +1359,7 @@ void JPEGSOF0Encode::vi_write(char const*bufr, slen_t len) {
 Rule::Applier::cons_t out_tiff_check_rule(Rule::OutputRule* or_) {
   Rule::Cache *cache=&or_->cache;
   if (cache->FileFormat!=cache->FF_TIFF
-   || cache->Compression==cache->CO_JAI
+   || cache->Compression==Rule::Cache::CO_JAI
      ) return Rule::Applier::DONT_KNOW;
   bool badp=false;
   /* Dat: acroread TIFF predictor2 OK. (examples/fishg_lzw2_pdf.job) */
@@ -1369,18 +1369,18 @@ Rule::Applier::cons_t out_tiff_check_rule(Rule::OutputRule* or_) {
       Error::sev(Error::WARNING_DEFER) << "check_rule: /FileFormat/TIFF requires /Predictor 1|2" << (Error*)0;
       badp=true;
     }
-    if (cache->Compression!=cache->CO_ZIP && cache->Compression!=cache->CO_LZW) {
+    if (cache->Compression!=Rule::Cache::CO_ZIP && cache->Compression!=Rule::Cache::CO_LZW) {
       Error::sev(Error::WARNING_DEFER) << "check_rule: real /Predictor requires /ZIP or /LZW" << (Error*)0;
       badp=true;
     }
   }
   #if !HAVE_LZW
-    if (cache->Compression==cache->CO_LZW) {
+    if (cache->Compression==Rule::Cache::CO_LZW) {
       Error::sev(Error::WARNING_DEFER) << "check_rule: `configure --enable-lzw' for /Compression/LZW with /FileFormat/TIFF" << (Error*)0;
       badp=true;
     }
   #endif
-  if (cache->Compression==cache->CO_Fax && !cache->isOneBit()) {
+  if (cache->Compression==Rule::Cache::CO_Fax && !cache->isOneBit()) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /FileFormat/TIFF /Compression/Fax requires a 1-bit /SampleFormat" << (Error*)0;
     badp=true;
   }
@@ -1451,25 +1451,26 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
   Filter::VerbatimCountE vc(tp.getS());
   GenBuffer::Writable *cp=&vc;
   JPEGSOF0Encode *jp=(JPEGSOF0Encode*)NULLP;
+  // Dat: g++-3.4: Rule::Cache::CO_None: `cache cannot appear in a constant expression'
   switch (cache->Compression) {
-   case cache->CO_None: break;
-   case cache->CO_ZIP: compr=tp.COMPRESSION_DEFLATE; cp=PSEncoder::newFlateEncode(*cp, or_->cacheHints.Effort); break;
-   case cache->CO_LZW: compr=tp.COMPRESSION_LZW; cp=PSEncoder::newLZWEncode(*cp); break;
+   case Rule::Cache::CO_None: break;
+   case Rule::Cache::CO_ZIP: compr=tp.COMPRESSION_DEFLATE; cp=PSEncoder::newFlateEncode(*cp, or_->cacheHints.Effort); break;
+   case Rule::Cache::CO_LZW: compr=tp.COMPRESSION_LZW; cp=PSEncoder::newLZWEncode(*cp); break;
    /* vvv Dat: RunLengthEncode EOD (char 128) is OK and ignored in TIFF PackBits streams */
-   case cache->CO_RLE: compr=tp.COMPRESSION_PACKBITS; cp=PSEncoder::newRunLengthEncode(*cp, or_->cacheHints.RecordSize); break;
-   case cache->CO_Fax:
+   case Rule::Cache::CO_RLE: compr=tp.COMPRESSION_PACKBITS; cp=PSEncoder::newRunLengthEncode(*cp, or_->cacheHints.RecordSize); break;
+   case Rule::Cache::CO_Fax:
     if (or_->cacheHints.K<0) compr=tp.COMPRESSION_CCITTFAX4;
     else if (or_->cacheHints.K==0) compr=tp.COMPRESSION_CCITTFAX3;
     else { compr=tp.COMPRESSION_CCITTFAX3; or_->cacheHints.K=img->getHt(); }
     cp=PSEncoder::newCCITTFaxEncode(*cp, or_->cacheHints.K, or_->cacheHints.EncoderBPL, /*EndOfLine:*/ compr==tp.COMPRESSION_CCITTFAX3, /*BlackIs1: !*/ true);
     /* Dat: libtiff enforces EndOfLine==(compr==tp.COMPRESSION_CCITTFAX3) */
     break;
-   case cache->CO_IJG:
+   case Rule::Cache::CO_IJG:
     compr=tp.COMPRESSION_JPEG;
     jp=new JPEGSOF0Encode(vc);
     cp=PSEncoder::newDCTIJGEncode(*jp, or_->cacheHints.EncoderColumns, or_->cacheHints.EncoderRows, or_->cacheHints.EncoderColors, or_->cacheHints.Quality);
     break;
-   case cache->CO_DCT: compr=tp.COMPRESSION_JPEG; {
+   case Rule::Cache::CO_DCT: compr=tp.COMPRESSION_JPEG; {
     SimBuffer::B other_parameters;
     or_->cacheHints.DCT->dump(other_parameters, 0, false);
     jp=new JPEGSOF0Encode(vc);
@@ -1621,15 +1622,15 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
 
   bool refe=false;
   if (compr==tp.COMPRESSION_JPEG) switch (jp->getColorSpace()) {
-    case img->CS_GRAYSCALE:
+    case Image::Sampled::CS_GRAYSCALE:
       assert(phot==tp.PHOTOMETRIC_MINISBLACK || phot==tp.PHOTOMETRIC_PALETTE);
       /* Dat: we don't change `phot' here, so JPEG compression can be applied
        *      to the palette indexes of indexed images :-)
        */
       break;
-    case img->CS_RGB: phot=tp.PHOTOMETRIC_RGB; break;
-    case img->CS_YCbCr: phot=tp.PHOTOMETRIC_YCBCR; refe=true; break; /* preferred to RGB */
-    // case img->CS_CMYK: phot=tp.PHOTOMETRIC_SEPARATED; inks=true; break; /* preferred to RGB */
+    case Image::Sampled::CS_RGB: phot=tp.PHOTOMETRIC_RGB; break;
+    case Image::Sampled::CS_YCbCr: phot=tp.PHOTOMETRIC_YCBCR; refe=true; break; /* preferred to RGB */
+    // case Image::Sampled::CS_CMYK: phot=tp.PHOTOMETRIC_SEPARATED; inks=true; break; /* preferred to RGB */
     default: Error::sev(Error::EERROR) << "TIFF6: color space " << (unsigned)jp->getColorSpace() << " not supported in TIFF-JPEG" << (Error*)0;
   }
 
@@ -1645,7 +1646,7 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
   tp.dirSHORT(tp.BitsPerSample, sppa, s4);
   tp.dirSL(tp.Compression, compr); /* SHORT */
   tp.dirSL(tp.Photometric, phot); /* SHORT */
-  if (cache->Compression==cache->CO_Fax) tp.dirSL(tp.FillOrder, 1); /* byte abcdefgh is (a<<7)+...+h */
+  if (cache->Compression==Rule::Cache::CO_Fax) tp.dirSL(tp.FillOrder, 1); /* byte abcdefgh is (a<<7)+...+h */
   tp.dirLONG(tp.StripOffsets, 8);
   if (!cache->isIndexed())
     tp.dirSL(tp.SamplesPerPixel, sppa); /* SHORT */
@@ -1770,7 +1771,7 @@ Rule::Applier::cons_t out_png_check_rule(Rule::OutputRule* or_) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /PNG requires /Binary" << (Error*)0;
     badp=true;
   }
-  if (cache->Compression!=cache->CO_None && cache->Compression!=cache->CO_ZIP) {
+  if (cache->Compression!=Rule::Cache::CO_None && cache->Compression!=Rule::Cache::CO_ZIP) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /PNG requires /Compression/None or /ZIP" << (Error*)0;
     badp=true;
   }
@@ -1796,7 +1797,7 @@ Rule::Applier::cons_t out_png_work(GenBuffer::Writable& out, Rule::OutputRule*or
   Image::Sampled::dimen_t wd=img->getWd(), ht=img->getHt();
   
   GenBuffer::Writable *rp=new LenCRC32Encode(out,4);
-  GenBuffer::Writable *cp=PSEncoder::newFlateEncode(*rp, (cache->Compression==cache->CO_None) ? 0: or_->cacheHints.Effort);
+  GenBuffer::Writable *cp=PSEncoder::newFlateEncode(*rp, (cache->Compression==Rule::Cache::CO_None) ? 0: or_->cacheHints.Effort);
 
   /* Dat: PredictorColumns, PredictorBPC and PredictorColors are forced to
    *      match the image, because PNG requires it.
@@ -2046,11 +2047,11 @@ Rule::Applier::cons_t out_bmp_check_rule(Rule::OutputRule* or_) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /BMP requires /Binary" << (Error*)0;
     badp=true;
   }
-  if (cache->Compression!=cache->CO_None && cache->Compression!=cache->CO_RLE) {
+  if (cache->Compression!=Rule::Cache::CO_None && cache->Compression!=Rule::Cache::CO_RLE) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /BMP requires /Compression/None or /RLE" << (Error*)0;
     badp=true;
   }
-  if (cache->Compression==cache->CO_RLE && cache->SampleFormat!=Image::SF_Indexed8) {
+  if (cache->Compression==Rule::Cache::CO_RLE && cache->SampleFormat!=Image::SF_Indexed8) {
     /* !! Imp: Implement compr==2 for /Indexed4 */
     Error::sev(Error::WARNING_DEFER) << "check_rule: /BMP/RLE requires /Indexed8" << (Error*)0;
     badp=true;

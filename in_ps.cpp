@@ -125,7 +125,7 @@ static Image::Loader::reader_t in_ps_checker(char buf[Image::Loader::MAGIC_LEN],
   while (p!=pend && *p!=' ' && *p!='\t') p++;
   while (p!=pend && (*p==' ' || *p=='\t')) p++;
   /* Imp: option to accept BoundingBox for non-EPS PS */
-  if (0!=strcmp(p,"EPSF-"),5) return in_eps_reader;
+  if (0!=strncmp(p,"EPSF-",5)) return in_eps_reader; /* BUGFIX at Fri Nov 26 12:13:58 CET 2004 */
   return in_ps_reader;
 }
 
