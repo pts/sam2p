@@ -693,9 +693,9 @@ int main(int argc, char**argv) {
     for (c=7;c<32;c++) words[c]=words[E_RANGE];
     for (c=32;c<42;c++) words[c]=words[E_COMPRESS];
     for (c=47;c<58;c++) words[c]=words[E_SYNTAX]; /* Name:'/', Number:'0'..'9' */
-    words['<']=words['>']= /* Hex */
-      words['[']=words[']']= /* Bracket */
-      words['{']=words['}']= /* Brace */
+    words[0U+'<']=words[0U+'>']= /* Hex */
+      words[0U+'[']=words[0U+']']= /* Bracket */
+      words[0U+'{']=words[0U+'}']= /* Brace */
       words[E_SYNTAX];
     for (c=127;c<WORDSSIZE;c++) words[c]=words[E_RANGE];
   }

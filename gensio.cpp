@@ -380,7 +380,7 @@ void Filter::UngetFILED::unread(char const *s, slen_t slen) {
   ftell_at-=slen;
   if (slen==0) {
   } else if (slen<=ofs) {
-    ofs-=slen;
+    memcpy(const_cast<char*>(unget()+(ofs-=slen)), s, slen);
   } else {
     slen-=ofs;
     ofs=0;
@@ -388,6 +388,28 @@ void Filter::UngetFILED::unread(char const *s, slen_t slen) {
       assert(unget.isEmpty()); // !!
       unget.vi_write(s, slen); /* complete garbage unless unget was empty */
     }
+  }
+}
+void Filter::UngetFILED::appendLine(GenBuffer::Writable &buf, int delimiter) {
+  if (delimiter<0) {
+    char rbuf[4096];
+    slen_t got;
+    /* vvv Imp: less memory copying, less stack usage? */
+    while (0!=(got=vi_read(rbuf, sizeof(rbuf)))) buf.vi_write(rbuf, got);
+  } else if (unget.getLength()==0) { do_getc:
+    int i;
+    if (f!=NULLP) {
+      while ((i=MACRO_GETC(f))>=0 && i!=delimiter) { buf.vi_putcc(i); ftell_at++; }
+      if (i>=0) buf.vi_putcc(i);
+    }
+  } else {
+    char const *p=unget()+ofs, *p0=p, *pend=unget.end_();
+    while (p!=pend && *p!=delimiter) p++;
+    ftell_at+=p-p0;
+    if (p==pend) { buf.vi_write(p0, p-p0); ofs=0; unget.forgetAll(); goto do_getc; }
+    ftell_at++; p++; /* found delimiter in `unget' */
+    buf.vi_write(p0, p-p0);
+    ofs+=p-p0;
   }
 }
 
@@ -440,7 +462,8 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
   #endif
   // tmpname="tmp.name";
   redir_cmd.term0();
-  if (tmpname)  Files::tmpRemoveCleanup(tmpname ()); /* already term0() */
+  if (tmpname) { Files::tmpRemoveCleanup(tmpname()); remove(tmpname()); } /* already term0() */
+  /* ^^^ Dat: remove() here introduces a race condition, but helps early error detection */
   if (tmpename) Files::tmpRemoveCleanup(tmpename()); /* already term0() */
   if (tmpsname) Files::tmpRemoveCleanup(tmpsname()); /* already term0() */
   /* </code similarity: Filter::PipeE::PipeE and Filter::PipeD::PipeD> */
@@ -562,14 +585,15 @@ Filter::PipeD::PipeD(GenBuffer::Readable &in_, char const*pipe_tmpl, slendiff_t 
   redir_cmd.term0();
   if (tmpname)  Files::tmpRemoveCleanup(tmpname ()); /* already term0() */
   if (tmpename) Files::tmpRemoveCleanup(tmpename()); /* already term0() */
-  if (tmpsname) Files::tmpRemoveCleanup(tmpsname()); /* already term0() */
+  if (tmpsname) { Files::tmpRemoveCleanup(tmpsname()); remove(tmpsname()); } /* already term0() */
+  /* ^^^ Dat: remove() here introduces a race condition, but helps early error detection */
   /* </code similarity: Filter::PipeE::PipeE and Filter::PipeD::PipeD> */
 }
 slen_t Filter::PipeD::vi_read(char *tobuf, slen_t tolen) {
   assert(!(tolen!=0 && state==2));
   if (state==2) return 0; /* Should really never happen. */
   /* Normal read operation with tolen>0; OR tolen==0 */
-  if (state==0) { /* Read the whole stream from `in', write it to `tmpname' */
+  if (state==0) { /* Read the whole stream from `in', write it to `tmpsname' */
    #if HAVE_PTS_POPEN
     if (!tmpsname) {
       if (NULLP==(p=popen(redir_cmd(), "w"CFG_PTS_POPEN_B))) Error::sev(Error::EERROR) << "Filter::PipeD" << ": popen() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;

@@ -1838,13 +1838,95 @@ Q34. ImageMagick convert creates smaller PNGs. Why?
      You are probably trying to convert a JPEG or other true color photo to
      PNG. Try one of the following compression options:
 
-      	sam2p -c:zip:12:7   # 464727 bytes
+	sam2p -c:zip:12:7   # 464727 bytes
 	sam2p -c:zip:12:8   # 454271 bytes
 	sam2p -c:zip:12:9   # 447525 bytes
 	sam2p -c:zip:13:9   # 488748 bytes
 	sam2p -c:zip:14:9   # 454182 bytes
 	sam2p -c:zip:15:9   # 453080 bytes
 	convert -quality ?  # 454438 bytes
+
+Q35. Can can sam2p create convert large JPEGs to smaller ones (with loss of
+     quality and resolution)?
+
+A35. sam2p cannot resize or scale images. So the pixel width and height of
+     the input and output image cannot be changed. If you need that (for
+     example you want to create thumbnails), use the famous convert(1)
+     utility of ImageMagick. For example:
+
+	convert -scale 444   -quality 50 in.jpg out.jpg  # specify out width
+	convert -scale "10%" -quality 50 in.jpg out.jpg  # specify scale ratio
+
+     However, it is possible to specify the quality of the JPEG output of
+     sam2p. The
+     quality of 0 means ugly output with small file size, and the quality of
+     100 means nice output with big file sizes. You can specify intermediate
+     integer quality values (50 and 75 are recommended). For example:
+
+	 sam2p -c ijg:10 large_input.jpg small_output.jpg
+
+     sam2p uses the cjpeg(1) and djpeg(1) utilities from libjpeg to write
+     and read JPEG files, respectively. If you need more control over your
+     JPEG output, then forget sam2p, and please consult the documentation of
+     those utilities.
+
+Q36. Can sam2p convert JPEG to GIF?
+
+A36. Yes, it can, but usually not directly. GIF allows maximum 256 different
+     colors in an image. A typical RGB JPEG image contains much more colors,
+     so it has to be quantized down to 256 colors first. For example, if the
+     console output of ``sam2p in.jpg out.gif'' contains ``applyProfile:
+     invalid combination, no applicable OutputRule'', then in.jpg must be
+     quantized first:
+
+	convert in.jpg out1.gif  # does the quantization automatically
+	sam2p out1.gif out2.gif  # compresses the output image further
+
+     From out1.gif and out2.gif keep the one with the smaller file size. It
+     is common that convert(1) creates huge GIF files because LZW compression
+     is disabled inside it. sam2p should be compiled with LZW compression
+     and GIF input/output enabled. To check this, run sam2p, and
+     examine its console output. It should contain a line:
+
+	Available Appliers: ... GIF89a+LZW ...
+
+     If GIF89a+LZW doesn't appear in the line, please recompile sam2p with:
+
+	make clean
+	./configure --enable-gif --enable-lzw
+	make
+	cp sam2p /usr/local/bin
+
+     , and try again.
+
+Q37. I need transform gif 15 colors images to BMP 256 colors not
+     compressed. sam2p convert it to BMP 16 colors...
+
+A37. Use
+
+	sam2p -c none -s rgb8 in.gif out.bmp
+
+     If you get an error message `Error: applyProfile: invalid combination,
+     no applicable OutputRule', it very probably means that your GIF is
+     transparent. Remove the transparent color within an image editor first.
+
+Q3. How do I convert a GIF file to PostScript Level2 EPS?
+
+A3. Check that sam2p has been compiled with GIF support: run sam2p, and
+    examine its console output. It should contain a line:
+
+	Available Loaders: ... GIF ...
+
+    If GIF doesn't appear in the line, please recompile sam2p with:
+
+
+    After that, run sam2p again, and check for the line above again.
+
+    In one-liner mode, just run:
+
+	./sam2p <INPUT.gif> <OUTPUT.eps>
+	Example: ./sam2p try.gif try.eps
+
 
 Upsampling
 ~~~~~~~~~~
@@ -2386,6 +2468,7 @@ Missing feature list
      PS and PDF input,
      /Background option (-bg) to change transparent pixels -> bg color
      LZW and ZIP compressed for indexed etc.
+/* Imp: command line option for /Transparent */
 /* Imp: avoid 3 warnings in: ./sam2p examples/pts2.pbm t.ppm */
 /* OK : margins for all PS, EPS and PDF (Sat Sep  7 16:17:58 CEST 2002 */
 /* Imp: howto in pts_defl.h */

@@ -1,4 +1,4 @@
-/*
+\/*
  * jpegdump_main.cpp -- dump a JPEG stream
  * by pts@math.bme.hu at Tue Jun  4 13:19:00 CEST 2002
  */

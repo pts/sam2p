@@ -1173,15 +1173,52 @@ Image::Sampled* Image::load(char const* format, filep_t f_, SimBuffer::Flat cons
 
 // #include <unistd.h> /* sleep() */
 
+#if 0
+Rule::Sampled *Rule::load(char const* filename) {
+  static char buf[2*Applier::MAGIC_LEN];
+  FILE *f=fopen(filename, "rb");
+  unsigned got=0;
+  if (f==NULLP) Error::sev(Error::EERROR) << "Cannot open/read image file: " << FNQ(filename) << (Error*)0;
+  slen_t ret=fread(buf, 1, Applier::MAGIC_LEN, f);
+  /* vvv Imp: clarify error message: may be a read error */
+  if (ret==0) Error::sev(Error::EERROR) << "Zero-length image file: " << FNQ(filename) << (Error*)0;
+  if (ret<Applier::MAGIC_LEN) memset(buf+ret, '\0', Applier::MAGIC_LEN-ret);
+#if 0
+  unsigned long pos=fseek(f, 0, SEEK_END);
+  pos=(pos<=Applier::MAGIC_LEN)?0:pos-Applier::MAGIC_LEN;
+  if (0!=fseek(f, pos, SEEK_SET)
+   || (got=fread(buf+Applier::MAGIC_LEN, 1, Applier::MAGIC_LEN, f))==0
+#else
+  if (0
+#endif
+   || (rewind(f), 0)
+   || ferror(f))
+    Error::sev(Error::EERROR) << "I/O error in image file: " << FNQ(filename) << (Error*)0;
+  if (got!=0 && got!=Applier::MAGIC_LEN) memmove(buf+2*Applier::MAGIC_LEN-got, buf+Applier::MAGIC_LEN, got);
+  Applier *p=first;
+  Applier::reader_t reader;
+  while (p!=NULLP) {
+    if (NULLP!=(reader=p->checker(buf,buf+Applier::MAGIC_LEN))) { return reader(f); }
+    p=p->next;
+  }
+  Error::sev(Error::EERROR) << "Unknown image format: " << FNQ(filename) << (Error*)0;
+  // Error::sev(Error::WARNING) << "Zero-length image1." << (Error*)0;
+  // Error::sev(Error::WARNING) << "Zero-length image2." << (Error*)0;
+  return 0; /*notreached*/
+}
+#endif
+
+
 Image::Sampled *Image::load(Image::Loader::UFD* ufd0, SimBuffer::Flat const& loadHints, char const* format) {
   Filter::UngetFILED &ufd=*(Filter::UngetFILED*)ufd0;
   /* Dat: format arg used in in_pnm.cpp */
-  static char buf[Loader::MAGIC_LEN];
+  static char buf[Loader::MAGIC_LEN+1];
   slen_t ret=ufd.vi_read(buf, Loader::MAGIC_LEN);
   /* vvv Imp: clarify error message: may be a read error */
+  if (ufd.hadError()) Error::sev(Error::EERROR) << "I/O error pre in image file: " << FNQ(ufd.getFilenameDefault("-")) << (Error*)0;
   if (ret==0) Error::sev(Error::EERROR) << "Zero-length image file: " << FNQ(ufd.getFilenameDefault("-")) << (Error*)0;
   if (ret<Loader::MAGIC_LEN) memset(buf+ret, '\0', Loader::MAGIC_LEN-ret);
-  if (ufd.hadError()) Error::sev(Error::EERROR) << "I/O error pre in image file: " << FNQ(ufd.getFilenameDefault("-")) << (Error*)0;
+  buf[Loader::MAGIC_LEN]='\0';
   /* Dat: do not read the trailer onto buf+Loader::MAGIC_LEN, because no ->checker() uses it yet. */
   Loader *p=first;
   Loader::reader_t reader;

@@ -68,6 +68,7 @@
 #define USE_IN_TGA 1
 #define USE_IN_LBM 1
 #define USE_IN_JAI 1
+#define USE_IN_PDF 1
 /* #define USE_OUT_GIF 1 */
 #define USE_IN_XPM_MAPPING 1
 #define USE_BIG_MEMORY 1

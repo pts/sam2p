@@ -59,6 +59,8 @@ void __pure_virtual() { abort(); }
 #  warning REQUIRES: in_bmp.o
 #  warning REQUIRES: in_pnm.o
 #  warning REQUIRES: in_tga.o
+#  warning REQUIRES: in_pdf.o
+#  warning REQUIRES: in_ps.o
 #endif
 extern Image::Loader in_tiff_loader;
 extern Image::Loader in_jpeg_loader;
@@ -71,6 +73,8 @@ extern Image::Loader in_gif_loader;
 extern Image::Loader in_bmp_loader;
 extern Image::Loader in_pnm_loader;
 extern Image::Loader in_tga_loader;
+extern Image::Loader in_pdf_loader;
+extern Image::Loader in_ps_loader;
 void init_loader() {
   static bool had_init_loader=false;
   if (had_init_loader) return;
@@ -85,6 +89,8 @@ void init_loader() {
   Image::register0(&in_jpeg_loader);
   Image::register0(&in_png_loader);
   Image::register0(&in_jai_loader);
+  Image::register0(&in_pdf_loader);
+  Image::register0(&in_ps_loader);
   had_init_loader=true;
 }
 

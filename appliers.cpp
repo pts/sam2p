@@ -552,7 +552,13 @@ Rule::Applier::cons_t out_gif89a_check_rule(Rule::OutputRule* or_) {
 #  define out_gif89a_work       (Rule::Applier::work_t)      NULLP
 #endif
 
-Rule::Applier out_gif89a_applier = { "GIF89a", out_gif89a_check_rule, out_gif89a_work, 0 };
+Rule::Applier out_gif89a_applier = {
+#if HAVE_LZW
+  "GIF89a+LZW"
+#else
+  "GIF89a"
+#endif
+  , out_gif89a_check_rule, out_gif89a_work, 0 };
 
 /* --- Tue Jun  4 19:51:03 CEST 2002 */
 
@@ -666,7 +672,7 @@ Rule::Applier::cons_t out_xpm_work(GenBuffer::Writable& out, Rule::OutputRule*or
     while (htc--!=0) {
       phend=p+wd;
       op=obuf;
-      while (p!=phend) *++op=xpms[*p++];
+      while (p!=phend) *++op=xpms[0U+*p++];
       out.vi_write(obuf, wd+4);
     }
   }

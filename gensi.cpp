@@ -610,7 +610,7 @@ SimBuffer::B::B(char const* str, slen_t len_): alloced(sizeof(small)) {
   memcpy(const_cast<char*>(beg), str, len);
 }
 
-SimBuffer::B::B(SimBuffer::B const& other): SimBuffer::Resizable(), SimBuffer::Flat(), alloced(sizeof(small)) {
+SimBuffer::B::B(SimBuffer::B const& other): GenBuffer(), SimBuffer::Resizable(), SimBuffer::Flat(), alloced(sizeof(small)) {
   beg=small;
   if (other.len>sizeof(small)) { len=0; vi_grow2(0, other.len, 0, 0); }
                      else len=other.len;

@@ -222,6 +222,10 @@ class Filter { public:
     inline virtual ~UngetFILED() { close(); }
     virtual int vi_getcc();
     virtual slen_t vi_read(char *buf, slen_t len);
+    /** Appends a line to buf, including delimiter unless EOF.
+     * @param delimiter: a char or negative to read to EOF
+     */ 
+    void appendLine(GenBuffer::Writable &buf, int delimiter='\n');
     void close();
     // void checkFILE();
     inline virtual long vi_tell() const { return ftell_at; } // return ftell_add+ofs+(f!=NULLP ? ftell(f) : 0); }

@@ -129,6 +129,12 @@ my @DSQ=map{shq$_}@DS;
 my $R="$GCCP -DOBJDEP -M -MG -E 2>&1 @DSQ";
 $R=backtick($R);
 
+if ($R!~/: warning: #warning\b/) {
+  # config2.h:314:4: warning: #warning REQUIRES: c_lgcc3.o
+  # Dat: g++-3.3 ignores #warning with -M -MG -E
+  $R.="\n".backtick("$GCCP -DOBJDEP -E 2>&1 >/dev/null @DSQ");
+}
+
 ## die $R;
 
 #** $pro{"x.ds"} is the list of features provided by "x.ds"; multiplicity
@@ -208,6 +214,9 @@ while ($R=~/\G(.*)\n?/g) {
     undef $included_from;
   } elsif ($S=~/\A([^:]+):\d+:(\d+:)? warning: this is the location of /) {
     # ^^^ gcc-3.1
+    undef $included_from;
+  } elsif ($S=~/: No such file or directory$/) {
+    # ^^^ gcc-3.3
     undef $included_from;
   } else {
     die "$0: invalid depret: [$S]\n";

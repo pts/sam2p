@@ -1,3 +1,11 @@
+sam2p (0.44-1) unstable; urgency=low
+
+  * bugfixes
+  * PDF, PS and EPS import
+  * compressed bts2.ttt, so target sam2p is smaller
+
+ -- Szabó Péter <pts@math.bme.hu>  Tue, 30 Sep 2003 12:36:56 +0200
+
 sam2p (0.43-4) unstable; urgency=low
 
   * Allow to read stdin from a pipe

@@ -48,6 +48,8 @@ in_lbm.cpp
 in_pcx.cpp
 in_png.cpp
 in_pnm.cpp
+in_pdf.cpp
+in_ps.cpp
 pts_defl.c
 pts_defl.h
 in_tga.cpp
