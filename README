@@ -1872,7 +1872,7 @@ A30. Please download the newest sources from
 Q31. Why not use libjpeg/libtiff/libpng/zlib or any other library with
      sam2p?
 
-A31. -- library and .h incompatibilities (they binary would be less portable
+A31. -- library and .h incompatibilities (the binary would be less portable
         across Linux systems)
      -- to avoid forced dependencies
      -- checkergcc wouldn't work
@@ -1891,7 +1891,7 @@ A32. You cannot. (Use -m to specify the margins.) The page size is
      `1 dict dup /PageSize [ 595 842 ] put setpagedevice ' to exactly specify
      the page width and height in 1/72 inches.
 
-     For example, change to PostScript file
+     For example, change the PostScript file
 
        %!PS-Adobe-3.0
        %%Pages: 1
@@ -1928,7 +1928,7 @@ Q33. How do I control ZIP compression ratio?
 
 A33. Use
 
-	sam2p -c:zip:1:0 in.img out.png  # uncompressed
+	sam2p -c:zip:1:0 in.img out.png  # uncompressed ZIP carrier
 	sam2p -c:zip:1:1 in.img out.png  # normal compression
 	sam2p -c:zip:1:9 in.img out.png  # maximum compression
 
@@ -1957,6 +1957,7 @@ A35. sam2p cannot resize or scale images. So the pixel width and height of
      utility of ImageMagick. For example:
 
 	convert -scale 444   -quality 50 in.jpg out.jpg  # specify out width
+	convert -scale x444  -quality 50 in.jpg out.jpg  # specify out height
 	convert -scale "10%" -quality 50 in.jpg out.jpg  # specify scale ratio
 
      However, it is possible to specify the quality of the JPEG output of
@@ -2033,7 +2034,7 @@ A39. Yes. For example use one of
 
 Q40. Can sam2p emit a multi-page PDF or a multi-page PS?
 
-A40. No it can't. Emitting a multi-page document would need a fundamental
+A40. No, it can't. Emitting a multi-page document would need a fundamental
      change of the sam2p architecture. (Should the 2nd page be compressed with
      a different method? What if the 2nd contains too many colors? Should we
      keep all previous pages in memory?)
