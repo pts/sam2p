@@ -1927,6 +1927,35 @@ A39. Yes. For example use
      to have resoultion 216 DPI (image scaled 3 times to both directions).
      Without scaling, 72 DPI is the default.
 
+Q40. Can sam2p emit a multi-page PDF or a multi-page PS?
+
+A40. No it can't. Emitting a multi-page document would need a fundamental
+     change of the sam2p architecture. (Should the 2nd page compressed with
+     a different method? What if the 2nd contains too many colors? Should we
+     keep all previous pages in memory?)
+
+     I think another program should be written that is able to concatenate
+     EPS/PS or PDF files. I've already written PDF-merger (not released
+     yet), and an EPS-merger would be even easier. But I don't have time to
+     implement these features soon.
+
+Q41. Can sam2p read a multi-page TIFF?
+
+A41. sam2p reads only the first page.
+
+     The auxilary utility tif22pnm could be patched so it extracts other
+     pages, and a new command line option can be added to sam2p that passes
+     the required page number to tif22pnm. But I don't have time to
+     implement these features soon.
+
+     By the way, multi-page TIFFs can be created with the following command:
+
+	tiffcp -c g4 d1.tiff d2.tiff d3.tiff output.tiff
+
+Q42. Can sam2p convert a multi-page TIFF to a multi-page PDF?
+
+A42. No. There are two main problems: See also Q40 and Q41.
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
