@@ -500,7 +500,7 @@ static void pstrqput(register char const* p, char const* pend) {
     else if (c=='\t')   putchar('t');
     else if (c=='\010') putchar('b');
     else if (c=='\f')   putchar('f');
-    else if (c=='(')    putchar(')');
+    else if (c=='(')    putchar('('); /* BUGFIX at Tue Feb 22 00:22:19 CET 2005 */
     else if (c==')')    putchar(')');
     else if (c>=64 || p==pend || ULE(*p-'0','7'-'0')) {
       putchar((c>>6&7)+'0');

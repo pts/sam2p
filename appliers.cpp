@@ -405,6 +405,29 @@ Rule::Applier out_l1tr_applier = { "P-TrOpBb", out_l1tr_check_rule, out_l1tr_wor
 //static char *l1mask_tte=
 //#include "l1mask.tth"
 
+static void gen_tkey(char *tkey, GenBuffer::Writable& out, GenBuffer::Writable*&tp, GenBuffer::Writable*& cp, Rule::OutputRule*or_) {
+  Rule::Cache *cache=&or_->cache;
+  tp=&out;
+       if (cache->TransferEncoding==cache->TE_A85) { tkey[3]='8'; tp=PSEncoder::newASCII85Encode (out, or_->cacheHints.TransferCPL); }
+  else if (cache->TransferEncoding==cache->TE_Hex) { tkey[3]='h'; tp=PSEncoder::newASCIIHexEncode(out, or_->cacheHints.TransferCPL); }
+  else tkey[3]='b';
+  cp=tp;
+       if (cache->Compression==Rule::Cache::CO_RLE) { tkey[4]='r'; cp=PSEncoder::newRunLengthEncode(*tp, or_->cacheHints.RecordSize); }
+  else if (cache->Compression==Rule::Cache::CO_ZIP) { tkey[4]='z'; cp=PSEncoder::newFlateEncode(*tp, or_->cacheHints.Effort); }
+  else if (cache->Compression==Rule::Cache::CO_LZW) { tkey[4]='l'; cp=PSEncoder::newLZWEncode(*tp); }
+  else tkey[4]='n';
+  /* vvv removed 'm' and '1' at Sun Sep 22 17:53:08 CEST 2002 */
+  tkey[2]=// cache->SampleFormat==Image::SF_Mask     ? 'm' :
+          // cache->SampleFormat==Image::SF_Indexed1 ? '1' :
+             cache->SampleFormat==Image::SF_Indexed2 ? '2' :
+             cache->SampleFormat==Image::SF_Indexed4 ? '4' :
+             cache->SampleFormat==Image::SF_Indexed8 ? '8' :
+             cache->SampleFormat==Image::SF_Transparent2 ? 't' :
+             cache->SampleFormat==Image::SF_Transparent4 ? 't' :
+             cache->SampleFormat==Image::SF_Transparent8 ? 't' :
+             'g'; /* /Gray*, /Rgb*, /Mask, /Indexed1 */
+}
+
 /** PostScript Level1 uncompressed binary or hex */
 Rule::Applier::cons_t out_l1c_check_rule(Rule::OutputRule* or_) {
   Rule::Cache *cache=&or_->cache;
@@ -424,33 +447,23 @@ Rule::Applier::cons_t out_l1c_check_rule(Rule::OutputRule* or_) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /SampleFormat/RGB* doesn't work with /FileFormat/PSL1 (use /PSLC or /PSL2)" << (Error*)0;
     badp=true;
   }
+  char tkey[]="l1..."; /* /l1{2,4,8,t}{8,h}{r,z,l} */
+  GenBuffer::Writable *tp0,*cp0,*out=(GenBuffer::Writable*)NULLP;
+  gen_tkey(tkey, *out, tp0, cp0, or_);
+  /* fprintf(stderr,"tkey=%s\n", tkey); */
+  if (!badp && Rule::Templates->get(tkey, strlen(tkey))==MiniPS::Qundef) return Rule::Applier::DONT_KNOW;
   return (Rule::Applier::cons_t)(badp ? 0+Rule::Applier::BAD : 0+Rule::Applier::OK);
   /* ^^^ Dat: 0+: pacify gcc-3.1 */
 }
 Rule::Applier::cons_t out_l1c_work(GenBuffer::Writable& out, Rule::OutputRule*or_, Image::SampledInfo *sf) {
   if (out_l1c_check_rule(or_)!=Rule::Applier::OK) return Rule::Applier::DONT_KNOW;
+  /* Dat: only these have been defined so far:  grep '^/l1[248tg][8h][rzl]' bts2.ttt
+   * /l1thr /l1g8r /l1ghr /l128r /l12hr /l148r /l14hr /l188r /l18hr /l1g8z /l1ghz /l1g8l /l1ghl
+   */
   or_->doSampleFormat(sf, true); /* Dat: `true': because of /Transparent+ */
-  char tkey[]="l1...";
-  Rule::Cache *cache=&or_->cache;
-  GenBuffer::Writable *tp=&out;
-       if (cache->TransferEncoding==cache->TE_A85) { tkey[3]='8'; tp=PSEncoder::newASCII85Encode (out, or_->cacheHints.TransferCPL); }
-  else if (cache->TransferEncoding==cache->TE_Hex) { tkey[3]='h'; tp=PSEncoder::newASCIIHexEncode(out, or_->cacheHints.TransferCPL); }
-  else tkey[3]='b';
-  GenBuffer::Writable *cp=tp;
-       if (cache->Compression==Rule::Cache::CO_RLE) { tkey[4]='r'; cp=PSEncoder::newRunLengthEncode(*tp, or_->cacheHints.RecordSize); }
-  else if (cache->Compression==Rule::Cache::CO_ZIP) { tkey[4]='z'; cp=PSEncoder::newFlateEncode(*tp, or_->cacheHints.Effort); }
-  else if (cache->Compression==Rule::Cache::CO_LZW) { tkey[4]='l'; cp=PSEncoder::newLZWEncode(*tp); }
-  else tkey[4]='n';
-  /* vvv removed 'm' and '1' at Sun Sep 22 17:53:08 CEST 2002 */
-  tkey[2]=// cache->SampleFormat==Image::SF_Mask     ? 'm' :
-          // cache->SampleFormat==Image::SF_Indexed1 ? '1' :
-             cache->SampleFormat==Image::SF_Indexed2 ? '2' :
-             cache->SampleFormat==Image::SF_Indexed4 ? '4' :
-             cache->SampleFormat==Image::SF_Indexed8 ? '8' :
-             cache->SampleFormat==Image::SF_Transparent2 ? 't' :
-             cache->SampleFormat==Image::SF_Transparent4 ? 't' :
-             cache->SampleFormat==Image::SF_Transparent8 ? 't' :
-             'g'; /* /Gray*, /Rgb*, /Mask, /Indexed1 */
+  char tkey[]="l1..."; /* /l1{2,4,8,t}{8,h}{r,z,l} */
+  GenBuffer::Writable *tp, *cp;
+  gen_tkey(tkey, out, tp, cp, or_);
   // fprintf(stderr, "tkey=(%s)\n", tkey);
   Rule::writeTTT(out, *tp, *cp, tkey, or_, sf,
     tkey[2]=='2' || tkey[2]=='4' || tkey[2]=='8' || tkey[2]=='t' ? Rule::writePalData : Rule::writeData
