@@ -765,8 +765,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
         char *argv[]={"(progname)","pts.ppm","pts.ps",NULL};
 	int argc=3;
 	char result[30];
-	// int ret=main(argc, argv);
-	int ret=getpid();
+	int ret=main(argc, argv);
+	// int ret=getpid();
 	sprintf(result, "main run: %d", ret);
 	MessageBox(hwnd, result, NULL, 0); /* unreached !! */
       }
