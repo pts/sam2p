@@ -128,6 +128,7 @@
 #undef HAVE_sprintf_in_stdio
 #undef HAVE_write_in_unistd
 #undef HAVE_system_in_stdlib
+#undef HAVE_lstat_in_sys_stat
 #undef HAVE_PTS_STDC
 #undef HAVE_SWITCH_ENUM_BUG
 #undef HAVE_ASCII_SYSTEM

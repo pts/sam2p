@@ -43,11 +43,12 @@ bts2.tth tul hosszu... fatal error C1076: compiler limit : internal heap limit r
 
 :-)) bts2.tth SUXX: error C2026: string too big, trailing characters truncated
 
+Imp: merge 0.40
 Imp: pts.xpm: unknown color
-Imp: \r\n
+Imp: \r\n output file
 Imp: warnings
-Imp: check for sprintf
-OK:
+Imp: VC++ check for sprintf
+OK:  autoconf
   #define HAVE_STATIC_CONST 1
   class A { static const int i=1; };
 Imp: _open -> fopen()
@@ -58,3 +59,4 @@ Imp: diff -r ""\
 Imp: chmod +x ./configure
 Imp: grep '!!'
 Imp: fopen(...,"rb") OK?
+Imp: autoconf lstat

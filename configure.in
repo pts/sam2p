@@ -142,6 +142,7 @@ AC_PTS_CHECK_HEADER(stdio.h,  sprintf, sprintf_in_stdio, [char s[42]="X"; sprint
 AC_PTS_CHECK_HEADER(stdlib.h, atoi,    atoi_in_stdlib,   [return atoi("42")!=42;])
 AC_PTS_CHECK_HEADER(unistd.h, write,   write_in_unistd,  [return write(1,"what",0)!=0;])
 AC_PTS_CHECK_HEADER(stdlib.h, system,  system_in_stdlib, [/*>255 OK*/return system("true")!=0;])
+AC_PTS_CHECK_HEADER(sys/stat.h, lstat, lstat_in_sys_stat,[struct stat st; return 0!=lstat("/",&st);])
 AC_PTS_CHECK_STRING
 AC_PTS_CHECK_MALLOC
 AC_FUNC_ALLOCA
