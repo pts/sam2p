@@ -5,6 +5,7 @@
 # ccdep.pl at Sat Jun  1 15:51:36 CEST 2002
 #
 # To create a .tar.gz, run: make MAKE_DIST=0 dist-noautoconf
+# To install dist: make MAKE_DIST=0 dist-install
 #
 
 ifndef MAKE_DIST
@@ -33,7 +34,7 @@ CXXALL=$(CXXX) $(CXXFLAGS) $(CXXFLAGSB)
 CCALL =$(CXXX) $(CXXFLAGS) $(CXXFLAGSB)
 CXDFAL=$(CXXFLAGS) $(CXXFLAGSB) $(LDFLAGS) $(LIBS)
 
-.PHONY: clean dist dist-noautoconf dist-more allclean distclean
+.PHONY: clean dist dist-noautoconf dist-more allclean distclean dist-install
 .PHONY: most all1 install
 
 ifndef MAKE_DIST
@@ -148,6 +149,9 @@ dist-noautoconf:
 # vvv Create a distribution with more files to aid compilation
 dist-more: bts2.tth
 	$(BASH) mkdist.sh sam2p-more bts2.tth
+dist-install: dist-noautoconf
+	chmod 600 ../sam2p-*.tar.gz
+	scp ../sam2p-*.tar.gz k:public_html
 
 install: sam2p
 	-mkdir -p '$(bindir)'

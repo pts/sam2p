@@ -1,3 +1,9 @@
+sam2p (0.44-2) unstable; urgency=low
+
+  * Added answers to FAQ in README.
+
+ -- Szabó Péter <pts@math.bme.hu>  Fri,  5 Mar 2004 19:54:44 +0100
+
 sam2p (0.44-1) unstable; urgency=low
 
   * bugfixes
