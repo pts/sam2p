@@ -11,12 +11,17 @@ impatient users (search for the phrase `Turbo tutorial' in your text editor).
 As of now, this README file is the only, and definitive documentation of sam2p.
 
 sam2p is a UNIX command line utility written in ANSI C++ that converts many
-raster (bitmap) image formats into Adobe PostScript or PDF files. The images
-are not vectorized. sam2p gives full control to the user to specify
-standards-compliance, compression, and bit depths. In some cases sam2p can
-compress an image 100 times smaller than the PostScript output of many other
-common image converters. sam2p provides ZIP, RLE and LZW (de)compression
-filters even on Level1 devices.
+raster (bitmap) image formats into Adobe PostScript or PDF files and several
+other formats. The images are not vectorized. sam2p gives full control to
+the user to specify standards-compliance, compression, and bit depths. In
+some cases sam2p can compress an image 100 times smaller than the PostScript
+output of many other common image converters. sam2p provides ZIP, RLE and
+LZW (de)compression filters even on Level1 PostScript devices. 
+
+A testimonail from Grant Ingram, UK: Anyway this is just a quick note to say
+thanks for writing the sam2p utility which I am using to create EPS figures
+of photographs for my thesis -- it works very well producing image sizes
+that are some 3% of the ones produced by ImageMagick.
 
 The author of sam2p recommends his program over other image image converts
 because of the following reasons:
