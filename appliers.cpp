@@ -976,6 +976,7 @@ Rule::Applier::cons_t out_jpeg_work(GenBuffer::Writable& out, Rule::OutputRule*o
   or_->doSampleFormat(sf);
   // GenBuffer::Writable *tp=&out; /* always binary */
   GenBuffer::Writable *cp=&out;
+  /* SUXX: cjpeg(1) won't create a color JPEG for a grayscale image */
   if (cache->Compression==Rule::Cache::CO_DCT) {
     SimBuffer::B other_parameters;
     or_->cacheHints.DCT->dump(other_parameters, 0, false);
