@@ -712,7 +712,7 @@ FlateEncode::FlateEncode(GenBuffer::Writable &out_, unsigned level_)
     /*pack_level=*/ level_,
     /*zfile=*/ (void*)&out_
   );
-  if (fs==NULL) Error::sev(Error::ERROR) << "Flate init error (out of memory?)" << (Error*)0;
+  if (fs==NULL) Error::sev(Error::EERROR) << "Flate init error (out of memory?)" << (Error*)0;
 }
 void *FlateEncode::gen_malloc(unsigned n) {
   return operator new(n);
@@ -733,7 +733,7 @@ void FlateEncode::vi_write(char const*buf, slen_t len) {
   }
   if (len==0) { /* EOF: send trailer */
     fs->deflate2(0,0,fs); /* Let the compressor flush its buffers. */
-    if (fs->err!=0) Error::sev(Error::ERROR) << "Flate compression error" << (Error*)0;
+    if (fs->err!=0) Error::sev(Error::EERROR) << "Flate compression error" << (Error*)0;
     fs->delete2(fs);
     fs=(struct pts_defl_interface*)NULL;
     if (s1>=65521) s1-=65521;
@@ -821,9 +821,9 @@ CCITTFaxEncode::CCITTFaxEncode(GenBuffer::Writable &out_, slendiff_t K, slen_t C
    || sCFEs.DamagedRowsBeforeError > cf_max_height
    || sCFEs.DecodedByteAlign < 1 || sCFEs.DecodedByteAlign > 16
    || (sCFEs.DecodedByteAlign & (sCFEs.DecodedByteAlign - 1)) != 0
-     ) Error::sev(Error::ERROR) << "pts_fax: invalid params" << (Error*)0;
+     ) Error::sev(Error::EERROR) << "pts_fax: invalid params" << (Error*)0;
   if (0!=s_CFE_template.init((stream_state*)&sCFEs))
-    Error::sev(Error::ERROR) << "pts_fax: init failed" << (Error*)0;
+    Error::sev(Error::EERROR) << "pts_fax: init failed" << (Error*)0;
   #if __CHECKER__
     memset(&r, 0, sizeof(r));
     memset(&w, 0, sizeof(w));
@@ -895,7 +895,7 @@ void CCITTFaxEncode::vi_write(char const*buf, slen_t len) {
 LZWEncode::LZWEncode(GenBuffer::Writable &out_): out(out_) {
   fs.tif_writer=/*FlateEncode::*/gen_write;
   fs.tif_sout=(void*)&out_;
-  if (0==pts_lzw_init(&fs)) Error::sev(Error::ERROR) << "LZW init error" << (Error*)0;
+  if (0==pts_lzw_init(&fs)) Error::sev(Error::EERROR) << "LZW init error" << (Error*)0;
 }
 
 void LZWEncode::vi_write(char const*buf, slen_t len) {
@@ -907,7 +907,7 @@ void LZWEncode::vi_write(char const*buf, slen_t len) {
   }
   while (len>=0x8000) {
     if (0==fs.tif_feeder(const_cast<char*>(buf),0x8000,&fs)) we:
-      Error::sev(Error::ERROR) << "LZW write error" << (Error*)0;
+      Error::sev(Error::EERROR) << "LZW write error" << (Error*)0;
     len-=0x8000; buf+=0x8000;
   }
   if (len!=0 && 0==fs.tif_feeder(const_cast<char*>(buf),len,&fs)) goto we;
@@ -963,7 +963,7 @@ void CjpegEncode::P::vi_copy(FILE *f) {
     0,    /* ColorTransform */
   };
   if (MACRO_GETC(f)!=0xff || MACRO_GETC(f)!=0xd8 || fread(r, 1, 8, f)!=8) {
-    bad: Error::sev(Error::ERROR) << "CjpegEncode: cjpeg created bad JPEG" << (Error*)0;
+    bad: Error::sev(Error::EERROR) << "CjpegEncode: cjpeg created bad JPEG" << (Error*)0;
   }
   out.vi_putcc((char)0xff);
   out.vi_putcc((char)0xd8);
@@ -1003,7 +1003,7 @@ void GSEncode::P::vi_check() {
   /* If STDOUT of gs is not empty, then it is very probably an error message. */
   // tmpename.term0(); /* already is */
   assert(tmpename.end_()[0]=='\0');
-  if (0!=Files::statSize(tmpename())) Error::sev(Error::ERROR) << "GSEncode: GS runtime error" << (Error*)0;
+  if (0!=Files::statSize(tmpename())) Error::sev(Error::EERROR) << "GSEncode: GS runtime error" << (Error*)0;
   /* Imp: display a meaningful error message */
 }
 
@@ -1054,7 +1054,7 @@ PSEncoder* PSEncoder::newLZWEncode(GenBuffer::Writable &out_) {
 #else
   (void)out_;
   #if 0
-    Error::sev(Error::ERROR) << "LZW not supported in this compilation of sam2p" << (Error*)0;
+    Error::sev(Error::EERROR) << "LZW not supported in this compilation of sam2p" << (Error*)0;
   #endif
   Error::sev(Error::WARNING) << "LZW: please `configure --enable-lzw' for builtin /Compression/LZW support" << (Error*)0;
   #if 0

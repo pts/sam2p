@@ -22,12 +22,23 @@ AC_MSG_CHECKING([for --enable-lzw])
 AC_ARG_ENABLE(lzw,
   [  --enable-lzw            enable built-in LZW (de)compression (def: no)],
   [], [])
-if test x"$enable_lzw" = x"yes"; then
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(USE_BUILTIN_LZW)
-  AC_MSG_WARN(LZW is patented till 19 June 2003; ask permission from Unisys to use it!)
+if test x1 = x"`perl -e 'print time>1056165811'`"; then
+  # After 19 June 2003: default: yes
+  if test x"$enable_lzw" = x"no"; then
+    AC_MSG_RESULT(no)
+  else
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(USE_BUILTIN_LZW)
+    dnl AC_MSG_WARN(LZW was patented till 19 June 2003; ask permission from Unisys to use it!)
+  fi
 else
-  AC_MSG_RESULT(no)
+  if test x"$enable_lzw" = x"yes"; then
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(USE_BUILTIN_LZW)
+    AC_MSG_WARN(LZW is patented till 19 June 2003; ask permission from Unisys to use it!)
+  else
+    AC_MSG_RESULT(no)
+  fi
 fi
 
 dnl Sun Jul  7 23:58:11 CEST 2002

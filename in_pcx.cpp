@@ -21,8 +21,8 @@
 #define pcxError(bname,conststr) Error::sev(Error::WARNING) << "PCX: " conststr << (Error*)0
 #define WaitCursor()
 #define xvbzero(p,len) memset(p, '\0', len)
-#define FatalError(conststr) Error::sev(Error::ERROR) << "PCX: " conststr << (Error*)0
-#define return_pcxError(bname, conststr) Error::sev(Error::ERROR) << "PCX: " conststr << (Error*)0
+#define FatalError(conststr) Error::sev(Error::EERROR) << "PCX: " conststr << (Error*)0
+#define return_pcxError(bname, conststr) Error::sev(Error::EERROR) << "PCX: " conststr << (Error*)0
 #define byte unsigned char
 #define size_t slen_t
 #define malloc_byte(n) new byte[n]
@@ -519,7 +519,6 @@ static int pcxError(fname,st)
 #endif
 
 static Image::Sampled *in_pcx_reader(Image::filep_t file_, SimBuffer::Flat const&) {
-  // Error::sev(Error::ERROR) << "Cannot load XPM images yet." << (Error*)0;
   PICINFO pinfo_;
   return LoadPCX((FILE*)file_, &pinfo_);
 }

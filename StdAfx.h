@@ -25,6 +25,7 @@
 #include <memory.h>
 #include <tchar.h>
 #include <stdio.h> /* sprintf() */
+#include <oledlg.h> /* OPENFILENAME */
 
 // Local Header Files
 

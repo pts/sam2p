@@ -184,7 +184,7 @@ Rule::Applier::cons_t out_p0jbin_work(GenBuffer::Writable& out, Rule::OutputRule
     MiniPS::Parser p(&flatD);
     ttm=p.parse1();
     if (p.parse1(p.EOF_ALLOWED)!=MiniPS::Qundef || MiniPS::getType(ttm)!=MiniPS::T_ARRAY)
-      Error::sev(Error::ERROR) << "TTM: the TTM file should contain a single array" << (Error*)0;
+      Error::sev(Error::EERROR) << "TTM: the TTM file should contain a single array" << (Error*)0;
     /* ^^^ Dat: the result of the second p.parse1() doesn't get delete0(...)d */
   }
   Filter::VerbatimE outve(out);
@@ -1253,7 +1253,7 @@ Rule::Applier::cons_t out_tiffjai_work(GenBuffer::Writable& out, Rule::OutputRul
     case img->CS_RGB: phot=tp.PHOTOMETRIC_RGB; break;
     case img->CS_YCbCr: phot=tp.PHOTOMETRIC_YCBCR; refe=true; break; /* preferred to RGB */
     case img->CS_CMYK: phot=tp.PHOTOMETRIC_SEPARATED; inks=true; break; /* preferred to RGB */
-    default: Error::sev(Error::ERROR) << "TIFF6-JAI: color space " << (unsigned)cs << " not supported in TIFF-JPEG" << (Error*)0;
+    default: Error::sev(Error::EERROR) << "TIFF6-JAI: color space " << (unsigned)cs << " not supported in TIFF-JPEG" << (Error*)0;
   }
 
   /* Dat: TIFF tags must appear in increasing numerical order */
@@ -1339,7 +1339,7 @@ void JPEGSOF0Encode::vi_write(char const*bufr, slen_t len) {
     slen_t len=buf.getLength();
     if (gi.bad==0 && (len<4 || buf[len-2]!='\xFF' || buf[len-1]!='\xD9')) gi.bad=10;
     if (gi.bad!=0)
-      Error::sev(Error::ERROR) << "JPEGS0F0: invalid JPEG stream: " << jai_errors[gi.bad] << (Error*)0;
+      Error::sev(Error::EERROR) << "JPEGS0F0: invalid JPEG stream: " << jai_errors[gi.bad] << (Error*)0;
     out.vi_write("\xFF\xD8", 2); /* extra SOI */
     out.vi_write(buf()+gi.SOF_offs-2, len-gi.SOF_offs+2); /* SOF0 and followers */
     out.vi_write(0,0);
@@ -1413,9 +1413,9 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
     PTS_dynamic_cast(Image::Indexed*,sf->getImg())->getClearTransp();
     assert((alpha!=NULLP) == (sf->hasTranspp()==true));
     sf->clearTransp();
-    static Image::sf_t const graytab[9]={0,Image::SF_Gray1,Image::SF_Gray2,0,Image::SF_Gray4,0,0,0,Image::SF_Gray8};
-    static Image::sf_t const rgbtab[9]={0,Image::SF_Rgb1,Image::SF_Rgb2,0,Image::SF_Rgb4,0,0,0,Image::SF_Rgb8};
-    static Image::sf_t const indexedtab[9]={0,Image::SF_Indexed1,Image::SF_Indexed2,0,Image::SF_Indexed4,0,0,0,Image::SF_Indexed8};
+    static Image::sf_t const graytab[9]={Image::SF_None,Image::SF_Gray1,Image::SF_Gray2,Image::SF_None,Image::SF_Gray4,Image::SF_None,Image::SF_None,Image::SF_None,Image::SF_Gray8};
+    static Image::sf_t const rgbtab[9]={Image::SF_None,Image::SF_Rgb1,Image::SF_Rgb2,Image::SF_None,Image::SF_Rgb4,Image::SF_None,Image::SF_None,Image::SF_None,Image::SF_Rgb8};
+    static Image::sf_t const indexedtab[9]={Image::SF_None,Image::SF_Indexed1,Image::SF_Indexed2,Image::SF_None,Image::SF_Indexed4,Image::SF_None,Image::SF_None,Image::SF_None,Image::SF_Indexed8};
     unsigned char minbpc=sf->minRGBBpcc();
     // fprintf(stderr,"minbpc=%u\n",minbpc);
          if (minbpc<8 && origSampleFormat==Image::SF_Transparent8) minbpc=8;
@@ -1624,7 +1624,7 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
     case img->CS_RGB: phot=tp.PHOTOMETRIC_RGB; break;
     case img->CS_YCbCr: phot=tp.PHOTOMETRIC_YCBCR; refe=true; break; /* preferred to RGB */
     // case img->CS_CMYK: phot=tp.PHOTOMETRIC_SEPARATED; inks=true; break; /* preferred to RGB */
-    default: Error::sev(Error::ERROR) << "TIFF6: color space " << (unsigned)jp->getColorSpace() << " not supported in TIFF-JPEG" << (Error*)0;
+    default: Error::sev(Error::EERROR) << "TIFF6: color space " << (unsigned)jp->getColorSpace() << " not supported in TIFF-JPEG" << (Error*)0;
   }
 
   /* Dat: TIFF tags must appear in increasing numerical order */

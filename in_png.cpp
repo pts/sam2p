@@ -32,8 +32,9 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
 };
 
 static Image::Sampled *in_png_reader(Image::filep_t file_, SimBuffer::Flat const&) {
-  // Error::sev(Error::ERROR) << "Cannot load PNG images yet." << (Error*)0;
+  // Error::sev(Error::EERROR) << "Cannot load PNG images yet." << (Error*)0;
   char const* cmd=
+#if 0
   #if OS_COTY==COTY_WIN9X || OS_COTY==COTY_WINNT
     "pngtopnm %S >%D\npngtopnm -alpha %S >>%D";
   #else
@@ -43,6 +44,17 @@ static Image::Sampled *in_png_reader(Image::filep_t file_, SimBuffer::Flat const
       "pngtopnm %S >%D\npngtopnm -alpha %S >>%D";
     #endif
   #endif
+#else /* Wed Feb  5 19:03:58 CET 2003 */
+  #if OS_COTY==COTY_WIN9X || OS_COTY==COTY_WINNT
+    "png22pnm -rgba %S >%D";
+  #else
+    #if OS_COTY==COTY_UNIX
+      "(png22pnm -rgba %S || (pngtopnm <%S && pngtopnm -alpha <%S)) >%D";
+    #else
+      "png22pnm -rgba %S >%D";
+    #endif
+  #endif
+#endif
   HelperE helper(cmd); /* Run external process pngtopnm */
   Encoder::writeFrom(*(Filter::PipeE*)&helper, (FILE*)file_);
   ((Filter::PipeE*)&helper)->vi_write(0,0); /* Signal EOF */

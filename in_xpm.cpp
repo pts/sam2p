@@ -132,7 +132,7 @@ int XPMTok::getcc() {
     }
    case ST_STR: st_str:
     i=MACRO_GETC(f);
-    if (i==-1) { ue: Error::sev(Error::ERROR) << "XPM: unexpected EOF" << (Error*)0; }
+    if (i==-1) { ue: Error::sev(Error::EERROR) << "XPM: unexpected EOF" << (Error*)0; }
     else if (i=='"') { state=ST_OUT; goto st_out; }
     else if (i=='\\') {
       if ((i=MACRO_GETC(f))==-1) goto ue;
@@ -152,22 +152,22 @@ Image::Sampled::dimen_t XPMTok::getDimen() {
     while (USGE((i=getcc()),'0') && USGE('9',i)) {
       bak=ret;
       ret=ret*10+(i-'0');
-      if (ret/10!=bak) Error::sev(Error::ERROR) << "XPM: dimen overflow" << (Error*)0;
+      if (ret/10!=bak) Error::sev(Error::EERROR) << "XPM: dimen overflow" << (Error*)0;
     }
     ungetcc(i);
     return ret;
-  } else Error::sev(Error::ERROR) << "XPM: dimen expected" << (Error*)0;
+  } else Error::sev(Error::EERROR) << "XPM: dimen expected" << (Error*)0;
   return 0; /*notreached*/
 }
 void XPMTok::getComma() {
-  if (getcc()!=T_COMMA) Error::sev(Error::ERROR) << "XPM: comma expected at " << ftell(f) << (Error*)0;
+  if (getcc()!=T_COMMA) Error::sev(Error::EERROR) << "XPM: comma expected at " << ftell(f) << (Error*)0;
 }
 void XPMTok::read(char *buf, unsigned len) {
   int i;
   while (len--!=0) {
     i=getcc();
     // fprintf(stderr,"i=%d\n", i);
-    if (i>=0 && i<=255) *buf++=i; else Error::sev(Error::ERROR) << "XPM: data expected" << (Error*)0;
+    if (i>=0 && i<=255) *buf++=i; else Error::sev(Error::EERROR) << "XPM: data expected" << (Error*)0;
   }
 }
 void XPMTok::readInStr(char *buf, unsigned len) {
@@ -182,7 +182,7 @@ void XPMTok::readInStr(char *buf, unsigned len) {
     else { assert(i>=0); ungetc(i,f); real:
       i=getcc();
       // fprintf(stderr,"i=%d\n", i);
-      if (i>=0 && i<=255) *buf++=i; else Error::sev(Error::ERROR) << "XPM: data expected" << (Error*)0;
+      if (i>=0 && i<=255) *buf++=i; else Error::sev(Error::EERROR) << "XPM: data expected" << (Error*)0;
     }
   }
 }
@@ -210,14 +210,14 @@ Image::Sampled::rgb_t XPMTok::getColor() {
     }
     if (i!=T_COMMA) goto cexp;
     Image::Sampled::rgb_t ret=parse_rgb(tmp);
-    if (ret==0x2000000) Error::sev(Error::ERROR) << "XPM: unknown color: " << tmp << (Error*)0;
+    if (ret==0x2000000) Error::sev(Error::EERROR) << "XPM: unknown color: " << tmp << (Error*)0;
     return ret;
-  } else { cexp: Error::sev(Error::ERROR) << "XPM: color expected" << (Error*)0; }
+  } else { cexp: Error::sev(Error::EERROR) << "XPM: color expected" << (Error*)0; }
   return 0; /*notreached*/
 }
 
 static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const&) {
-  // Error::sev(Error::ERROR) << "Cannot load XPM images yet." << (Error*)0;
+  // Error::sev(Error::EERROR) << "Cannot load XPM images yet." << (Error*)0;
   XPMTok tok((FILE*)file_);
   Image::Sampled::dimen_t wd=tok.getDimen();
   Image::Sampled::dimen_t ht=tok.getDimen();
@@ -230,7 +230,7 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
   tok.ungetcc(i); tok.getComma();
   
   // Error::sev(Error::DEBUG) << "wd="<<wd<<" ht="<<ht<<" colors="<<colors<<" cpp="<<cpp << (Error*)0;
-  if (1UL*cpp*colors>65535) Error::sev(Error::ERROR) << "XPM: too many colors" << (Error*)0;
+  if (1UL*cpp*colors>65535) Error::sev(Error::EERROR) << "XPM: too many colors" << (Error*)0;
   // if (cpp==1) {
   // }
   Image::Sampled::dimen_t transp=colors; /* No transparent colors yet. */
@@ -274,8 +274,8 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
     while (ht--!=0) {
       tok.getComma();
       for (p=outbuf+ret->getRlen(); outbuf!=p; ) {
-        if ((i=tok.getcc())<0 || i>255) Error::sev(Error::ERROR) << "XPM: data expected" << (Error*)0;
-        if ((s=bin[i])<0) Error::sev(Error::ERROR) << "XPM: unpaletted color" << (Error*)0;
+        if ((i=tok.getcc())<0 || i>255) Error::sev(Error::EERROR) << "XPM: data expected" << (Error*)0;
+        if ((s=bin[i])<0) Error::sev(Error::EERROR) << "XPM: unpaletted color" << (Error*)0;
         *outbuf++=s;
       }
     }
@@ -292,7 +292,7 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
       tok.getComma();
       for (p=outbuf+ret->getRlen(); outbuf!=p; ) {
         tok.readInStr(pend,2);
-        if ((s=bin[(pend[0]<<8)+pend[1]])<0) Error::sev(Error::ERROR) << "XPM: unpaletted color" << (Error*)0;
+        if ((s=bin[(pend[0]<<8)+pend[1]])<0) Error::sev(Error::EERROR) << "XPM: unpaletted color" << (Error*)0;
         *outbuf++=s;
       }
     }
@@ -306,7 +306,7 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
       tok.getComma();
       for (p=outbuf+ret->getRlen(); outbuf!=p; ) {
         tok.readInStr(pend,2);
-        if ((s=bin[(pend[0]<<8)+pend[1]])==(unsigned short)-1) Error::sev(Error::ERROR) << "XPM: unpaletted color" << (Error*)0;
+        if ((s=bin[(pend[0]<<8)+pend[1]])==(unsigned short)-1) Error::sev(Error::EERROR) << "XPM: unpaletted color" << (Error*)0;
         *outbuf++=(rgb1=rgb[s])>>16;
         *outbuf++=rgb1>>8;
         *outbuf++=rgb1;
@@ -326,7 +326,7 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
         tok.getComma();
         for (p=outbuf+ret->getRlen(); outbuf!=p; ) {
           tok.readInStr(pend,cpp);
-          if (NULLP==(pend=h.get(pend, cpp))) Error::sev(Error::ERROR) << "XPM: unpaletted color" << (Error*)0;
+          if (NULLP==(pend=h.get(pend, cpp))) Error::sev(Error::EERROR) << "XPM: unpaletted color" << (Error*)0;
           *outbuf++=*pend;
         }
       }
@@ -347,7 +347,7 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
         tok.getComma();
         for (p=outbuf+ret->getRlen(); outbuf!=p; outbuf+=3) {
           tok.readInStr(pend,cpp);
-          if (NULLP==(pend=h.get(pend, cpp))) Error::sev(Error::ERROR) << "XPM: unpaletted color" << (Error*)0;
+          if (NULLP==(pend=h.get(pend, cpp))) Error::sev(Error::EERROR) << "XPM: unpaletted color" << (Error*)0;
           memcpy(outbuf, pend, 3);
         }
       }
@@ -366,7 +366,7 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
           tok.read(pend,cpp);
           if (0!=memcmp(p,pend,cpp)) {
             p=tab; lastcol=0; while (p!=pend && 0!=memcmp(p,pend,cpp)) { p+=cpp; lastcol++; }
-            if (p==pend) Error::sev(Error::ERROR) << "XPM: unpaletted color" << (Error*)0;
+            if (p==pend) Error::sev(Error::EERROR) << "XPM: unpaletted color" << (Error*)0;
             if (rgb[lastcol]==0x1000000) p=tab+cpp*(lastcol=transp); /* fix single transp */
           }
           *outbuf++=lastcol;
@@ -379,7 +379,7 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
           tok.read(pend,cpp);
           if (0!=memcmp(p,pend,cpp)) {
             p=tab; lastcol=0; while (p!=pend && 0!=memcmp(p,pend,cpp)) { p+=cpp; lastcol++; }
-            if (p==pend) Error::sev(Error::ERROR) << "XPM: unpaletted color" << (Error*)0;
+            if (p==pend) Error::sev(Error::EERROR) << "XPM: unpaletted color" << (Error*)0;
           }
           *outbuf++=rgb[lastcol]>>16;
           *outbuf++=rgb[lastcol]>>8;

@@ -47,6 +47,8 @@ igloo, wincvs nem tudnak SSH-s cvs-t. WinCVS azt mondja magáról, hogy tud;
   de nincs értelmes hibaüzenet, és nincs olyan ablak, amirõl a
   dokumentáció írja, hogy ott kell beállítani
 
+Error::ERROR -> Error:EERROR
+
 Imp: merge 0.40, diff -r ""
 Imp: pts.xpm: unknown color
 Imp: test vc++

@@ -109,13 +109,22 @@ end restore showpage
 %%EOF\n)
 
 % _l23_
+% With old (pre-Wed Feb  5 17:46:59 CET 2003) PDF code, /Length was one less,
+% because it hasn't counted the last \n newline in the content stream. This
+% made a problem with pdfTeX 0.12 shipped with Debian Slink.
+% Old code (focus on the \n's)
+%[ (3 0 obj\n<</Length ) ] %1
+%-4 %2: length of chunk 4
+%(>>\nstream\n) %3
+%[ (q`s\n`w 0 0 `h 0 0 cm /S Do Q) ] %4.0
+%(\nendstream\nendobj\n) %5
 /p02 [%sam2p-ttm; by pts@fazekas.hu at Sat Apr 20 18:33:30 CEST 2002
 (%PDF-1.`0\n`B) %0
 [ (3 0 obj\n<</Length ) ] %1
 -4 %2: length of chunk 4
 (>>\nstream\n) %3
-[ (q`s\n`w 0 0 `h 0 0 cm /S Do Q) ] %4.0
-(\nendstream\nendobj\n) %5
+[ (q`s\n`w 0 0 `h 0 0 cm /S Do Q\n) ] %4.0
+(endstream\nendobj\n) %5
 [ (2 0 obj\n<</Type/Pages/Kids[<</Type/Page/MediaBox[`X]
 /CropBox[`X]/Parent 2 0 R/Resources<</XObject<</S
 4 0 R>>/ProcSet[/PDF`C]>>/Contents
@@ -146,8 +155,8 @@ end restore showpage
 [ (3 0 obj\n<</Length ) ] %1
 -4 %2: length of chunk 4
 (>>\nstream\n) %3
-[ (q`s\n`g rg `w 0 0 `h 0 0 cm /S Do Q) ] %4.0
-(\nendstream\nendobj\n) %5
+[ (q`s\n`g rg `w 0 0 `h 0 0 cm /S Do Q\n) ] %4.0
+(endstream\nendobj\n) %5
 [ (2 0 obj\n<</Type/Pages/Kids[<</Type/Page/MediaBox[`X]
 /CropBox[`X]/Parent 2 0 R/Resources<</XObject<</S
 4 0 R>>/ProcSet[/PDF`C]>>/Contents
@@ -180,8 +189,8 @@ end restore showpage
 (>>\nstream\n) %3
 [ (q`s\n`g rg `w 0 0 `h 0 0 cm\nBI/W `w/H `h/ImageMask true/BPC `b`F ID
 `S
-EI\nQ) ] %4.0
-(\nendstream\nendobj\n) %5
+EI\nQ\n) ] %4.0
+(endstream\nendobj\n) %5
 [ (2 0 obj\n<</Type/Pages/Kids[<</Type/Page/MediaBox[`X]
 /CropBox[`X]/Parent 2 0 R/Resources<</ProcSet[/PDF`C]>>/Contents
 3 0 R>>]/Count 1>>\nendobj\n) ] %6
@@ -207,8 +216,8 @@ EI\nQ) ] %4.0
 [ (q`s
 `G rg 0 0 m `w 0 l `w `h l 0 `h l F
 `g rg
-`w 0 0 `h 0 0 cm /S Do Q) ] %4.0
-(\nendstream\nendobj\n) %5
+`w 0 0 `h 0 0 cm /S Do Q\n) ] %4.0
+(endstream\nendobj\n) %5
 [ (2 0 obj\n<</Type/Pages/Kids[<</Type/Page/MediaBox[`X]
 /CropBox[`X]/Parent 2 0 R/Resources<</XObject<</S
 4 0 R>>/ProcSet[/PDF`C]>>/Contents
@@ -244,8 +253,8 @@ EI\nQ) ] %4.0
 `G rg 0 0 m `w 0 l `w `h l 0 `h l F
 `g rg `w 0 0 `h 0 0 cm\nBI/W `w/H `h/ImageMask true/BPC `b`F ID
 `S
-EI\nQ) ] %4.0
-(\nendstream\nendobj\n) %5
+EI\nQ\n) ] %4.0
+(endstream\nendobj\n) %5
 [ (2 0 obj\n<</Type/Pages/Kids[<</Type/Page/MediaBox[`X]
 /CropBox[`X]/Parent 2 0 R/Resources<</ProcSet[/PDF`C]>>/Contents
 3 0 R>>]/Count 1>>\nendobj\n) ] %6
@@ -269,8 +278,8 @@ EI\nQ) ] %4.0
 (>>\nstream\n) %3
 [ (q`s\n`w 0 0 `h 0 0 cm\nBI/Interpolate false/W `w/H `h/CS`1/BPC `b`F ID
 `S
-EI\nQ) ] %4.0
-(\nendstream\nendobj\n) %5
+EI\nQ\n) ] %4.0
+(endstream\nendobj\n) %5
 [ (2 0 obj\n<</Type/Pages/Kids[<</Type/Page/MediaBox[`X]
 /CropBox[`X]/Parent 2 0 R/Resources<</ProcSet[/PDF`C]>>/Contents
 3 0 R>>]/Count 1>>\nendobj\n) ] %6
@@ -316,8 +325,8 @@ end restore showpage
 [ (3 0 obj\n<</Length ) ] %1
 -4 %2: length of chunk 4
 (>>\nstream\n) %3
-[ (q`s\n`w 0 0 `h 0 0 cm /S Do Q) ] %4.0
-(\nendstream\nendobj\n) %5
+[ (q`s\n`w 0 0 `h 0 0 cm /S Do Q\n) ] %4.0
+(endstream\nendobj\n) %5
 [ (2 0 obj\n<</Type/Pages/Kids[<</Type/Page/MediaBox[`X]
 /CropBox[`X]/Parent 2 0 R/Resources<</XObject<</S
 4 0 R>>/ProcSet[/PDF`C]>>/Contents
@@ -351,8 +360,8 @@ end restore showpage
 (>>\nstream\n) %3
 [ (q`s\n`w 0 0 `h 0 0 cm\nBI/W `w/H `h/CS/Device`d/BPC `b`F ID
 `S
-EI\nQ) ] %4.0
-(\nendstream\nendobj\n) %5
+EI\nQ\n) ] %4.0
+(endstream\nendobj\n) %5
 [ (2 0 obj\n<</Type/Pages/Kids[<</Type/Page/MediaBox[`X]
 /CropBox[`X]/Parent 2 0 R/Resources<</ProcSet[/PDF`C]>>/Contents
 3 0 R>>]/Count 1>>\nendobj\n) ] %6
@@ -425,8 +434,8 @@ restore showpage
 (>>\nstream\n) %3
 % [ (q `g rg 0 0 `w `h re B Q) ] %4.0
 % ^^^ SUXX `re' draws a rectangle with black border in acroread :-(
-[ (q `g rg 0 0 m `w 0 l `w `h l 0 `h l F Q) ] %4.0
-(\nendstream\nendobj\n) %5
+[ (q `g rg 0 0 m `w 0 l `w `h l 0 `h l F Q\n) ] %4.0
+(endstream\nendobj\n) %5
 [ (2 0 obj\n<</Type/Pages/Kids[<</Type/Page/MediaBox[`X]
 /CropBox[`X]/Parent 2 0 R/Resources<</ProcSet[/PDF`C]>>/Contents
 3 0 R>>]/Count 1>>\nendobj\n) ] %6
@@ -448,8 +457,8 @@ restore showpage
 [ (3 0 obj\n<</Length ) ] %1
 -4 %2: length of chunk 4
 (>>\nstream\n) %3
-[ (q`s `g rg 0 0 m `w 0 l `w `h l 0 `h l S Q) ] %4.0
-(\nendstream\nendobj\n) %5
+[ (q`s `g rg 0 0 m `w 0 l `w `h l 0 `h l S Q\n) ] %4.0
+(endstream\nendobj\n) %5
 [ (2 0 obj\n<</Type/Pages/Kids[<</Type/Page/MediaBox[`X]
 /CropBox[`X]/Parent 2 0 R/Resources<</ProcSet[/PDF`C]>>/Contents
 3 0 R>>]/Count 1>>\nendobj\n) ] %6

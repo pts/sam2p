@@ -13,8 +13,12 @@
 #include <stdio.h>
 #include <stdlib.h> /* exit() */
 #include <string.h> /* strlen() */
+#if _MSC_VER > 1000
+#  include "windows.h" /* ExitThread() */
+#endif
 
 char const* Error::argv0=(char const*)NULLP;
+char const* Error::long_argv0=(char const*)NULLP;
 char const* Error::banner0=(char const*)NULLP;
 char const* Error::tmpargv0=(char const*)"pRg_tMp";
 
@@ -37,8 +41,8 @@ Error::Policy *Error::policy_top=&defaultPolicy, *Error::policy_bottom=&defaultP
 char const*Error::level2str(level_t level) {
   return level==ASSERT ? "failed_assertion" : /* Imp: make assert() produce this */
          level==FATAL ? "Fatal Error" :
-         level==ERROR ? "Error" :
          level==ERROR_CONT ? "Error" :
+         level==EERROR ? "Error" :
          level==WARNING_DEFER ? "Warning" :
          level==WARNING ? "Warning" :
          level==NOTICE ? "Notice" :
@@ -140,7 +144,11 @@ void Error::cexit(int exitCode) {
     delete first_cleanup; /* Allocated from as an array, but has no destructors. */
     first_cleanup=next;
   }
-  exit(exitCode); /* <stdlib.h> */
+  #if _MSC_VER > 1000
+    ExitThread(exitCode);
+  #else
+    exit(exitCode); /* <stdlib.h> */
+  #endif
 }
 
 Error::Cleanup* Error::newCleanup(Error::Cleanup::handler_t handler, void *data, slen_t size) {

@@ -34,7 +34,7 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
 };
 
 static Image::Sampled *in_tiff_reader(Image::filep_t file_, SimBuffer::Flat const&) {
-  // Error::sev(Error::ERROR) << "Cannot load TIFF images yet." << (Error*)0;
+  // Error::sev(Error::EERROR) << "Cannot load TIFF images yet." << (Error*)0;
   // HelperE helper("tifftopnm %S"); /* Cannot extract alpha channel */
   // HelperE helper("tif22pnm -rgba %S"); /* tif22pnm <= 0.07 */
   HelperE helper("tif22pnm -rgba %S pnm:"); /* Wants to seek in the file. */

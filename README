@@ -2106,6 +2106,13 @@ History
      synchronized to GIMP tif22pnm
      transparent(+?) TIFF output, really
 
+0.42 Wed Feb  5 18:40:12 CET 2003
+     vcsam2p.exe (graphic .exe with Visual Studio 6.0), merged
+     added Below feature -m:lower:5
+     png22pnm support
+     Debian Slink pdfTeX integration
+
+??
      (expected) !!
      transparent(+?) TIFF output,
      complete turbo tutorial,

@@ -9,6 +9,7 @@
 #include "encoder.hpp"
 #include "minips.hpp"
 #include "rule.hpp"
+#include "main.hpp"
 
 /* Sat Jul  6 16:39:19 CEST 2002
  * empirical checkerg++ helper routines for gcc version 2.95.2 20000220 (Debian GNU/Linux)
@@ -45,9 +46,6 @@ void __pure_virtual() { abort(); }
 #include <stdio.h>
 #include <string.h> /* memset() */
 
-Files::FILEW sout(stdout);
-Files::FILEW serr(stderr);
-
 #if OBJDEP
 #  warning REQUIRES: in_tiff.o
 #  warning REQUIRES: in_jpeg.o
@@ -72,7 +70,9 @@ extern Image::Loader in_gif_loader;
 extern Image::Loader in_bmp_loader;
 extern Image::Loader in_pnm_loader;
 extern Image::Loader in_tga_loader;
-static void init_loader(GenBuffer::Writable &s) {
+void init_loader() {
+  static bool had_init_loader=false;
+  if (had_init_loader) return;
   Image::register0(&in_tga_loader); /* checker not sure; install early */
   Image::register0(&in_pcx_loader);
   Image::register0(&in_xpm_loader);
@@ -84,9 +84,7 @@ static void init_loader(GenBuffer::Writable &s) {
   Image::register0(&in_jpeg_loader);
   Image::register0(&in_png_loader);
   Image::register0(&in_jai_loader);
-  s << "Available Loaders:";
-  Image::printLoaders(s);
-  s << ".\n";
+  had_init_loader=true;
 }
 
 #if OBJDEP
@@ -112,8 +110,9 @@ extern Rule::Applier out_empty_applier;
 extern Rule::Applier out_meta_applier;
 extern Rule::Applier out_xwd_applier;
 extern Rule::Applier out_x11_applier;
-static void init_applier(GenBuffer::Writable &s) {
-  s << "Available Appliers:";
+void init_applier() {
+  static bool had_init_applier=false;
+  if (had_init_applier) return;
   // Rule::register0(&out_l1op_applier);
   Rule::register0(&out_l1tr_applier);
   // Rule::register0(&out_l1fa85g_applier);
@@ -134,8 +133,7 @@ static void init_applier(GenBuffer::Writable &s) {
   Rule::register0(&out_meta_applier);
   Rule::register0(&out_xwd_applier);
   Rule::register0(&out_x11_applier);
-  Rule::printAppliers(s);
-  s << ".\n";
+  had_init_applier=true;
 }
 
 static char *bts_ttt=
@@ -210,7 +208,7 @@ static unsigned sam2p_optval(char const* s, slen_t slen) {
   return OPT_unknown;
 }
 
-static void displayJob(SimBuffer::Flat const& jobss) {
+static void displayJob(GenBuffer::Writable &sout, SimBuffer::Flat const& jobss) {
   fflush(stdout); fflush(stderr);
   #if 0
     puts("\n\n% begin sam2p job dump");
@@ -252,6 +250,7 @@ static inline void one_setdimen2(char const*&Dimen1, char const*&Dimen2, char co
 } while(0)
 #endif
 
+static bool do_DisplayJobFile;
 static bool buildProfile_quiet=false;
 /** Creates an in-memory job file according to the command-line options.
  * @param a argv+1
@@ -273,7 +272,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   Rule::Cache::pr_t Predictor=Rule::Cache::PR_None; /* Imp: separate for each Compression */
   Rule::Cache::ff_t FileFormat=Rule::Cache::FF_default;
   Rule::Cache::te_t TransferEncoding=Rule::Cache::TE_default;
-  bool do_DisplayJobFile=false;
+  do_DisplayJobFile=false;
   bool do_stop_SampleFormat=false;
   char const *OutputFile=(char const*)NULLP, *InputFile=(char const*)NULLP;
   // SimBuffer::B tmp;
@@ -787,9 +786,6 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
    *    /Created  pop
    *    /Produced pop
    */
-  
-  
-  if (do_DisplayJobFile) displayJob(jobss);
   return false;
   #undef APPEND_sf
   #undef APPEND_co
@@ -800,65 +796,48 @@ static bool option_eq(char const *arg, char const*option) {
   return 0==GenBuffer::nocase_strcmp(arg, option);
 }
 
+void init_sam2p_engine(char const*argv0) {
+  Error::long_argv0=argv0==(char const*)NULLP ? "sam2p" : argv0;
+  Error::argv0=Files::only_fext(Error::long_argv0);
+  Error::tmpargv0="_sam2p_";
+  Error::banner0="sam2p v0.42";
+}
+
 /* --- */
 
-/** main: process entry point for the sam2p utility. */
-int main(int, char const*const* argv) {
-  /* --- Initialize */
-
-  bool helpp=argv[0]==(char const*)NULLP || argv[0]!=(char const*)NULLP && argv[1]!=(char const*)NULLP && argv[2]==(char const*)NULLP && (
-             option_eq(argv[1], "-help") || 
-             option_eq(argv[1], "-h") || 
-             option_eq(argv[1], "-?") || 
-             option_eq(argv[1], "/h") || 
-             option_eq(argv[1], "/?"));
-  bool versionp=argv[0]!=(char const*)NULLP && argv[1]!=(char const*)NULLP && argv[2]==(char const*)NULLP && (
-             option_eq(argv[1], "-version") || 
-             option_eq(argv[1], "-v"));
-  char const *long_argv0=argv[0]==(char const*)NULLP ? "sam2p" : argv[0];
-  Error::argv0=Files::only_fext(long_argv0);
-  Error::tmpargv0="_sam2p_";
-  Error::banner0="sam2p v0.41";
-
-  if (versionp) {
-    sout << "This is " << Error::banner0 << ".\n";
-    return 0;
-  }
-
-  /* Don't print diagnostics to stdout, becuse it might be the OutputFile */
-  serr << "This is " << Error::banner0 << ".\n";
-  init_loader(serr);
-  init_applier(serr);
+void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*argv1, bool helpp) {
+  Error::serr=&serr;
 
   /* --- Parse arguments, generate/read .job file */
   
   MiniPS::VALUE job=MiniPS::Qundef;
   Filter::FlatR bts(bts_ttt);
-  if (!helpp && argv[0]!=(char const*)NULLP && argv[1]!=(char const*)NULLP && argv[2]==(char const*)NULLP) {
+  if (!helpp && argv1[0]!=(char const*)NULLP && argv1[1]==(char const*)NULLP) {
     /* A single argument: must be the name of the .job file */
-    MiniPS::Parser p(argv[1]);
+    MiniPS::Parser p(argv1[0]);
     p.addSpecRun("%bts", &bts); /* bts: Built-in TemplateS, the bts.ttt file in the sources */
     job=p.parse1();
     if (p.parse1(p.EOF_ALLOWED)!=MiniPS::Qundef)
-      Error::sev(Error::ERROR) << "job: the .job file should contain a single job" << (Error*)0;
+      Error::sev(Error::EERROR) << "job: the .job file should contain a single job" << (Error*)0;
     /* ^^^ Dat: the result of the second p.parse1() doesn't get delete0(...)d */
-  } else if (helpp || argv[0]==(char const*)NULLP || argv[1]==(char const*)NULLP) { help: /* help message */
-    sout << "Usage:   " << long_argv0 << " <filename.job>\n" <<
-            "         " << long_argv0 << " [options] <in.img> [OutputFormat:] <out.img>\n" <<
-            "Example: " << long_argv0 << " test.gif EPS: test.eps\n";
+  } else if (helpp || argv1[0]==(char const*)NULLP) { help: /* help message */
+    sout << "Usage:   " << Error::long_argv0 << " <filename.job>\n" <<
+            "         " << Error::long_argv0 << " [options] <in.img> [OutputFormat:] <out.img>\n" <<
+            "Example: " << Error::long_argv0 << " test.gif EPS: test.eps\n";
     if (helpp) Error::cexit(0);
-    Error::sev(Error::ERROR) << "Incorrect command line" << (Error*)0;
+    Error::sev(Error::EERROR) << "Incorrect command line" << (Error*)0;
   } else { /* one_liner */
     SimBuffer::B jobss;
-    if (one_liner(jobss, argv+1)) goto help;
+    if (one_liner(jobss, argv1)) goto help;
+    if (do_DisplayJobFile) displayJob(sout, jobss);
     Filter::FlatR jobr(jobss(), jobss.getLength());
     MiniPS::Parser p(&jobr);
     p.addSpecRun("%bts", &bts); /* bts: Built-in TemplateS, the bts.ttt file in the sources */
     if (MiniPS::Qerror==(job=p.parse1(p.EOF_ILLEGAL, Error::ERROR_CONT))
      || p.parse1(p.EOF_ALLOWED)!=MiniPS::Qundef
        ) {
-      displayJob(jobss);
-      Error::sev(Error::ERROR) << "job: in-memory .job file corrupt (bug?" "?)" << (Error*)0;
+      displayJob(sout, jobss);
+      Error::sev(Error::EERROR) << "job: in-memory .job file corrupt (bug?" "?)" << (Error*)0;
       /* ^^^ Dat: the result of the second p.parse1() doesn't get delete0(...)d */
     }
   }
@@ -908,7 +887,6 @@ int main(int, char const*const* argv) {
     }
     MiniPS::RDICT(job)->put("/LoadHints", (MiniPS::VALUE)LoadHints); /* avoid memory leak (job gets freed recursively) */
   }
-
       
   /* Imp: eliminate memory leak from default LoadHints */
   /* vvv may raise tons of error messages */
@@ -928,11 +906,11 @@ int main(int, char const*const* argv) {
   FILE *of=stdout;
   if (OutputFile->getLength()!=1 || OutputFile->begin_()[0]!='-') {
     if ((of=fopen(OutputFile->begin_(), "wb"))==(FILE*)NULLP) {
-      Error::sev(Error::ERROR) << "job: cannot rewrite OutputFile: " << FNQ2(OutputFile->begin_(),OutputFile->getLength()) << (Error*)0;
+      Error::sev(Error::EERROR) << "job: cannot rewrite OutputFile: " << FNQ2(OutputFile->begin_(),OutputFile->getLength()) << (Error*)0;
     }
     /*if (!overwrite)*/
     Files::tmpRemoveCleanup(OutputFile->begin_(), &of);
-  }
+  } else Files::set_binary_mode(1, true);
   
   /* --- Find and apply best applier */
   
@@ -944,7 +922,7 @@ int main(int, char const*const* argv) {
   fflush(of);
   if (ferror(of)) {
     /* FILE *backup=of; of=(FILE*)NULLP; fclose(backup); */
-    Error::sev(Error::ERROR) << "job: error writing OutputFile: " << FNQ2(OutputFile->begin_(),OutputFile->getLength()) << (Error*)0;
+    Error::sev(Error::EERROR) << "job: error writing OutputFile: " << FNQ2(OutputFile->begin_(),OutputFile->getLength()) << (Error*)0;
   }
   if (of!=stdout) { /* Don't interfere with tmpRemoveCleanup() */
     FILE *backup=of; of=(FILE*)NULLP; fclose(backup);
@@ -952,7 +930,7 @@ int main(int, char const*const* argv) {
   if (overwrite) {
     if (0!=rename(OutputFile->begin_(), InputFile->begin_())) {
       // remove(OutputFile->begin_()); /* tmpRemoveCleanup() does it */
-      Error::sev(Error::ERROR) << "job: error renaming, InputFile left intact" << (Error*)0;
+      Error::sev(Error::EERROR) << "job: error renaming, InputFile left intact" << (Error*)0;
     }
   }
   Error::sev(Error::NOTICE) << "job: written OutputFile: " << FNQ2(OutputFile->begin_(),OutputFile->getLength()) << (Error*)0;
@@ -966,5 +944,37 @@ int main(int, char const*const* argv) {
   fputs("Success.\n", stderr);
   fflush(stdout); fflush(stderr);
   Error::cexit(0);
+}
+
+/** main: process entry point for the sam2p utility. */
+int main(int, char const*const* argv) {
+  Files::FILEW sout(stdout);
+  Files::FILEW serr(stderr);
+  /* --- Initialize */
+
+  bool helpp=argv[0]==(char const*)NULLP || argv[0]!=(char const*)NULLP && argv[1]!=(char const*)NULLP && argv[2]==(char const*)NULLP && (
+             option_eq(argv[1], "-help") || 
+             option_eq(argv[1], "-h") || 
+             option_eq(argv[1], "-?") || 
+             option_eq(argv[1], "/h") || 
+             option_eq(argv[1], "/?"));
+  bool versionp=argv[0]!=(char const*)NULLP && argv[1]!=(char const*)NULLP && argv[2]==(char const*)NULLP && (
+             option_eq(argv[1], "-version") || 
+             option_eq(argv[1], "-v"));
+  init_sam2p_engine(argv[0]);
+  
+  if (versionp) {
+    sout << "This is " << Error::banner0 << ".\n";
+    return 0;
+  }
+
+  /* Don't print diagnostics to stdout, becuse it might be the OutputFile */
+  serr << "This is " << Error::banner0 << ".\n";
+  init_loader();
+  serr << "Available Loaders:"; Image::printLoaders(serr); serr << ".\n";
+  init_applier();
+  serr << "Available Appliers:"; Rule::printAppliers(serr); serr << ".\n";
+
+  run_sam2p_engine(sout, serr, argv+(argv[0]!=(char const*)NULLP), helpp);
   return 0; /*notreached*/
 }

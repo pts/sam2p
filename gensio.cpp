@@ -28,7 +28,12 @@ extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list 
 #include "error.hpp"
 #include <string.h> /* strlen() */
 #include <stdarg.h> /* va_list */
-#include <unistd.h> /* getpid() */
+#if _MSC_VER > 1000
+// extern "C" int getpid(void);
+#  include <process.h>
+#else
+#  include <unistd.h> /* getpid() */
+#endif
 #include <sys/stat.h> /* struct stat */
 #include <stdlib.h> /* getenv() */
 #include <errno.h>
@@ -49,10 +54,6 @@ extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list 
 #  endif
 #  include "snprintf.h"
 #  define VSNPRINTF fixup_vsnprintf /* Tested, C99. */
-#endif
-
-#if _MSC_VER > 1000
-extern "C" int getpid(void);
 #endif
 
 static void cleanup(int) {
@@ -176,7 +177,7 @@ void Encoder::writeFrom(GenBuffer::Writable& out, FILE *f) {
 /* --- */
 
 Filter::FILEE::FILEE(char const* filename) {
-  if (NULLP==(f=fopen(filename,"wb"))) Error::sev(Error::ERROR) << "Filter::FILEE: error open4write: " << FNQ2(filename,strlen(filename)) << (Error*)0;
+  if (NULLP==(f=fopen(filename,"wb"))) Error::sev(Error::EERROR) << "Filter::FILEE: error open4write: " << FNQ2(filename,strlen(filename)) << (Error*)0;
   closep=true;
 }
 void Filter::FILEE::vi_write(char const*buf, slen_t len) {
@@ -189,7 +190,7 @@ void Filter::FILEE::close() {
 /* --- */
 
 Filter::FILED::FILED(char const* filename) {
-  if (NULLP==(f=fopen(filename,"rb"))) Error::sev(Error::ERROR) << "Filter::FILED: error open4read: " << FNQ2(filename,strlen(filename)) << (Error*)0;
+  if (NULLP==(f=fopen(filename,"rb"))) Error::sev(Error::EERROR) << "Filter::FILED: error open4read: " << FNQ2(filename,strlen(filename)) << (Error*)0;
   closep=true;
 }
 slen_t Filter::FILED::vi_read(char *buf, slen_t len) {
@@ -218,9 +219,9 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
      case 'd': case 'D': /* temporary file for encoded data output */
       pp=&tmpname;
      put:
-      // if (*pp) Error::sev(Error::ERROR) << "Filter::PipeE" << ": multiple %escape" << (Error*)0;
+      // if (*pp) Error::sev(Error::EERROR) << "Filter::PipeE" << ": multiple %escape" << (Error*)0;
       /* ^^^ multiple %escape is now a supported feature */
-      if (!*pp && !Files::find_tmpnam(*pp)) Error::sev(Error::ERROR) << "Filter::PipeE" << ": tmpnam() failed" << (Error*)0;
+      if (!*pp && !Files::find_tmpnam(*pp)) Error::sev(Error::EERROR) << "Filter::PipeE" << ": tmpnam() failed" << (Error*)0;
       assert(! !*pp); /* pacify VC6.0 */
       // *pp << ext;
       pp->term0();
@@ -235,11 +236,11 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
       pp=&tmpsname;
       goto put;
      default:
-      Error::sev(Error::ERROR) << "Filter::PipeE" << ": invalid %escape in pipe_tmpl" << (Error*)0;
+      Error::sev(Error::EERROR) << "Filter::PipeE" << ": invalid %escape in pipe_tmpl" << (Error*)0;
     } else redir_cmd << s[-1];
   }
   #if 0
-    if (!tmpname) Error::sev(Error::ERROR) << "Filter::PipeE" << ": no outname (%D) in cmd: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
+    if (!tmpname) Error::sev(Error::EERROR) << "Filter::PipeE" << ": no outname (%D) in cmd: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
   #else
     /* Append quoted file redirect to command, if missing */
     if (!tmpname) { s=" >%D"; goto lex; }
@@ -258,22 +259,22 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
 
  #if HAVE_PTS_POPEN
   if (!tmpsname) {
-    if (NULLP==(p=popen(redir_cmd(), "w"CFG_PTS_POPEN_B))) Error::sev(Error::ERROR) << "Filter::PipeE" << ": popen() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
+    if (NULLP==(p=popen(redir_cmd(), "w"CFG_PTS_POPEN_B))) Error::sev(Error::EERROR) << "Filter::PipeE" << ": popen() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
     signal(SIGPIPE, SIG_IGN); /* Don't abort process with SIGPIPE signals if child cannot read our data */
   } else {
  #else
   if (1) {
  #endif
    #if !HAVE_system_in_stdlib
-    Error::sev(Error::ERROR) << "Filter::PipeE" << ": no system() on this system" << (Error*)0;
+    Error::sev(Error::EERROR) << "Filter::PipeE" << ": no system() on this system" << (Error*)0;
    #else
-    if (NULLP==(p=fopen(tmpsname(), "wb"))) Error::sev(Error::ERROR) << "Filter::PipeD" << ": fopen(w) failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
+    if (NULLP==(p=fopen(tmpsname(), "wb"))) Error::sev(Error::EERROR) << "Filter::PipeD" << ": fopen(w) failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
    #endif
   }
 }
 void Filter::PipeE::vi_copy(FILE *f) {
   writeFrom(out, f);
-  if (ferror(f)) Error::sev(Error::ERROR) << "Filter::PipeE: vi_copy() failed" << (Error*)0;
+  if (ferror(f)) Error::sev(Error::EERROR) << "Filter::PipeE: vi_copy() failed" << (Error*)0;
   fclose(f);
 }
 void Filter::PipeE::vi_write(char const*buf, slen_t len) {
@@ -283,20 +284,20 @@ void Filter::PipeE::vi_write(char const*buf, slen_t len) {
     if (tmpsname) {
      #if HAVE_system_in_stdlib
       fclose(p);
-      if (0!=(Files::system3(redir_cmd()))) Error::sev(Error::ERROR) << "Filter::PipeE" << ": system() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
+      if (0!=(Files::system3(redir_cmd()))) Error::sev(Error::EERROR) << "Filter::PipeE" << ": system() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
       remove(tmpsname());
      #endif /* Dat: else is not required; would be unreachable code. */
     } else {
      #if HAVE_PTS_POPEN
-      if (0!=pclose(p)) Error::sev(Error::ERROR) << "Filter::PipeE" << ": pclose() failed; error in external prg" << (Error*)0;
+      if (0!=pclose(p)) Error::sev(Error::EERROR) << "Filter::PipeE" << ": pclose() failed; error in external prg" << (Error*)0;
      #endif
     }
     vi_check();
     p=(FILE*)NULLP;
     FILE *f=fopen(tmpname(),"rb");
-    if (NULLP==f) Error::sev(Error::ERROR) << "Filter::PipeE" <<": fopen() after pclose() failed: " << tmpname << (Error*)0;
+    if (NULLP==f) Error::sev(Error::EERROR) << "Filter::PipeE" <<": fopen() after pclose() failed: " << tmpname << (Error*)0;
     vi_copy(f);
-    // if (ferror(f)) Error::sev(Error::ERROR) << "Filter::Pipe: fread() tmpfile failed" << (Error*)0;
+    // if (ferror(f)) Error::sev(Error::EERROR) << "Filter::Pipe: fread() tmpfile failed" << (Error*)0;
     // fclose(f);
     /* ^^^ interacts badly when Image::load() is called inside vi_copy(),
      * Image::load() calls fclose()
@@ -311,7 +312,7 @@ void Filter::PipeE::vi_write(char const*buf, slen_t len) {
 //      assert(!ferror(p));
       if (ferror(p)) {
         vi_check(); /* Give a chance to report a better error message when Broken File. */
-        Error::sev(Error::ERROR) << "Filter::PipeE" << ": pipe write failed" << (Error*)0;
+        Error::sev(Error::EERROR) << "Filter::PipeE" << ": pipe write failed" << (Error*)0;
       }
       buf+=wr; len-=wr;
     }
@@ -338,9 +339,9 @@ Filter::PipeD::PipeD(GenBuffer::Readable &in_, char const*pipe_tmpl, slendiff_t 
      case 'd': case 'D': /* temporary file for encoded data output */
       pp=&tmpname;
      put:
-      // if (*pp) Error::sev(Error::ERROR) << "Filter::PipeD: multiple %escape" << (Error*)0;
+      // if (*pp) Error::sev(Error::EERROR) << "Filter::PipeD: multiple %escape" << (Error*)0;
       /* ^^^ multiple %escape is now a supported feature */
-      if (!*pp && !Files::find_tmpnam(*pp)) Error::sev(Error::ERROR) << "Filter::PipeD" << ": tmpnam() failed" << (Error*)0;
+      if (!*pp && !Files::find_tmpnam(*pp)) Error::sev(Error::EERROR) << "Filter::PipeD" << ": tmpnam() failed" << (Error*)0;
       assert(*pp);
       pp->term0();
       if ((unsigned char)(s[-1]-'A')<(unsigned char)('Z'-'A'))
@@ -355,11 +356,11 @@ Filter::PipeD::PipeD(GenBuffer::Readable &in_, char const*pipe_tmpl, slendiff_t 
       goto put;
      /* OK: implement temporary file for input, option to suppress popen() */
      default:
-      Error::sev(Error::ERROR) << "Filter::PipeD: invalid %escape in pipe_tmpl" << (Error*)0;
+      Error::sev(Error::EERROR) << "Filter::PipeD: invalid %escape in pipe_tmpl" << (Error*)0;
     } else redir_cmd << s[-1];
   }
   #if 0
-    if (!tmpname) Error::sev(Error::ERROR) << "Filter::PipeD" << ": no outname (%D) in cmd: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
+    if (!tmpname) Error::sev(Error::EERROR) << "Filter::PipeD" << ": no outname (%D) in cmd: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
   #else
     /* Append quoted file redirect to command, if missing */
     if (!tmpname) { s=" >%D"; goto lex; }
@@ -381,28 +382,28 @@ slen_t Filter::PipeD::vi_read(char *tobuf, slen_t tolen) {
   if (state==0) { /* Read the whole stream from `in', write it to `tmpname' */
    #if HAVE_PTS_POPEN
     if (!tmpsname) {
-      if (NULLP==(p=popen(redir_cmd(), "w"CFG_PTS_POPEN_B))) Error::sev(Error::ERROR) << "Filter::PipeD" << ": popen() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
+      if (NULLP==(p=popen(redir_cmd(), "w"CFG_PTS_POPEN_B))) Error::sev(Error::EERROR) << "Filter::PipeD" << ": popen() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
       signal(SIGPIPE, SIG_IGN); /* Don't abort process with SIGPIPE signals if child cannot read our data */
       vi_precopy();
       in.vi_read(0,0);
-      if (0!=pclose(p)) Error::sev(Error::ERROR) << "Filter::PipeD" << ": pclose() failed; error in external prg" << (Error*)0;
+      if (0!=pclose(p)) Error::sev(Error::EERROR) << "Filter::PipeD" << ": pclose() failed; error in external prg" << (Error*)0;
     } else {
    #else
     if (1) {
    #endif
      #if !HAVE_system_in_stdlib
-      Error::sev(Error::ERROR) << "Filter::PipeD" << ": no system() on this system" << (Error*)0;
+      Error::sev(Error::EERROR) << "Filter::PipeD" << ": no system() on this system" << (Error*)0;
      #else
-      if (NULLP==(p=fopen(tmpsname(), "wb"))) Error::sev(Error::ERROR) << "Filter::PipeD" << ": fopen(w) failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
+      if (NULLP==(p=fopen(tmpsname(), "wb"))) Error::sev(Error::EERROR) << "Filter::PipeD" << ": fopen(w) failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
       vi_precopy();
       in.vi_read(0,0);
       fclose(p);
-      if (0!=(Files::system3(redir_cmd()))) Error::sev(Error::ERROR) << "Filter::PipeD" << ": system() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
+      if (0!=(Files::system3(redir_cmd()))) Error::sev(Error::EERROR) << "Filter::PipeD" << ": system() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
       remove(tmpsname());
      #endif
     }
     vi_check();
-    if (NULLP==(p=fopen(tmpname(),"rb"))) Error::sev(Error::ERROR) << "Filter::PipeD" << ": fopen() after pclose() failed: " << tmpname << (Error*)0;
+    if (NULLP==(p=fopen(tmpname(),"rb"))) Error::sev(Error::EERROR) << "Filter::PipeD" << ": fopen() after pclose() failed: " << tmpname << (Error*)0;
     state=1;
   } /* IF state==0 */
   assert(state==1);
@@ -426,7 +427,7 @@ void Filter::PipeD::vi_precopy() {
       wr=fwrite(buf, 1, len>0x4000?0x4000:len, p);
       if (ferror(p)) {
         vi_check(); /* Give a chance to report a better error message when Broken File. */
-        Error::sev(Error::ERROR) << "Filter::PipeD" << ": pipe write failed" << (Error*)0;
+        Error::sev(Error::EERROR) << "Filter::PipeD" << ": pipe write failed" << (Error*)0;
       }
     }
   }
@@ -539,7 +540,9 @@ FILE *Files::open_tmpnam(SimBuffer::B &dir, bool binary_p, char const*extension)
   /* ^^^ Dat: we need DIR_SEP here, because the name of the tmp file may be
    * passed to Win32 COMMAND.COM, which interprets "/" as a switch
    */
-  fname << '_' << getpid() << '_' << counter++;
+  long pid=getpid();
+  if (pid<0 && pid>-(1<<24)) pid=-pid;
+  fname << '_' << pid << '_' << counter++;
   if (extension) fname << extension;
   fname.term0();
   FILE *f=(FILE*)NULLP;
@@ -641,7 +644,7 @@ int Files::system3(char const *commands) {
     tmpnam.term0();
     Files::tmpRemoveCleanup(tmpnam());
     fprintf(f, "@echo off\n%s\n", commands);
-    if (ferror(f)) Error::sev(Error::ERROR) << "system3: write to tmp .bat file: " << tmpnam << (Error*)NULLP;
+    if (ferror(f)) Error::sev(Error::EERROR) << "system3: write to tmp .bat file: " << tmpnam << (Error*)NULLP;
     fclose(f);
     // printf("(%s)\n", tmpnam()); system("bash");
     // int ret=system(("sh "+tmpnam)());

@@ -103,8 +103,7 @@ static struct
 static bitmap_type ReadImage (FILE *fp,
                          struct tga_header *hdr);
 bitmap_type
-tga_load_image (at_string filename)
-{
+tga_load_image (at_string filename) {
   FILE *fp;
   struct tga_header hdr;
 
@@ -131,6 +130,7 @@ tga_load_image (at_string filename)
 
   /* Check the signature. */
 
+  memset(&hdr, '\0', sizeof(hdr));
   if (fseek (fp, 0, SEEK_SET) ||
       fread (&hdr, sizeof (hdr), 1, fp) != 1)
 #if PTS_SAM2P

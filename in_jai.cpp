@@ -229,7 +229,7 @@ static void jai_handle_jpeg(struct gfxinfo *result, T *fp) {
           if (result->had_jfif!=0) ;
           else if (result->colortransform==0) result->colorspace=Image::Sampled::CS_RGB;
           else if (result->colortransform==1) ;
-          else if (result->colortransform!=127) Error::sev(Error::ERROR) << "JAI: unknown ColorTransform: " << (unsigned)result->colortransform << (Error*)0;
+          else if (result->colortransform!=127) Error::sev(Error::EERROR) << "JAI: unknown ColorTransform: " << (unsigned)result->colortransform << (Error*)0;
           else if (result->id_rgb!=0) result->colorspace=Image::Sampled::CS_RGB;
           /* Imp: check for id_ycbcr */
           else Error::sev(Error::WARNING) << "JAI: assuming YCbCr color space" << (Error*)0;
@@ -237,7 +237,7 @@ static void jai_handle_jpeg(struct gfxinfo *result, T *fp) {
           result->colorspace=Image::Sampled::CS_CMYK;
           if (result->colortransform==0) ;
           else if (result->colortransform==2) result->colorspace=Image::Sampled::CS_YCCK;
-          else if (result->colortransform!=127) Error::sev(Error::ERROR) << "JAI: unknown ColorTransform: " << (unsigned)result->colortransform << (Error*)0;
+          else if (result->colortransform!=127) Error::sev(Error::EERROR) << "JAI: unknown ColorTransform: " << (unsigned)result->colortransform << (Error*)0;
         } else assert(0);
         result->bad=0;
       }
@@ -311,7 +311,7 @@ static Image::Sampled *in_jai_reader(Image::filep_t file_, SimBuffer::Flat const
   struct gfxinfo gi;
   jai_handle_jpeg(&gi, (FILE*)file_);
   // long ftel=ftell((FILE*)file_);
-  if (gi.bad!=0) Error::sev(Error::ERROR) << "JAI: " << jai_errors[gi.bad] << (Error*)0;
+  if (gi.bad!=0) Error::sev(Error::EERROR) << "JAI: " << jai_errors[gi.bad] << (Error*)0;
   // printf("ftell=%lu\n", ftell((FILE*)file_));
   fseek((FILE*)file_, 0L, 2); /* EOF */
   long flen=ftell((FILE*)file_); /* skip extra bytes after EOI */
@@ -322,7 +322,7 @@ static Image::Sampled *in_jai_reader(Image::filep_t file_, SimBuffer::Flat const
   if (fread(ret->getHeadp(), flen, 1, (FILE*)file_)!=1 || ferror((FILE*)file_)) {
     ret->fixEOI();
     fclose((FILE*)file_);
-    Error::sev(Error::ERROR) << "JAI: IO error" << (Error*)0;
+    Error::sev(Error::EERROR) << "JAI: IO error" << (Error*)0;
   }
   fclose((FILE*)file_);
   return ret;

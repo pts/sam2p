@@ -32,15 +32,14 @@
 
 static Image::Sampled *in_gif_reader(Image::filep_t file_, SimBuffer::Flat const&) {
   Image::Indexed *img;
-  // Error::sev(Error::ERROR) << "Cannot load XPM images yet." << (Error*)0;
   CGIFFF GifFileType *giff;
   CGIFFF SavedImage *sp;
   CGIFFF ColorMapObject *cm;
   
   if (0==(giff=CGIFFF DGifOpenFILE(file_)) || GIF_ERROR==CGIFFF DGifSlurp(giff))
-    Error::sev(Error::ERROR) << "GIF: " << (CGIFFF GetGifError() || "unknown error") << (Error*)0;
+    Error::sev(Error::EERROR) << "GIF: " << (CGIFFF GetGifError() || "unknown error") << (Error*)0;
   if (giff->ImageCount<1)
-    Error::sev(Error::ERROR) << "GIF: no image in file" << (Error*)0;
+    Error::sev(Error::EERROR) << "GIF: no image in file" << (Error*)0;
 
   sp=giff->SavedImages+0;
   cm = (sp->ImageDesc.ColorMap ? sp->ImageDesc.ColorMap : giff->SColorMap);

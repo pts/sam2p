@@ -409,10 +409,10 @@ unsigned char Image::Sampled::minRGBBpc() const {
 Image::Indexed* Image::Sampled::addAlpha0(Image::Sampled *img, Image::Gray *al) {
   Image::Indexed *iimg=(Image::Indexed*)img;
   unsigned ncols=0;
-  if (img==NULLP) Error::sev(Error::ERROR) << "addAlpha: too many colors, transparency impossible" << (Error*)0;
+  if (img==NULLP) Error::sev(Error::EERROR) << "addAlpha: too many colors, transparency impossible" << (Error*)0;
   iimg->to8();
   iimg->packPal();
-  if ((ncols=iimg->getNcols())==256) Error::sev(Error::ERROR) << "addAlpha: too many colors, transparency impossible" << (Error*)0;
+  if ((ncols=iimg->getNcols())==256) Error::sev(Error::EERROR) << "addAlpha: too many colors, transparency impossible" << (Error*)0;
   iimg->setNcolsMove(ncols+1);
   /* fprintf(stderr,"old ncols=%u\n", ncols); */
   iimg->setPal(ncols,0); /* black */
@@ -860,7 +860,7 @@ void Image::Indexed::dumpDebug(GenBuffer::Writable& gw) {
 
 Image::Sampled* Image::Indexed::addAlpha(Image::Gray *al) {
   // Error::sev(Error::WARNING) << "Indexed: alpha channel ignored" << (Error*)0; return this;
-  if (al->getHt()!=ht || al->getWd()!=wd) Error::sev(Error::ERROR) << "addAlpha: image dimension mismatch" << (Error*)0;
+  if (al->getHt()!=ht || al->getWd()!=wd) Error::sev(Error::EERROR) << "addAlpha: image dimension mismatch" << (Error*)0;
   bool ign_mid=false;
   unsigned char lightest, darkest;
   al->to8();
@@ -893,7 +893,7 @@ Image::Sampled* Image::Indexed::addAlpha(Image::Gray *al) {
     }
     if (ncols==256) { /* Try again, probably now we have less colors */
       packPal();
-      if ((ncols=getNcols())==256) Error::sev(Error::ERROR) << "Indexed::addAlpha: too many colors, transparency impossible" << (Error*)0;
+      if ((ncols=getNcols())==256) Error::sev(Error::EERROR) << "Indexed::addAlpha: too many colors, transparency impossible" << (Error*)0;
       for (p=rowbeg,alq=al->getRowbeg(); p!=pend; p++) 
         if ((unsigned char)*alq++!=255) *p=ncols;
     }
@@ -1009,7 +1009,7 @@ void Image::Gray::setBpc(unsigned char bpc_) {
 
 Image::Sampled* Image::Gray::addAlpha(Image::Gray *al) {
   // Error::sev(Error::WARNING) << "Gray: alpha channel ignored" << (Error*)0; return this;
-  if (al->getHt()!=ht || al->getWd()!=wd) Error::sev(Error::ERROR) << "addAlpha: image dimension mismatch" << (Error*)0;
+  if (al->getHt()!=ht || al->getWd()!=wd) Error::sev(Error::EERROR) << "addAlpha: image dimension mismatch" << (Error*)0;
   bool ign_mid=false;
   unsigned char lightest, darkest;
   al->to8();
@@ -1107,7 +1107,7 @@ void Image::RGB::setBpc(unsigned char bpc_) {
 #endif
 
 Image::Sampled* Image::RGB::addAlpha(Image::Gray *al) {
-  if (al->getHt()!=ht || al->getWd()!=wd) Error::sev(Error::ERROR) << "addAlpha: image dimension mismatch" << (Error*)0;
+  if (al->getHt()!=ht || al->getWd()!=wd) Error::sev(Error::EERROR) << "addAlpha: image dimension mismatch" << (Error*)0;
   bool ign_mid=false;
   unsigned char lightest, darkest;
   al->to8();
@@ -1173,12 +1173,12 @@ Image::Sampled* Image::load(char const* format, filep_t f_, SimBuffer::Flat cons
   unsigned got=0;
   slen_t ret=fread(buf, 1, Loader::MAGIC_LEN, f);
   /* vvv Imp: clarify error message: may be a read error */
-  if (ret==0) Error::sev(Error::ERROR) << "Zero-length image file" << (Error*)0;
+  if (ret==0) Error::sev(Error::EERROR) << "Zero-length image file" << (Error*)0;
   if (ret<Loader::MAGIC_LEN) memset(buf+ret, '\0', Loader::MAGIC_LEN-ret);
   if (0
    || (rewind(f), 0)
    || ferror(f))
-    Error::sev(Error::ERROR) << "I/O error in image file" << (Error*)0;
+    Error::sev(Error::EERROR) << "I/O error in image file" << (Error*)0;
   if (got!=0 && got!=Loader::MAGIC_LEN) memmove(buf+2*Loader::MAGIC_LEN-got, buf+Loader::MAGIC_LEN, got);
   Loader *p=first;
   Loader::reader_t reader;
@@ -1188,7 +1188,7 @@ Image::Sampled* Image::load(char const* format, filep_t f_, SimBuffer::Flat cons
      && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints))) { return reader(f, loadHints); }
     p=p->next;
   }
-  Error::sev(Error::ERROR) << "Unknown input image format" << (Error*)0;
+  Error::sev(Error::EERROR) << "Unknown input image format" << (Error*)0;
   return 0; /*notreached*/
 }
 
@@ -1196,10 +1196,10 @@ Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHin
   static char buf[2*Loader::MAGIC_LEN];
   FILE *f=fopen(filename, "rb");
   unsigned got=0;
-  if (f==NULLP) Error::sev(Error::ERROR) << "Cannot open/read image file: " << FNQ(filename) << (Error*)0;
+  if (f==NULLP) Error::sev(Error::EERROR) << "Cannot open/read image file: " << FNQ(filename) << (Error*)0;
   slen_t ret=fread(buf, 1, Loader::MAGIC_LEN, f);
   /* vvv Imp: clarify error message: may be a read error */
-  if (ret==0) Error::sev(Error::ERROR) << "Zero-length image file: " << FNQ(filename) << (Error*)0;
+  if (ret==0) Error::sev(Error::EERROR) << "Zero-length image file: " << FNQ(filename) << (Error*)0;
   if (ret<Loader::MAGIC_LEN) memset(buf+ret, '\0', Loader::MAGIC_LEN-ret);
 #if 0
   unsigned long pos=fseek(f, 0, SEEK_END);
@@ -1211,7 +1211,7 @@ Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHin
 #endif
    || (rewind(f), 0)
    || ferror(f))
-    Error::sev(Error::ERROR) << "I/O error in image file: " << FNQ(filename) << (Error*)0;
+    Error::sev(Error::EERROR) << "I/O error in image file: " << FNQ(filename) << (Error*)0;
   if (got!=0 && got!=Loader::MAGIC_LEN) memmove(buf+2*Loader::MAGIC_LEN-got, buf+Loader::MAGIC_LEN, got);
   Loader *p=first;
   Loader::reader_t reader;
@@ -1219,7 +1219,7 @@ Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHin
     if ((Loader::checker_t)NULLP!=p->checker && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints))) { return reader(f, loadHints); }
     p=p->next;
   }
-  Error::sev(Error::ERROR) << "Unknown input image format: " << FNQ(filename) << (Error*)0;
+  Error::sev(Error::EERROR) << "Unknown input image format: " << FNQ(filename) << (Error*)0;
   // Error::sev(Error::WARNING) << "Zero-length image1." << (Error*)0;
   // Error::sev(Error::WARNING) << "Zero-length image2." << (Error*)0;
   return 0; /*notreached*/

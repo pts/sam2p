@@ -441,7 +441,7 @@ void Rule::OutputRule::doSampleFormat(Image::SampledInfo *info, bool separatep) 
   /* vvv simplifier added at Sat Jun 15 13:59:40 CEST 2002 */
   if (separatep2) cache.SampleFormat=Image::SF_Transparent8;
   if (!info->setSampleFormat(cache.SampleFormat, cache.WarningOK, /*TryOnly*/false, cache.Transparent))
-    Error::sev(Error::ERROR) << "doSampleFormat: cannot set desired SampleFormat" << (Error*)0;
+    Error::sev(Error::EERROR) << "doSampleFormat: cannot set desired SampleFormat" << (Error*)0;
   Image::Sampled *img=info->getImg();
   slen_t n=1;
   if (separatep2) {
@@ -568,10 +568,10 @@ Rule::Sampled *Rule::load(char const* filename) {
   static char buf[2*Applier::MAGIC_LEN];
   FILE *f=fopen(filename, "rb");
   unsigned got=0;
-  if (f==NULLP) Error::sev(Error::ERROR) << "Cannot open/read image file: " << FNQ(filename) << (Error*)0;
+  if (f==NULLP) Error::sev(Error::EERROR) << "Cannot open/read image file: " << FNQ(filename) << (Error*)0;
   slen_t ret=fread(buf, 1, Applier::MAGIC_LEN, f);
   /* vvv Imp: clarify error message: may be a read error */
-  if (ret==0) Error::sev(Error::ERROR) << "Zero-length image file: " << FNQ(filename) << (Error*)0;
+  if (ret==0) Error::sev(Error::EERROR) << "Zero-length image file: " << FNQ(filename) << (Error*)0;
   if (ret<Applier::MAGIC_LEN) memset(buf+ret, '\0', Applier::MAGIC_LEN-ret);
 #if 0
   unsigned long pos=fseek(f, 0, SEEK_END);
@@ -583,7 +583,7 @@ Rule::Sampled *Rule::load(char const* filename) {
 #endif
    || (rewind(f), 0)
    || ferror(f))
-    Error::sev(Error::ERROR) << "I/O error in image file: " << FNQ(filename) << (Error*)0;
+    Error::sev(Error::EERROR) << "I/O error in image file: " << FNQ(filename) << (Error*)0;
   if (got!=0 && got!=Applier::MAGIC_LEN) memmove(buf+2*Applier::MAGIC_LEN-got, buf+Applier::MAGIC_LEN, got);
   Applier *p=first;
   Applier::reader_t reader;
@@ -591,7 +591,7 @@ Rule::Sampled *Rule::load(char const* filename) {
     if (NULLP!=(reader=p->checker(buf,buf+Applier::MAGIC_LEN))) { return reader(f); }
     p=p->next;
   }
-  Error::sev(Error::ERROR) << "Unknown image format: " << FNQ(filename) << (Error*)0;
+  Error::sev(Error::EERROR) << "Unknown image format: " << FNQ(filename) << (Error*)0;
   // Error::sev(Error::WARNING) << "Zero-length image1." << (Error*)0;
   // Error::sev(Error::WARNING) << "Zero-length image2." << (Error*)0;
   return 0; /*notreached*/
@@ -686,7 +686,7 @@ void Rule::applyProfile(GenBuffer::Writable& out, OutputRule*rule_list, Image::S
       }
     } /* IF image supports SampleFormat */
   }
-  Error::sev(Error::ERROR) << "applyProfile: invalid combination, no applicable OutputRule" << (Error*)0;
+  Error::sev(Error::EERROR) << "applyProfile: invalid combination, no applicable OutputRule" << (Error*)0;
 }
 
 void Rule::deleteProfile(OutputRule*rule_list) {
@@ -992,7 +992,7 @@ void Rule::writeTTE(
       }
       break;
      default:
-      Error::sev(Error::ERROR) << "writeTTE: unknown escape: " << (char)p[-1] << (Error*)0;
+      Error::sev(Error::EERROR) << "writeTTE: unknown escape: " << (char)p[-1] << (Error*)0;
     }
     template_=p;
   }
@@ -1015,7 +1015,7 @@ void Rule::writeTTM(
   MiniPS::VALUE *chunk;
   param_assert(chunkArray!=NULLP);
   // param_assert(chunkArray->getLength()<=MAXLEN);
-  if (chunkArray->getLength()>(int)MAXLEN) Error::sev(Error::ERROR) << "writeTTM: TTM too long" << (Error*)0;
+  if (chunkArray->getLength()>(int)MAXLEN) Error::sev(Error::EERROR) << "writeTTM: TTM too long" << (Error*)0;
   GenBuffer::Writable& out=outve.getOut();
   MiniPS::ii_t i, ii;
   for (chunkArray->getFirst(chunk), i=0; chunk!=NULLP; chunkArray->getNext(chunk), i++) {
@@ -1033,9 +1033,9 @@ void Rule::writeTTM(
       writeTTE(outve, outpal, outstream, MiniPS::RSTRING(*chunk)->begin_(), or_, sf, stream_writer, strings);
       break;
      case MiniPS::T_INTEGER:
-      if (0==(ii=MiniPS::int2ii(*chunk))) Error::sev(Error::ERROR) << "writeTTM: zero is an invalid chunk" << (Error*)0;
+      if (0==(ii=MiniPS::int2ii(*chunk))) Error::sev(Error::EERROR) << "writeTTM: zero is an invalid chunk" << (Error*)0;
       if (ii>0) { /* an offset */
-        if (ii>i) Error::sev(Error::ERROR) << "writeTTM: cannot predict chunk offset" << (Error*)0;
+        if (ii>i) Error::sev(Error::EERROR) << "writeTTM: cannot predict chunk offset" << (Error*)0;
         if (MiniPS::T_ARRAY==MiniPS::getType(chunkArray->get(ii)))
                chunks[i].write_num(offsets[ii], 10);
           else chunks[i] << offsets[ii];
@@ -1044,7 +1044,7 @@ void Rule::writeTTM(
       }
       break;
      default:
-      Error::sev(Error::ERROR) << "writeTTM: invalid chunk type: " << MiniPS::getTypeStr(MiniPS::getType(*chunk)) << (Error*)0;
+      Error::sev(Error::EERROR) << "writeTTM: invalid chunk type: " << MiniPS::getTypeStr(MiniPS::getType(*chunk)) << (Error*)0;
     }
     offsets[i+1]=offsets[i]+chunks[i].getLength();
   } /* NEXT */
@@ -1077,7 +1077,7 @@ void Rule::writeTTT(
     writeTTM(*(Filter::VerbatimE*)&out, outpal, outstream, MiniPS::RARRAY(val), or_, sf, stream_writer, strings);
     break;
    default:
-    Error::sev(Error::ERROR) << "writeTTT: invalid template type: " << MiniPS::getTypeStr(MiniPS::getType(val)) << (Error*)0;
+    Error::sev(Error::EERROR) << "writeTTT: invalid template type: " << MiniPS::getTypeStr(MiniPS::getType(val)) << (Error*)0;
   }
 }
 

@@ -98,16 +98,16 @@ int MiniPS::Tokenizer::yylex() {
     if (in.vi_getcc()!='>') goto err;
     return '>';
    case '<':
-    if ((c=in.vi_getcc())==-1) { uf_hex: Error::sev(Error::ERROR) << "miniPS: unfinished hexstr" << (Error*)0; }
+    if ((c=in.vi_getcc())==-1) { uf_hex: Error::sev(Error::EERROR) << "miniPS: unfinished hexstr" << (Error*)0; }
     if (c=='<') return '<';
-    if (c=='~') Error::sev(Error::ERROR) << "miniPS: a85str unsupported" << (Error*)0;
+    if (c=='~') Error::sev(Error::EERROR) << "miniPS: a85str unsupported" << (Error*)0;
     tv.bb=&b; b.clear();
     hi=true;
     while (c!='>') {
       if ((hv=b.hexc2n(c))!=16) {
         if (hi) { b << (char)(hv<<4); hi=false; }
            else { b.end_()[-1]|=hv; hi=true; }
-      } else if (!is_ps_white(c)) Error::sev(Error::ERROR) << "miniPS: syntax error in hexstr" << (Error*)0;
+      } else if (!is_ps_white(c)) Error::sev(Error::EERROR) << "miniPS: syntax error in hexstr" << (Error*)0;
       if ((c=in.vi_getcc())==-1) goto uf_hex;
     }
     /* This is correct even if an odd number of hex digits have arrived */
@@ -137,7 +137,7 @@ int MiniPS::Tokenizer::yylex() {
         b << (char)(8*hv+(c-'0'));
       } /* SWITCH */
     } /* WHILE */    
-    uf_str: Error::sev(Error::ERROR) << "miniPS: unfinished str" << (Error*)0;
+    uf_str: Error::sev(Error::EERROR) << "miniPS: unfinished str" << (Error*)0;
    case '/':
     /* fall-through, b will begin with '/' */
    default: /* /nametype, /integertype or /realtype */
@@ -170,7 +170,7 @@ int MiniPS::Tokenizer::yylex() {
     return 'E'; /* /nametype */
   }
  err:
-  Error::sev(Error::ERROR) << "miniPS: syntax error" << (Error*)0;
+  Error::sev(Error::EERROR) << "miniPS: syntax error" << (Error*)0;
   goto again_getcc; /* notreached */
 }
 
@@ -675,7 +675,7 @@ void MiniPS::Dict::extend(ii_t newlen) {
 MiniPS::Parser::Parser(char const *filename_) {
   FILE *ff;
   ff=(filename_[0]=='-' && filename_[1]=='\0')? stdin: fopen(filename_, "r"); /* not "rb" */
-  if (ff==NULLP) Error::sev(Error::ERROR) << "MiniPS::Parser: cannot open file: " << FNQ(filename_) << (Error*)0;
+  if (ff==NULLP) Error::sev(Error::EERROR) << "MiniPS::Parser: cannot open file: " << FNQ(filename_) << (Error*)0;
   f=(FILEP)ff;
   rd=new Files::FILER(ff);
   tok=new Tokenizer(*rd);
@@ -754,7 +754,7 @@ void MiniPS::Parser::setSpecRuns(MiniPS::Dict *newSpecRuns) {
   }
 }
 void MiniPS::Parser::setDepth(unsigned depth_) {
-  if (depth_>=MAX_DEPTH) Error::sev(Error::ERROR) << "MiniPS::Parser: `run' inclusion too deep" << (Error*)0;
+  if (depth_>=MAX_DEPTH) Error::sev(Error::EERROR) << "MiniPS::Parser: `run' inclusion too deep" << (Error*)0;
   depth=depth_;
 }
 MiniPS::VALUE MiniPS::Parser::parse1(int closer, int sev) {
@@ -856,13 +856,13 @@ MiniPS::VALUE MiniPS::Parser::parse1(int closer, int sev) {
       if (Qundef==(key=parse1('>', sev))) break;
       if (key==Qerror) return Qerror;
       if (getType(key)!=T_SNAME) {
-        Error::sev(Error::ERROR) << "MiniPS::Parser: dict key must be a /name" << (Error*)0;
+        Error::sev(Error::EERROR) << "MiniPS::Parser: dict key must be a /name" << (Error*)0;
         return Qerror;
       }
       val=parse1(EOF_ILLEGAL_POP, sev); /* No EOF allowed here */
       if (val==Qerror) return Qerror;
       if (val!=Qpop) {
-        // if (Qundef!=ap->push(RSNAME(key)->begin_(),RSNAME(key)->getLength(),val)) Error::sev(Error::ERROR) << "MiniPS::Parser: duplicate dict key" << (Error*)0;
+        // if (Qundef!=ap->push(RSNAME(key)->begin_(),RSNAME(key)->getLength(),val)) Error::sev(Error::EERROR) << "MiniPS::Parser: duplicate dict key" << (Error*)0;
         /* ^^^ should free if non-fatal error */
         if (Qundef!=(v=ap->push(RSNAME(key)->begin_(),RSNAME(key)->getLength(),val))) {
           Error::sev(Error::WARNING) << "MiniPS::Parser: overriding previous dict key: " << RSNAME(key)->begin_() << (Error*)0;
@@ -885,7 +885,7 @@ void MiniPS::scanf_dict(VALUE job, bool show_warnings, ...) {
   char *key;
   unsigned ty;
   VALUE default_, *dst, got;
-  if (getType(job)!=T_DICT) Error::sev(Error::ERROR) << "scanf_dict: dict expected" << (Error*)0;
+  if (getType(job)!=T_DICT) Error::sev(Error::EERROR) << "scanf_dict: dict expected" << (Error*)0;
   PTS_va_start(ap, show_warnings);
   //  "InputFile",  MiniPS::T_STRING, MiniPS::Qundef, &InputFile,
   //  "OutputFile", MiniPS::T_STRING, MiniPS::Qundef, &OutputFile,
@@ -902,34 +902,34 @@ void MiniPS::scanf_dict(VALUE job, bool show_warnings, ...) {
       got = (ty==S_SENUM) ? RDICT(default_)->get(" ",1) /* get the default value */
           : (ty==S_FUNC) ? ((VALUE(*)(VALUE))default_)(Qundef)
           : default_;
-      if (got==Qundef) Error::sev(Error::ERROR) << "scanf_dict: required key missing: /" << key << (Error*)0;
+      if (got==Qundef) Error::sev(Error::EERROR) << "scanf_dict: required key missing: /" << key << (Error*)0;
       /* type of default value is unchecked deliberately */
     } else switch (ty) {
      case S_RGBSTR:
-      if (getType(got)!=T_STRING || RSTRING(got)->getLength()!=3) Error::sev(Error::ERROR) << "scanf_dict: key /" << key << " must be an RGB color triplet" << (Error*)0;
+      if (getType(got)!=T_STRING || RSTRING(got)->getLength()!=3) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be an RGB color triplet" << (Error*)0;
       break;
      case S_SENUM:
-      if (getType(got)!=T_SNAME) Error::sev(Error::ERROR) << "scanf_dict: key /" << key << " must be an enum value (name)" << (Error*)0;
+      if (getType(got)!=T_SNAME) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be an enum value (name)" << (Error*)0;
       got=RDICT(default_)->get(RSNAME(got)->begin_(),RSNAME(got)->getLength());
-      if (got==Qundef) Error::sev(Error::ERROR) << "scanf_dict: key /" << key << " must be a valid enum value" << (Error*)0;
+      if (got==Qundef) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be a valid enum value" << (Error*)0;
       break;
      case S_FUNC:
       got=((VALUE(*)(VALUE))default_)(got);
-      if (got==Qundef) Error::sev(Error::ERROR) << "scanf_dict: key /" << key << " has invalid value" << (Error*)0;
+      if (got==Qundef) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " has invalid value" << (Error*)0;
       break;
      case S_UINTEGER:
-      if ((got&1)==0 || got<Qinteger(0)) Error::sev(Error::ERROR) << "scanf_dict: key /" << key << " must be a non-negative integer" << (Error*)0;
+      if ((got&1)==0 || got<Qinteger(0)) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be a non-negative integer" << (Error*)0;
       break;
      case S_ANY:
       break;
      case S_PINTEGER:
-      if ((got&1)==0 || got<=Qinteger(0)) Error::sev(Error::ERROR) << "scanf_dict: key /" << key << " must be a positive integer" << (Error*)0;
+      if ((got&1)==0 || got<=Qinteger(0)) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be a positive integer" << (Error*)0;
       break;
      case S_NUMBER:
-      if ((got&1)==0 && getType(got)!=T_REAL) Error::sev(Error::ERROR) << "scanf_dict: key /" << key << " must be real or integer" << (Error*)0;
+      if ((got&1)==0 && getType(got)!=T_REAL) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be real or integer" << (Error*)0;
       break;
      default:
-      if (getType(got)!=ty) Error::sev(Error::ERROR) << "scanf_dict: key /" << key << " must have type " << getTypeStr(ty) << (Error*)0;
+      if (getType(got)!=ty) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must have type " << getTypeStr(ty) << (Error*)0;
     }
     *dst=got;
   }
@@ -962,7 +962,7 @@ bool MiniPS::isZero(MiniPS::VALUE v) {
    case T_REAL: return RREAL(v)->getBp()==0;
    case T_INTEGER: return int2ii(v)==0;
   }
-  Error::sev(Error::ERROR) << "isZero: number expected" << (Error*)0;
+  Error::sev(Error::EERROR) << "isZero: number expected" << (Error*)0;
   return false; /* NOTREACHED */
 }
 
@@ -978,7 +978,7 @@ void MiniPS::dumpAdd3(GenBuffer::Writable &out, MiniPS::VALUE a, MiniPS::VALUE b
     while (tt--!=t) switch (getType(*tt)) {
      case T_REAL: if ((dd=RREAL(*tt)->getBp())!=0) { d+=dd; no_real_real=false; } break;
      case T_INTEGER: if ((ll=int2ii(*tt))!=0) { d+=ll; l+=ll; }  break;
-     default: err: Error::sev(Error::ERROR) << "dumpAdd3: numbers expected" << (Error*)0;
+     default: err: Error::sev(Error::EERROR) << "dumpAdd3: numbers expected" << (Error*)0;
     }
     switch (subt) {
      case T_REAL:    d-=RREAL(sub)->getBp(); no_real_real=false; break;

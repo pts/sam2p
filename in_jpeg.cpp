@@ -33,7 +33,7 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
 };
 
 static Image::Sampled *in_jpeg_reader(Image::filep_t file_, SimBuffer::Flat const&) {
-  // Error::sev(Error::ERROR) << "Cannot load JPEG images yet." << (Error*)0;
+  // Error::sev(Error::EERROR) << "Cannot load JPEG images yet." << (Error*)0;
   HelperE helper("djpeg"); /* Run external process `djpeg' to convert JPEG -> PNM */
   Encoder::writeFrom(*(Filter::PipeE*)&helper, (FILE*)file_);
   ((Filter::PipeE*)&helper)->vi_write(0,0); /* Signal EOF */

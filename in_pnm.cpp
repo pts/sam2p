@@ -41,7 +41,7 @@ static Image::Sampled *in_pnm_reader(Image::filep_t file_, SimBuffer::Flat const
     bitmap=pnm_load_image((char*)(void*)f); 
     // fwrite(bitmap.bitmap,1,(unsigned)bitmap.width*bitmap.height*bitmap.np,stdout);
     /* Dat: black pixel is transparent */
-    if (BITMAP_PLANES(bitmap)!=1) Error::sev(Error::ERROR) << "PNM: alpha must be PBM or PGM" << (Error*)0;
+    if (BITMAP_PLANES(bitmap)!=1) Error::sev(Error::EERROR) << "PNM: alpha must be PBM or PGM" << (Error*)0;
     Image::Gray *img=new Image::Gray(BITMAP_WIDTH(bitmap), BITMAP_HEIGHT(bitmap), 8);
     memcpy(img->getRowbeg(), BITMAP_BITS(bitmap), (slen_t)BITMAP_WIDTH(bitmap)*BITMAP_HEIGHT(bitmap));
     delete [] BITMAP_BITS(bitmap);

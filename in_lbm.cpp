@@ -82,10 +82,10 @@ static void debit(char *picput, char *lines, unsigned wd, unsigned depth) {
 #endif
 
 void LBMRead::errUnEOF() {
-  Error::sev(Error::ERROR) << "LBM: unexpected EOF" << (Error*)0;
+  Error::sev(Error::EERROR) << "LBM: unexpected EOF" << (Error*)0;
 }
 void LBMRead::err(char *s) {
-  Error::sev(Error::ERROR) << s << (Error*)0;
+  Error::sev(Error::EERROR) << s << (Error*)0;
 }
 
 inline int LBMRead::getcn() {
@@ -262,7 +262,6 @@ Image::Sampled *LBMRead::doit() {
 }
 
 static Image::Sampled *in_lbm_reader(Image::filep_t file_, SimBuffer::Flat const&) {
-  // Error::sev(Error::ERROR) << "Cannot load XPM images yet." << (Error*)0;
   return LBMRead((FILE*)file_).doit(); /* Destructor: fclose((FILE*)file_); */
 }
 

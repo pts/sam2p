@@ -96,6 +96,7 @@
 # pragma warning(disable: 4514) /* 'each_char' : unreferenced inline function has been removed */
 # pragma warning(disable: 4512) /* 'PipeE' : assignment operator could not be generated */
 # pragma warning(disable: 4310) /* cast truncates constant value */
+# pragma warning(disable: 4355) /* 'this' : used in base member initializer list */
 #endif
 
 #if __VA_START_STDC__

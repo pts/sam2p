@@ -246,7 +246,7 @@ class MiniPS {
     /** Allocates and returns. Qundef is returned on EOF
      * @param closer: EOF_ILLEGAL, EOF_ALLOWED, '>' or ']'
      */
-    VALUE parse1(int closer=EOF_ILLEGAL, int sev=Error::ERROR);
+    VALUE parse1(int closer=EOF_ILLEGAL, int sev=Error::EERROR);
     void setDepth(unsigned depth_);
     /** Sets special filename for the `run' operator. `run' will read that
      * special file from param `rd_', and then it will call rd_->vi_rewind().

@@ -20,9 +20,11 @@ class Error {
   static char const* banner0;
   static char const* argv0;
   static char const* tmpargv0;
+  static char const* long_argv0;
   /** Error types. */
   BEGIN_STATIC_ENUM(int,level_t)
-    ASSERT=4, FATAL=3, ERROR=2,
+    ASSERT=4, FATAL=3,
+    EERROR=2, /* ERROR conflicts with the Win32 API :-( */
     ERROR_CONT=-2, /* error, but continue running program */
     WARNING=-3,
     WARNING_DEFER=-4, /* warning, but defer (and later possibly omit) displaying it */
@@ -50,7 +52,7 @@ class Error {
    * -- killer: like `printed', but runs cleanup handlers and terminates the
    *    program immediately.
    *
-   * @param level is one of the constants mentioned above (FATAL, ERROR,
+   * @param level is one of the constants mentioned above (FATAL, EERROR,
    *   WARNING, NOTICE etc). Can be positive, zero or negative. The larger
    *   the `level', the more severe the error is. The default policy is:
    *   level>=0 errors are killer, -99<=level<=-1 errors are printed,

@@ -153,7 +153,6 @@ class Rule { public:
      * /Scale/None. Default to 0.
      */
     MiniPS::VALUE LowerMargin;
-
     static char const* dumpScale(sc_t Scale);
   };
 
