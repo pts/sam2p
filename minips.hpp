@@ -76,7 +76,8 @@ class MiniPS {
     S_ANY=23, /* anything; meta-type used by scanf_dict() */
     S_PINTEGER=24, /* positive integer; meta-type used by scanf_dict() */
     S_RGBSTR=25, /* an optional 3-byte string, representing an RGB color triplet */
-    S_NUMBER=26 /* real or integer */
+    S_NUMBER=26, /* real or integer */
+    S_PNUMBER=27 /* positive real or integer */
   END_STATIC_ENUM()
 
   /** No virtual methods because of special types. MiniPS composite values
@@ -230,6 +231,7 @@ class MiniPS {
   /** Fortunate coincidence that 2x+1>0 <=> x>0 */
   static inline bool isPositive(VALUE v) { return v>0; }
   static inline VALUE undef2null(VALUE v) { return v==Qundef ? Qnull : v; }
+  // static SimBuffer::B scale72(VALUE v, double d);
   
   class Parser {
     /** Define this to avoid including <stdio.h> */
@@ -291,7 +293,11 @@ class MiniPS {
   static void setDumpPS(VALUE v, bool g);
   /** @param v must be T_REAL or T_INTEGER */
   static bool isZero(VALUE v);
-  /** Dumps the human-readable real or integer value of the sum a+b+c-sub
+  /** @param v must be T_REAL or T_INTEGER
+   * @return true iff v==i
+   */
+  static bool isEq(VALUE v, double d);
+  /** Dumps the human-readable real or integer value of the sum (m/72)*a+b+c-sub
    * to `out'.
    * @param rounding 0: nothing. 1: round the sum _up_ to integers. 2:
    *        round the sum _up_ to non-negative integers
@@ -300,7 +306,8 @@ class MiniPS {
    * @param c must be T_REAL or T_INTEGER
    * @param sub must be T_REAL or T_INTEGER
    */
-  static void dumpAdd3(GenBuffer::Writable &out, VALUE a, VALUE b, VALUE c, VALUE sub, unsigned rounding=0);
+  static void dumpAdd3(GenBuffer::Writable &out, VALUE m, VALUE a, VALUE b, VALUE c, VALUE sub, unsigned rounding=0);
+  static void dumpScale(GenBuffer::Writable &out, VALUE v);
 };
 
 /* Fri Aug 16 17:07:14 CEST 2002 */

@@ -1,3 +1,9 @@
+sam2p (0.44-8) unstable; urgency=low
+
+  * Added /ImageDPI and -m:dpi:, see README.
+
+ -- Szabó Péter <pts@winter>  Mon, 21 Feb 2005 23:53:51 +0100
+
 sam2p (0.44-7) unstable; urgency=low
 
   * Updated copyright of pts_fax.c

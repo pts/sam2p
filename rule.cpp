@@ -382,6 +382,7 @@ void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
     "TransferCPL",     MiniPS::S_PINTEGER,MiniPS::Qinteger(78),  &TransferCPL,
     "DCT",             MiniPS::T_DICT,    MiniPS::Qnull,         &DCT,
     "Scale",           MiniPS::S_SENUM,   y_Scale,               &Scale,
+    "ImageDPI",        MiniPS::S_PNUMBER, MiniPS::Qinteger(72),  &cacheHints.ImageDPI,
     "TopMargin",       MiniPS::S_NUMBER,  MiniPS::Qinteger(0),   &cacheHints.TopMargin,
     "BottomMargin",    MiniPS::S_NUMBER,  MiniPS::Qinteger(0),   &cacheHints.BottomMargin,
     "LeftMargin",      MiniPS::S_NUMBER,  MiniPS::Qinteger(0),   &cacheHints.LeftMargin,
@@ -393,7 +394,7 @@ void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
     "Subject",         MiniPS::T_STRING,  MiniPS::Qnull,         &cacheHints.Subject,
     "Author",          MiniPS::T_STRING,  MiniPS::Qnull,         &cacheHints.Author,
     "Creator",         MiniPS::T_STRING,  MiniPS::Qnull,         &cacheHints.Creator,
-    "Procuder",        MiniPS::T_STRING,  MiniPS::Qnull,         &cacheHints.Producer,
+    "Producer",        MiniPS::T_STRING,  MiniPS::Qnull,         &cacheHints.Producer,
     "Created",         MiniPS::T_STRING,  MiniPS::Qnull,         &cacheHints.Created,
     "Produced",        MiniPS::T_STRING,  MiniPS::Qnull,         &cacheHints.Produced,
 #if 0
@@ -431,6 +432,7 @@ void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
   cacheHints.ColorTransform=MiniPS::int2ii(ColorTransform);
   cacheHints.TransferCPL=MiniPS::int2ii(TransferCPL);
   cacheHints.Scale=(Rule::CacheHints::sc_t)MiniPS::int2ii(Scale);
+  /* fprintf(stderr, "scaled=%g\n", (char*)MiniPS::scale(ImageDPI,1)); */
 }
 
 void Rule::OutputRule::doSampleFormat(Image::SampledInfo *info, bool separatep) {
@@ -777,7 +779,8 @@ void Rule::writeTTE(
   Image::Sampled *img=sf->getImg();
   param_assert(template_!=(const char*)NULLP);
   p=template_;
-  bool nzp;
+  bool nzp, scp;
+  SimBuffer::B scf;
   while (1) {  
     assert(template_==p);
     while (*p!='`' && *p!='\0') p++; /* '`' is the escape character */
@@ -929,12 +932,12 @@ void Rule::writeTTE(
        do_bbox:
         // out << MiniPS::RVALUE(or_->cacheHints.LowerMargin) << ';'; /* SUXX: this would put `1 72 mul' */
         // out << MiniPS::RVALUE(or_->cacheHints.BottomMargin) << ';'; /* SUXX: this would put `1 72 mul' */
-        MiniPS::dumpAdd3(out, MiniPS::Qinteger(0), MiniPS::Qinteger(0), or_->cacheHints.LowerMargin, or_->cacheHints.BottomMargin, 1);
+        MiniPS::dumpAdd3(out, MiniPS::Qinteger(0), MiniPS::Qinteger(0), MiniPS::Qinteger(0), or_->cacheHints.LowerMargin, or_->cacheHints.BottomMargin, 1);
         out << ' ';
-        MiniPS::dumpAdd3(out, MiniPS::Qinteger(img->getWd()),
+        MiniPS::dumpAdd3(out, or_->cacheHints.ImageDPI, MiniPS::Qinteger(img->getWd()),
           or_->cacheHints.LeftMargin, or_->cacheHints.RightMargin, MiniPS::Qinteger(0), 2);
         out << ' ';
-        MiniPS::dumpAdd3(out, MiniPS::Qinteger(img->getHt()),
+        MiniPS::dumpAdd3(out, or_->cacheHints.ImageDPI, MiniPS::Qinteger(img->getHt()),
           or_->cacheHints.TopMargin, or_->cacheHints.LowerMargin, MiniPS::Qinteger(0), 2);
         if (!or_->cache.isPDF()) out << '\n';
       }
@@ -942,15 +945,24 @@ void Rule::writeTTE(
      case 's': /* scaling to a full PostScript page or translation for PDF and EPS */
       nzp=!(MiniPS::isZero(or_->cacheHints.LowerMargin)
          && MiniPS::isZero(or_->cacheHints.TopMargin));
+      scp=!MiniPS::isEq(or_->cacheHints.ImageDPI, 72);
+      
       if (or_->cache.isPDF()) {
-        if (nzp) out << " 1 0 0 1 " << MiniPS::RVALUE(or_->cacheHints.LeftMargin)
-                             << ' ' << MiniPS::RVALUE(or_->cacheHints.LowerMargin)
+        SimBuffer::B scf;
+        if (scp) MiniPS::dumpScale(scf, or_->cacheHints.ImageDPI);
+            else scf << 'x';
+        if (nzp || scp) out << " " << scf << " 0 0 " << scf << " " << MiniPS::RVALUE(or_->cacheHints.LeftMargin)
+                            << ' ' << MiniPS::RVALUE(or_->cacheHints.LowerMargin)
                      << " cm"; /* translate */
       } else switch (or_->cacheHints.Scale) {
        case Rule::CacheHints::SC_None:
         if (nzp) out << '\n' << MiniPS::RVALUE(or_->cacheHints.LeftMargin)
                      << ' '  << MiniPS::RVALUE(or_->cacheHints.LowerMargin)
                      << " translate";
+        if (scp) {
+          MiniPS::dumpScale(scf, or_->cacheHints.ImageDPI);
+          out << '\n' << scf << " dup scale";
+        }
         break;
        case Rule::CacheHints::SC_OK:
         /* from pshack/big.ps */

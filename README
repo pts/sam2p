@@ -348,6 +348,7 @@ Options (case insensitive):
 -- -c:g3:2d                : [pts] equivalent to -c:fax:-2
 -- -c:jai                  : [pts] hint /Compression/JAI
 
+-- -m:dpi:(dimen)      : set /ImageDPI to `dimen'
 -- -m:(dimen) \        : set all margins (/TopMargin,/BottomMargin, /LeftMargin, /RightMargin) to `dimen'
    -m:all:(dimen) \    :                  /LeftMargin, /RightMargin) to `dimen'
    -m:a:(dimen)        :
@@ -1127,6 +1128,8 @@ elements:
 -- RightMargin         : dimen; desired horizontal gap between the right line of the raster and 
                            the right line of the page. Default: 0. Ignored unless for PS and PDF 
                            output. See docs about `dimen' elsewhere in this document.
+-- ImageDPI            : positive number; resolution of bitmap image in dots per inch.
+                           Default: 72, which means no scaling.
 -- Scale               : enum /None -- don't scale (zoom, magnify) the image (default) 
                               /OK -- scale PS image to fit page (x factor == y factor) 
                               /RotateOK -- scale and/or rotate PS image to fit page (x factor == y factor)
@@ -2139,12 +2142,15 @@ A44. Do
 Q45. Is it possible to specify a resolution other than 72 DPI, so that the
      dimensions of the resulting PDF are accurate for print-resolution images?
         
-A45. No, it isn't. But you can specify margins with the `-m' option, for
-     example, `-m:1cm'. If you really need a different resoultion for PDF,
-     consider modifying ``case 'X':'' and ``case 's':'' in rule.cpp and
-     multiply the numbers img->getWd() and img->getHt() found there.
+A45. In the most recent version of sam2p, now it is. Just use `-m:dpi:144'
+     to have the output EPS or PDF scaled to double size, or use
+     `-m:dpi:<real>' to have it scaled by a factor of <real>/72. Note that
+     this works only for EPS and PDF output. For all other FileFormat{}s,
+     `-m:dpi:' is ignored. The `-m:dpi:' option doesn't scale the values
+     specified for the other `-m:...' options.
 
-     Use your DTP or word processor program to resize the image properly. For
+     To proper way of scaling an image, however, is
+     using your DTP or word processor program to resize it properly. For
      example, after running `sam2p foo.png foo.pdf', in LaTeX, use
 
         % \usepackage{graphicx}

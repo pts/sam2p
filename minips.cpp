@@ -956,6 +956,12 @@ void MiniPS::scanf_dict(VALUE job, bool show_warnings, ...) {
      case S_NUMBER:
       if ((got&1)==0 && getType(got)!=T_REAL) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be real or integer" << (Error*)0;
       break;
+     case S_PNUMBER:
+      if ((got&1)==0 && getType(got)!=T_REAL) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be real or integer" << (Error*)0;
+      if ((got&1)!=0 && got<=Qinteger(0)
+       || getType(got)==T_REAL && RREAL(got)->getBp()<=0
+         ) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be positive" << (Error*)0;
+      break;
      default:
       if (getType(got)!=ty) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must have type " << getTypeStr(ty) << (Error*)0;
     }
@@ -994,55 +1000,71 @@ bool MiniPS::isZero(MiniPS::VALUE v) {
   return false; /* NOTREACHED */
 }
 
-void MiniPS::dumpAdd3(GenBuffer::Writable &out, MiniPS::VALUE a, MiniPS::VALUE b, MiniPS::VALUE c, MiniPS::VALUE sub, unsigned rounding) {
+bool MiniPS::isEq(MiniPS::VALUE v, double d) {
+  double dif=0;
+  switch (getType(v)) {
+   case T_REAL: dif=RREAL(v)->getBp()-d; break;
+   case T_INTEGER: dif=int2ii(v)-d; break;
+   default: Error::sev(Error::EERROR) << "isEq: number expected" << (Error*)0;
+  }
+  if (dif<0.0) dif=-dif;
+  /* fprintf(stderr,"dif=%g g=%d\n", dif, (dif<0.000001)); */
+  return (dif<0.000001); /* Imp: ... */
+}
+
+void MiniPS::dumpScale(GenBuffer::Writable &out, VALUE v) {
+  double d=0;
+  switch (getType(v)) {
+   case T_REAL: d=RREAL(v)->getBp(); break;
+   case T_INTEGER:
+    if (int2ii(v)%72==0) { out << (int2ii(v)/72); return; }
+    d=int2ii(v); break;
+   default: Error::sev(Error::EERROR) << "dumpScale: number expected" << (Error*)0;
+  }
+  char buf[64]; /* Dat: enough */
+  sprintf(buf, "%"PTS_CFG_PRINTFGLEN"g", d/72.0);
+  out << buf;
+}
+
+void MiniPS::dumpAdd3(GenBuffer::Writable &out, MiniPS::VALUE m, MiniPS::VALUE a, MiniPS::VALUE b, MiniPS::VALUE c, MiniPS::VALUE sub, unsigned rounding) {
   long ll;
   #if 1
     /* Sat Sep  7 15:30:28 CEST 2002 */
     bool no_real_real=true;
     double d=0, dd;
     long l=0;
-    MiniPS::VALUE t[3], *tt=t+3;  t[0]=a; t[1]=b; t[2]=c;
-    unsigned subt=getType(sub);
-    while (tt--!=t) switch (getType(*tt)) {
-     case T_REAL: if ((dd=RREAL(*tt)->getBp())!=0) { d+=dd; no_real_real=false; } break;
-     case T_INTEGER: if ((ll=int2ii(*tt))!=0) { d+=ll; l+=ll; }  break;
-     default: err: Error::sev(Error::EERROR) << "dumpAdd3: numbers expected" << (Error*)0;
-    }
-    switch (subt) {
-     case T_REAL:    d-=RREAL(sub)->getBp(); no_real_real=false; break;
-     case T_INTEGER: d-=int2ii(sub); l-=int2ii(sub); break;
-     default: goto err;
+    if (getType(m)==T_REAL && isEq(m,72)) /* Imp: not so exact comparison */
+      m=Qinteger(72);
+    MiniPS::VALUE t[5], *tt;
+    t[0]=a; t[1]=m; t[2]=b; t[3]=c; t[4]=sub;
+    for (tt=t;tt<t+5;tt++) switch (getType(*tt)) {
+     case T_REAL:
+      dd=RREAL(*tt)->getBp();
+     doadd:
+      if (no_real_real) {
+        d=l;
+        no_real_real=false;
+      }
+      if (tt==t+1) {
+        if (dd==0.0 || d==0.0) { no_real_real=true; l=0; d=0.0; }
+                          else d*=dd/72;
+      } else if (tt==t+4) d-=dd;
+      else d+=dd;
+      break;
+     case T_INTEGER:
+      ll=int2ii(*tt);
+      if (tt==t+1) {
+        if (ll%72==0) l*=ll/72;
+        else { dd=ll; goto doadd; }
+      } else if (tt==t+4) l-=ll;
+      else l+=ll;
+      break;
+     default: Error::sev(Error::EERROR) << "dumpAdd3: numbers expected" << (Error*)0;
     }
     if (no_real_real) { out << l; return; }
   #else
     /* Sat Sep  7 15:16:12 CEST 2002 */
-    unsigned at=getType(a), bt=getType(b), ct=getType(c), subt=getType(sub);
-    if (at==T_INTEGER && bt==T_INTEGER && ct==T_INTEGER) {
-      out << int2ii(a)+int2ii(b)+int2ii(c);
-      return;
-    }
-    double d=0;
-    switch (at) {
-     case T_REAL:    d=RREAL(a)->getBp(); break;
-     case T_INTEGER: d=int2ii(a); break;
-     default: goto err;
-    }
-    assert(0);
-    switch (bt) {
-     case T_REAL:    d+=RREAL(b)->getBp(); break;
-     case T_INTEGER: d+=int2ii(b); break;
-     default: goto err;
-    }
-    switch (ct) {
-     case T_REAL:    d+=RREAL(c)->getBp(); break;
-     case T_INTEGER: d+=int2ii(c); break;
-     default: goto err;
-    }
-    switch (subt) {
-     case T_REAL:    d-=RREAL(sub)->getBp(); break;
-     case T_INTEGER: d-=int2ii(sub); break;
-     default: err: Error::sev(Error::ERROR) << "dumpAdd3: numbers expected" << (Error*)0;
-    }
+    ...
   #endif
   if (rounding!=0) {
     ll=(long)d;

@@ -154,6 +154,8 @@ class Rule { public:
      * /Scale/None. Default to 0.
      */
     MiniPS::VALUE LowerMargin;
+    /** 72 by default. */
+    MiniPS::VALUE ImageDPI;
     static char const* dumpScale(sc_t Scale);
   };
 

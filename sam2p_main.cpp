@@ -290,7 +290,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   // SimBuffer::B tmp;
   char const *TopMargin=(char const*)NULLP, *BottomMargin=(char const*)NULLP, 
              *LeftMargin=(char const*)NULLP, *RightMargin=(char const*)NULLP,
-             *LowerMargin=(char const*)NULLP;
+             *LowerMargin=(char const*)NULLP, *ImageDPI=(char const*)NULLP;
   bool negLowerMargin=false;
   Rule::CacheHints::sc_t Scale=Rule::CacheHints::SC_default;
   #define APPEND_sf(val) do { if (sfx[val]==0) { sfx[val]=1; sft[sflen++]=val; } } while (0)
@@ -378,6 +378,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
               || 0!=(p2=one_pabbr(param,"y:"))) { if (MiniPS::Real::isDimen(p2)) TopMargin=BottomMargin=LowerMargin=p2; else goto err_dimexp; }
         else if (0!=(p2=one_pabbr(param,"left:"))) { if (MiniPS::Real::isDimen(p2)) LeftMargin=p2; else goto err_dimexp; }
         else if (0!=(p2=one_pabbr(param,"right:"))) { if (MiniPS::Real::isDimen(p2)) RightMargin=p2; else goto err_dimexp; }
+        else if (0!=(p2=one_pabbr(param,"dpi:"))) { if (MiniPS::Real::isDimen(p2)) ImageDPI=p2; else goto err_dimexp; }
         else if (0!=(p2=one_pabbr(param,"top:"))
               || 0!=(p2=one_pabbr(param,"up:"))) { if (MiniPS::Real::isDimen(p2)) TopMargin=p2; else goto err_dimexp; }
         else if (0!=(p2=one_pabbr(param,"bottom:"))
@@ -789,6 +790,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   
   /* Append more Hints */
   if (Scale!=Rule::CacheHints::SC_None) Hints << "\n/Scale /" << protect_null(Rule::CacheHints::dumpScale(Scale));
+  if ((char const*)NULLP!=ImageDPI) Hints << "\n/ImageDPI " << ImageDPI;
   if ((char const*)NULLP!=LeftMargin) Hints << "\n/LeftMargin " << LeftMargin;
   if ((char const*)NULLP!=RightMargin) Hints << "\n/RightMargin " << RightMargin;
   if ((char const*)NULLP!=TopMargin) Hints << "\n/TopMargin " << TopMargin;
