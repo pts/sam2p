@@ -14,7 +14,6 @@
 #include "gensi.hpp"
 #include <stdio.h>
 
-
 /* Naming conventions: *Encode is a specific, well-known PostScript or PDF
  * encoding filter documented by Adobe, *Encoder is something more general.
  */
@@ -288,6 +287,17 @@ class Files {
 
   /** Sat Sep  7 20:58:54 CEST 2002 */
   static void doSignalCleanup();
+
+  /** Set the specified file descriptor to binary mode. Useful for stdin (0),
+   * stdout (1), stderr (2) on Win32 and DOS systems. On these systems, this
+   * call has the effect of `fopen(..., "rb");' On UNIX, file
+   * descriptors are always binary. 
+   */
+  #if HAVE_DOS_BINARY
+    static void set_binary_mode(int fd, bool binary);
+  #else
+    static inline void set_binary_mode(int,bool) {}
+  #endif
 };
 
 #endif

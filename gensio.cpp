@@ -33,6 +33,11 @@ extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list 
 #include <stdlib.h> /* getenv() */
 #include <errno.h>
 #include <signal.h> /* signal() */ /* Imp: use sigaction */
+#if HAVE_DOS_BINARY
+#undef __STRICT_ANSI__
+#include <fcntl.h> /* O_BINARY */
+#include <io.h> /* setmode() */
+#endif
 
 #define USGE(a,b) ((unsigned char)(a))>=((unsigned char)(b))
 
@@ -606,5 +611,12 @@ char const* Files::only_fext(char const*filename) {
   }
   return ret;
 }
+
+#if HAVE_DOS_BINARY
+void Files::set_binary_mode(int fd, bool binary) {
+  /* Wed Dec 11 18:17:30 CET 2002 */
+  setmode(fd, binary ? O_BINARY : O_TEXT);
+}
+#endif
 
 /* __END__ */

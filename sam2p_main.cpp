@@ -545,11 +545,13 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
      normal_label:
       if (InputFile==(char const*)NULLP) {
         if (p[0]=='-' && p[1]=='\0') { /* Filename: STDIN or STDOUT */
-         Error::sev(Error::ERROR_CONT) << "one_liner: `-' (stdin) not allowed as InputFile (stdin unseekable)" << (Error*)0;
-         badp=true;
-         continue;
+          // Files::set_binary_mode(0, true);
+          Error::sev(Error::ERROR_CONT) << "one_liner: `-' (stdin) not allowed as InputFile (stdin unseekable)" << (Error*)0;
+          badp=true;
+          continue;
         } else InputFile=p;
       } else if (OutputFile==(char const*)NULLP) {
+        Files::set_binary_mode(1, true);
         OutputFile=p;
         if (FileFormat==Rule::Cache::FF_default) { /* OutputFile; determine FileFormat from extension */
           pend=p+strlen(p);

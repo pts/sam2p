@@ -5,6 +5,7 @@
 #
 #
 
+
 WD="`pwd`"
 [ "$WD" ] || {
   echo "$0: cannot find current directory"
@@ -21,11 +22,22 @@ cd "$UPDIR"
 #  exit 3
 #}
 
-tar czvf "$MYDIR.tar.gz" `<"$MYDIR"/files perl -pi -e '$_="$ENV{MYDIR}/$_"'`
+if [ "$1" ]; then
+  TAR_BASENAME="$1"
+  shift
+  EXTRA_FILES=""
+  for F in "$@"; do EXTRA_FILES="$EXTRA_FILES$F
+"; done
+else
+  TAR_BASENAME="$MY_DIR"
+  EXTRA_FILES=""
+fi
 
-[ -s "$UPDIR/$MYDIR.tar.gz" ] || {
-  echo "$0: zero size: $UPDIR/$MYDIR.tar.gz"
+tar czvf "$TAR_BASENAME.tar.gz" `{ cat "$MYDIR"/files; echo -n "$EXTRA_FILES"; } | perl -pi -e '$_="$ENV{MYDIR}/$_"'`
+
+[ -s "$UPDIR/$TAR_BASENAME.tar.gz" ] || {
+  echo "$0: zero size: $UPDIR/$TAR_BASENAME.tar.gz"
   exit 4
 }
 
-echo "Created $UPDIR/$MYDIR.tar.gz" >&2
+echo "Created $UPDIR/$TAR_BASENAME.tar.gz" >&2

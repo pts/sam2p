@@ -2110,6 +2110,9 @@ History
      GIMP tif22pnm
      /Background option (-bg) to change transparent pixels -> bg color
 
+0.40 Wed Dec 11 19:24:31 CET 2002
+     builds out-of-the box (./configure ...; make -> sam2p.exe) on Win32 with MinGW32 + Perl
+
 Missing feature list
 ~~~~~~~~~~~~~~~~~~~~
 /* OK : margins for all PS, EPS and PDF (Sat Sep  7 16:17:58 CEST 2002 */

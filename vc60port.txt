@@ -43,19 +43,19 @@ bts2.tth tul hosszu... fatal error C1076: compiler limit : internal heap limit r
 
 :-)) bts2.tth SUXX: error C2026: string too big, trailing characters truncated
 
-Imp: merge 0.40
+Imp: merge 0.40, diff -r ""
 Imp: pts.xpm: unknown color
-Imp: \r\n output file
-Imp: warnings
-OK:  autoconf
-  #define HAVE_STATIC_CONST 1
-  class A { static const int i=1; };
+Imp: test vc++
+Imp: add tif22pnm, png22pnm
+OK : #undef HAVE_PTS_VSNPRINTF, because msvcrt.dll has a completely buggy vsnprintf()
+OK : verify no "\r\n" output file
+OK : Win32 (VC++, mingw): either fopen(...,"rb") or setmode(..., O_BINARY) OK
+OK : test mingw
+OK : eliminate warnings
+OK : autoconf:  #define HAVE_STATIC_CONST 1:  class A { static const int i=1; };
 OK : _open -> fopen()
-Imp: #if !defined(HAVE_SNPRINTF) || !defined(HAVE_C99_VSNPRINTF); VC++ check for sprintf
 OK : xpmc.h ""\
 OK : bts2.tth ""\
-Imp: diff -r ""\
 OK : chmod +x ./configure
-Imp: grep '!!'
-Imp: fopen(...,"rb") OK?
+OK : grep '!!' UNIX
 OK : autoconf lstat

@@ -23,7 +23,8 @@ my @numenc=('\60','\61','\62','\63','\64','\65','\66','\67','\70','\71');
 my @enc;
 for (my $I=0;$I<256;$I++) { $enc[$I]=sprintf"\\%03o",$I }
 
-binmode STDIN;
+binmode STDIN if @ARGV;
+binmode STDOUT; # UNIX NL in output
 while (0<read STDIN, $_, 2040) {
   s/([^\w\.\/\- ])(\d*)/$enc[ord$1].join("",@numenc[split"",$2])/ge;
   s/(.{74}[^\\]{0,3})/$1\\\n/gs;

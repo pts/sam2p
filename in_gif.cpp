@@ -67,6 +67,7 @@ static Image::Loader::reader_t in_gif_checker(char buf[Image::Loader::MAGIC_LEN]
 #define in_gif_name "GIF"
 
 #else
+#include <string.h>
 #include "image.hpp"
 #include "error.hpp"
 #define in_gif_name (char const*)NULLP

@@ -267,7 +267,7 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
   hd[12]=0; /* reversed */
   out.vi_write(hd, 13);
 
-  // out.vi_write("\xFF\x00\x00" "\x00\xFF\x00" "\x00\x00\xFF", 9); // !!
+  // out.vi_write("\xFF\x00\x00" "\x00\xFF\x00" "\x00\x00\xFF", 9);
   
   out.vi_write(img->getHeadp(), img->getRowbeg()-img->getHeadp()); /* write colormap */
   if (c!=0) {

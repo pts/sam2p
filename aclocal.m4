@@ -690,6 +690,9 @@ static int myprintf(int max, char *dstr, char *fmt, ...) {
 }
 
 int c99t[]={13,9,10,10,10}, oldt[]={-1,9,-1,0,-1}, sun99t[]={13,9,10,-1,10};
+/* wincrtt[]={-1,9,10,-1,-1}, but it modifies the string in a completely
+ * bogus way (passes 1 test of 5)
+ */
 
 int main
 #ifdef __STDC__

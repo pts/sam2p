@@ -314,4 +314,10 @@ typedef int bool;
 #  endif
 #endif
 
+#if defined(__MSDOS__) || defined(__CYGWIN__) || defined(__MINGW32__) || _MSC_VER > 1000
+#  define HAVE_DOS_BINARY 1
+#else
+#  undef  HAVE_DOS_BINARY
+#endif
+
 #endif /* config2.h */

@@ -56,7 +56,7 @@ bool CloseSource;
 bool CloseTarget;
 #endif
 
-/* !! GS expected
+/* GS expected
  * min_left=0
  * bits_left=32
  *
@@ -149,7 +149,7 @@ int main(int argc, char **argv) {
     sCFEs.free_=gsfax_free;
     sCFEs.memcpy_=gsfax_memcpy;
     s_CFE_template.set_defaults((stream_state*)&sCFEs);
-    /* !! sCFEs.K=-1; ... */
+    /* sCFEs.K=-1; ... */
     work(f, (stream_template const*)&s_CFE_template, (stream_state*)&sCFEs);
   #endif
   #if USE_BUILTIN_FAXD
@@ -163,7 +163,7 @@ int main(int argc, char **argv) {
     sCFDs.free_=gsfax_free;
     sCFDs.memcpy_=gsfax_memcpy;
     s_CFD_template.set_defaults((stream_state*)&sCFDs);
-    /* !! sCFEs.K=-1; ... */
+    /* sCFEs.K=-1; ... */
     work(f, (stream_template const*)&s_CFD_template, (stream_state*)&sCFDs);
   #endif
   } else {

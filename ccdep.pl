@@ -21,8 +21,8 @@ eval 'setenv PERL_BADLANG x;exec perl -T -x -S -- "$0" $argv:q;#'.q
 # Imp: avoid $ etc. in Makefile
 # OK : all 8 combinations of PROVIDES|REQUIRES|CONFLICTS
 #
-#use integer;
-#use strict;
+BEGIN { eval { require integer; import integer } }
+BEGIN { eval { require strict ; import strict  } }
 
 # Typical invocation: ccdep.pl --FAL=assert,no,yes,checker $(CXX)
 my @FAL=();
@@ -41,12 +41,6 @@ sub find_ds() {
     push @L, $E if $E=~/\.(c(|c|xx|pp|[+][+])|C)\Z(?!\n)/ and -f $E;
   }
   @L
-}
-
-sub shq($) {
-  my $S=$_[0];
-  $S=~s@'@'\\''@g;
-  $S
 }
 
 sub expand_glob($$ $) {
@@ -83,11 +77,57 @@ sub mustbe_subset_of($$ $$) {
 
 print "$0: running.\n";
 
+sub unix_shq($) {
+  my $S=$_[0];
+  $S=~s@'@'\\''@g;
+  "'$S'"
+}
+
+sub shq($) {
+  my $S=$_[0];
+  return $S if $S!~/[^\w.-]/;
+  if ($^O eq 'MSWin32') {
+    # assume the called program is CygWin/Ming32; see later
+    # Arguments are delimited by white space, which is either a space or a tab.
+    # .       A string surrounded by double quotation marks is interpreted as a
+    # single argument, regardless of white space contained within. A quoted
+    # string can be embedded in an argument. Note that the caret (^) is not
+    # recognized as an escape character or delimiter. 
+    # .       A double quotation mark preceded by a backslash, \", is interpreted as
+    # a literal double quotation mark (").
+    # .       Backslashes are interpreted literally, unless they immediately precede
+    # a double quotation mark.
+    # .       If an even number of backslashes is followed by a double quotation
+    # mark, then one backslash (\) is placed in the argv array for every pair
+    # of backslashes (\\), and the double quotation mark (") is interpreted as
+    # a string delimiter.
+    # .       If an odd number of backslashes is followed by a double quotation
+    # mark, then one backslash (\) is placed in the argv array for every pair
+    # of backslashes (\\) and the double quotation mark is interpreted as an
+    # escape sequence by the remaining backslash, causing a literal double
+    # quotation mark (") to be placed in argv.
+    $S=~s@"@\\"@g; return qq{"$S"}
+  } else {
+    $S=~s@'@'\\''@g; return qq{'$S'}
+  }
+}
+
+sub backtick(@) {
+  my $S=$_[0];
+  if ($^O eq 'MSWin32') {
+    # assume the called program is CygWin/Ming32; and we have proper /bin/sh
+    $S="sh -c ".unix_shq($S); # /bin/sh can handle IO-redirections such as `2>&1' right
+  } else {
+    # assume UNIX
+  }
+  print "+ $S\n";
+  readpipe $S # `` qx``
+}
+
 my @DS=find_ds();
 my @DSQ=map{shq$_}@DS;
 my $R="$GCCP -DOBJDEP -M -MG -E 2>&1 @DSQ";
-print "+ $R\n";
-$R=`$R`;
+$R=backtick($R);
 
 ## die $R;
 

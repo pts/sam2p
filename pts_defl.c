@@ -511,7 +511,7 @@ asmv_local int bi_valid; /*:GLOBAL*/
 /* Number of valid bits in bi_buf.  All bits above the last valid bit
  * are always zero.
  */
-zzz char file_outbuf[1024]; /*:GLOBAL*/ /* !! */
+zzz char file_outbuf[1024]; /*:GLOBAL*/ /* static! */
 /* Output buffer for compression to file */
 local char *out_buf;
 local char *out_bufp, *out_buflast; /*:GLOBAL*/
@@ -605,7 +605,7 @@ struct pts_defl_internal_state { /* Thu Jul  4 23:16:41 CEST 2002 */
    * are always zero.
    */
   #if 0
-    char file_outbuf[1024]; /*:GLOBAL*/ /*!! separate alloc*/
+    char file_outbuf[1024]; /*:GLOBAL*/ /* separate alloc*/
     /* Output buffer for compression to file */
     char *out_buf;
   #else
