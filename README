@@ -2349,6 +2349,7 @@ Further changes moved to debian/changelog.
 
 Missing feature list
 ~~~~~~~~~~~~~~~~~~~~
+!! rxvt_bug.png -> useful Win98 .bmp
 ??
      (expected) !!
      --invert option, for tif22pnm users
