@@ -1,5 +1,6 @@
 hq.pl
 c_lgcc.cpp
+c_lgcc3.cpp
 in_jai.hpp
 jpegdump_main.cpp
 sam2p_main.cpp

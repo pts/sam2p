@@ -2096,6 +2096,7 @@ History
      CUPS raster input and output,
      PS and PDF input,
      GIMP tif22pnm
+     /Background option (-bg) to change transparent pixels -> bg color
 
 Missing feature list
 ~~~~~~~~~~~~~~~~~~~~

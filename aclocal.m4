@@ -12,6 +12,9 @@ dnl autoconf-2.13 generates bad code for AC_C_CONST in g++-3.2
 dnl autoconf-2.54 is good (verified at Wed Dec 11 15:28:28 CET 2002)
 AC_PREREQ([2.14])
 
+dnl stupid autoconf-2.54 does #include <stdlib.h>
+m4_define([_AC_PROG_CXX_EXIT_DECLARATION],[])
+
 AC_DEFUN([AC_PTS_CHECK_INTEGRALS],[
 dnl Checks for integral sizes.
 AC_REQUIRE([AC_HEADER_STDC])
@@ -914,10 +917,15 @@ AC_DEFUN([AC_PTS_GCC_LINKS_CXX], [
       if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext} && ./conftest${ac_exeext}
       then ac_cv_pts_gcc_links_cxx=yes
       else
-        LIBS="$LIBS c_lgcc.cpp"
+        LIBS="$LIBS_saved c_lgcc.cpp"
         if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext} && ./conftest${ac_exeext}
         then ac_cv_pts_gcc_links_cxx=yes-with-help
-        else ac_cv_pts_gcc_links_cxx=no; CXX_new="$CXX_saved"; fi
+        else 
+          LIBS="$LIBS_saved c_lgcc3.cpp"
+          if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext} && ./conftest${ac_exeext}
+          then ac_cv_pts_gcc_links_cxx=yes-with-help3
+          else ac_cv_pts_gcc_links_cxx=no; CXX_new="$CXX_saved"; fi
+        fi
       fi
     ],[ac_cv_pts_gcc_links_cxx=compilation-failed])
     CXX="$CXX_saved"
@@ -927,6 +935,7 @@ AC_DEFUN([AC_PTS_GCC_LINKS_CXX], [
   AC_SUBST(LDXX)
   case x"$ac_cv_pts_gcc_links_cxx" in
     xyes-with-help) LDXX="$CXX_new"; AC_DEFINE(HAVE_PTS_C_LGCC_CPP_REQUIRED) ;;
+    xyes-with-help3) LDXX="$CXX_new"; AC_DEFINE(HAVE_PTS_C_LGCC3_CPP_REQUIRED) ;;
     xyes) LDXX="$CXX_new" ;;
     xno)  LDXX="$CXX_new" ;;
     *)    AC_MSG_ERROR([Compilation failed, aborting.]) ;;

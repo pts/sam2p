@@ -1707,84 +1707,6 @@ else
     CXXFLAGS=
   fi
 fi
-for ac_declaration in \
-   ''\
-   '#include <stdlib.h>' \
-   'extern "C" void std::exit (int) throw (); using std::exit;' \
-   'extern "C" void std::exit (int); using std::exit;' \
-   'extern "C" void exit (int) throw ();' \
-   'extern "C" void exit (int);' \
-   'void exit (int);'
-do
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-#include "confdefs.h"
-#include <stdlib.h>
-$ac_declaration
-int
-main ()
-{
-exit (42);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  :
-else
-  echo "$as_me: failed program was:" >&5
-cat conftest.$ac_ext >&5
-continue
-fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-  cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-#include "confdefs.h"
-$ac_declaration
-int
-main ()
-{
-exit (42);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest.$ac_objext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  break
-else
-  echo "$as_me: failed program was:" >&5
-cat conftest.$ac_ext >&5
-fi
-rm -f conftest.$ac_objext conftest.$ac_ext
-done
-rm -f conftest*
-if test -n "$ac_declaration"; then
-  echo '#ifdef __cplusplus' >>confdefs.h
-  echo $ac_declaration      >>confdefs.h
-  echo '#endif'             >>confdefs.h
-fi
 
 ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -1949,7 +1871,7 @@ else
     CXX_new="$CXX"
     ac_ext_saved="$ac_ext"
     cat > conftest.$ac_ext <<EOF
-#line 1952 "configure"
+#line 1874 "configure"
 #include "confdefs.h"
 
       #include <stdio.h>
@@ -1991,14 +1913,23 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (exit $ac_status); } && test -s conftest${ac_exeext} && ./conftest${ac_exeext}
       then ac_cv_pts_gcc_links_cxx=yes
       else
-        LIBS="$LIBS c_lgcc.cpp"
+        LIBS="$LIBS_saved c_lgcc.cpp"
         if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   (eval $ac_link) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } && test -s conftest${ac_exeext} && ./conftest${ac_exeext}
         then ac_cv_pts_gcc_links_cxx=yes-with-help
-        else ac_cv_pts_gcc_links_cxx=no; CXX_new="$CXX_saved"; fi
+        else
+          LIBS="$LIBS_saved c_lgcc3.cpp"
+          if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && test -s conftest${ac_exeext} && ./conftest${ac_exeext}
+          then ac_cv_pts_gcc_links_cxx=yes-with-help3
+          else ac_cv_pts_gcc_links_cxx=no; CXX_new="$CXX_saved"; fi
+        fi
       fi
 
 else
@@ -2019,6 +1950,10 @@ echo "${ECHO_T}$ac_cv_pts_gcc_links_cxx" >&6
   case x"$ac_cv_pts_gcc_links_cxx" in
     xyes-with-help) LDXX="$CXX_new"; cat >>confdefs.h <<\_ACEOF
 #define HAVE_PTS_C_LGCC_CPP_REQUIRED 1
+_ACEOF
+ ;;
+    xyes-with-help3) LDXX="$CXX_new"; cat >>confdefs.h <<\_ACEOF
+#define HAVE_PTS_C_LGCC3_CPP_REQUIRED 1
 _ACEOF
  ;;
     xyes) LDXX="$CXX_new" ;;
@@ -6893,7 +6828,7 @@ fi
 rm -f Makedep
 ac_n="${ac_n:-$ECHO_N}"
 echo $ac_n "running make Makedep""... $ac_c" 1>&6
-echo "configure:6896: running make Makedep" >&5
+echo "configure:6831: running make Makedep" >&5
 if >&5 2>&5 make Makedep; then :
   echo "$as_me:$LINENO: result: ok" >&5
 echo "${ECHO_T}ok" >&6
@@ -6906,7 +6841,7 @@ echo "$as_me: error: cannot compute depends" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-echo "configure:6909: all OK" >&5
+echo "configure:6844: all OK" >&5
 
 echo "configure done. Now you should run: make; make install"
 

@@ -135,6 +135,7 @@
 
 /* Is the file c_gcc.cpp required for gcc when linking C++ programs? */
 #undef HAVE_PTS_C_LGCC_CPP_REQUIRED
+#undef HAVE_PTS_C_LGCC3_CPP_REQUIRED
 
 /** Does the C library have a working vsnprintf()? */
 #undef HAVE_PTS_VSNPRINTF

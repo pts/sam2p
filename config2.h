@@ -284,6 +284,9 @@ typedef int bool;
 #if OBJDEP && defined(__cplusplus) && HAVE_PTS_C_LGCC_CPP_REQUIRED
 #  warning REQUIRES: c_lgcc.o
 #endif
+#if OBJDEP && defined(__cplusplus) && HAVE_PTS_C_LGCC3_CPP_REQUIRED
+#  warning REQUIRES: c_lgcc3.o
+#endif
 
 /* at Wed Aug 21 18:28:24 CEST 2002 */
 #if HAVE_getc_in_stdio
