@@ -33,11 +33,16 @@ static void iter_copy_sub(char const*beg, slen_t len, void *data) {
   memcpy(CD->to, beg, len);
   CD->to+=len; CD->clen-=len;
 }
+#include <stdio.h>
 slen_t GenBuffer::copyRange(char *to, slen_t cfrom, slen_t clen) const {
   if (clen==0) return getLength();
   copydata_t cd= { to, cfrom, clen, 0 };
   each_sub(iter_copy_sub, &cd);
-  while (cd.clen--!=0) *cd.to++='\0'; /* padding */
+  fprintf(stderr,"cd.clen=%d\n", cd.clen);
+  while (cd.clen--!=0) {
+    fprintf(stderr,"padded.\n");
+    *cd.to++='\0'; /* padding */
+  }
   return cd.sumlen;
 }
 
@@ -66,16 +71,20 @@ bool GenBuffer::toBool(bool &dst) {
   return false;
 }
 
+#include <stdio.h>
+
 bool GenBuffer::toInteger(unsigned long &dst) {
   /* Imp: several bases (2, 8, 10 and 16), ignore _too_long_ */
   /* Imp: check for overflow! */
   slen_t len=copyRange(numtmp, 0, sizeof(numtmp));
+  fprintf(stderr,"len=%d\n", len);
   if (len>=sizeof(numtmp)) return true; /* too long */
   /* ASSERT(numtmp null-terminated) */
   char *p=numtmp;
   if (*p=='+') p++;
   unsigned long i=0;
   while (1) {
+    fprintf(stderr,"toInteger'%c'\n", *p);
     if (*p<'0' || *p>'9') break;
     i=10*i+(*p-'0');
     p++;
@@ -323,7 +332,12 @@ GenBuffer::Writable& GenBuffer::Writable::format(char const *fmt, ...) {
 /* --- */
 
 slen_t SimBuffer::Flat::copyRange(char *to, slen_t cfrom, slen_t clen) const {
-  if (cfrom<len) memcpy(to, beg+cfrom, cfrom+clen>len ? len-cfrom : clen);
+  if (cfrom<len) { /* !! BUGFIX at Fri Mar  7 20:30:07 CET 2003 */
+    slen_t dlen;
+    memcpy(to, beg+cfrom, dlen=cfrom+clen>len ? len-cfrom : clen);
+    to+=dlen;
+  }
+  while (clen--!=0) *to++='\0'; /* padding */
   return len;
 }
 

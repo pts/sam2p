@@ -495,7 +495,9 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
             pend++; while (*pend==':') pend++;
             SimBuffer::Static s(pend);
             if (s.toInteger(i)) goto inv_par;
+            // Error::sev(Error::FATAL) << "SUXX)" << s << ',' << i << '.' << (Error*)0;
             APPEND_co(Rule::Cache::CO_ZIP); Hints << "\n/Effort " << i;
+            // Error::sev(Error::FATAL) << "SUXX(" << s << ',' << Hints << '.' << (Error*)0;
           }            
         } else goto inv_par;
         break;
