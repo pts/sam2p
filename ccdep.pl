@@ -1,7 +1,7 @@
 #! /bin/sh --
 eval '(exit $?0)' && eval 'PERL_BADLANG=x;export PERL_BADLANG;: \
-;exec perl -T -x -S -- "$0" ${1+"$@"};#'if 0;
-eval 'setenv PERL_BADLANG x;exec perl -T -x -S -- "$0" $argv:q;#'.q
+;exec perl -T -S -- "$0" ${1+"$@"};#'if 0;
+eval 'setenv PERL_BADLANG x;exec perl -x -S -- "$0" $argv:q;#'.q
 #!perl -w
 +($0=~/(.*)/s);do$1;die$@if$@;__END__+if 0;
 # Don't touch/remove lines 1--7: http://www.inf.bme.hu/~pts/Magic.Perl.Header
@@ -12,6 +12,7 @@ eval 'setenv PERL_BADLANG x;exec perl -T -x -S -- "$0" $argv:q;#'.q
 # 0.32 by pts@math.bme.hu at Tue Sep  3 19:12:20 CEST 2002
 # 0.33 by pts@math.bme.hu at Thu Oct 31 09:47:25 CET 2002
 #
+# Dat: no -T (tainting checks) anymore, does bad to our readpipe()
 # OK : emit `TARGETS_yes = ...'
 # Imp: make #warning etc. in *.h files work as expected
 # OK : generated.h
@@ -121,6 +122,11 @@ sub backtick(@) {
     # assume UNIX
   }
   print "+ $S\n";
+  #die unless $ENV{PATH}=~/(.*)/s; # Dat: untaint()
+  #$ENV{PATH}=$1;
+  #die "$ENV{PATH}";
+  # Dat: if `.' is part of $ENV{PATH}, `Insecure directory...' is reported
+  #die unless $S=~/(.*)/s; # Dat: untaint()
   readpipe $S # `` qx``
 }
 
