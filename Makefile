@@ -66,7 +66,7 @@ HQ=perl -x hq.pl
 #%.tth: %.ttm
 #	<$< >$@	$(HQ)
 %.tth: %.ttt
-	<$< >$@	$(HQ)
+	$(HQ) <$< >$@
 
 # Sun Sep 22 01:16:20 CEST 2002
 L1_LIST=l1g8z.pst l1ghz.pst l1gbz.pst \
@@ -124,11 +124,13 @@ l1gbl.pst: l1lzw.psm psmlib.psm ps_tiny
 	mv -f tmp.pst $@
 # vvv copy the .ttt, not the .tth
 #     The perl program down there is a portable cat(1) implementation.
-bts2.ttt: bts.ttt $(L1_LIST)
+bts1.ttt: bts.ttt $(L1_LIST)
 	perl -pe0 $^ >$@
+bts2.ttt: bts1.ttt ps_tiny
+	./ps_tiny --copy <$< >$@
 
 clean:
-	rm -f *~ a.out DEADJOE core *.o *.tth .rgd *.rgd tmp.pin tmp.i tmp.ps0 tmp.h tmp.pst
+	rm -f *~ a.out DEADJOE core *.o *.tth .rgd *.rgd tmp.pin tmp.i tmp.ps0 tmp.h tmp.pst autom4te.cache/*
 	rm -f debian/changelog.dch debian/*~ 
 	rm -f $(ALL) $(ALL:=.yes) $(ALL:=.no) $(ALL:=.assert) $(ALL:=.checker)
 	-rmdir -- autom4te.cache

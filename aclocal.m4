@@ -555,6 +555,50 @@ int main
   AC_DEFINE_UNQUOTED(PTS_CFG_P_TMPDIR, $ac_cv_pts_cfg_p_tmpdir)
 ])
 
+dnl by pts@fazekas.hu at Wed Oct  1 19:14:28 CEST 2003
+dnl on i386:
+dnl   perl -e 'die sprintf"%.16f",(1/3)'  ## 0.3333333333333333  (we chose 16)
+dnl   perl -e 'die sprintf"%.17f",(1/3)'  ## 0.33333333333333331
+AC_DEFUN([AC_PTS_CFG_PRINTFGLEN], [
+  AC_CACHE_CHECK(for width of printf .g, ac_cv_pts_cfg_printfglen, [
+    AC_TRY_RUN([
+#define __USE_SVID 1
+#define __USE_GNU  1
+#include <stdio.h>
+
+int main
+#ifdef __STDC__
+(int argc, char **argv)
+#else
+(argc, argv) int argc; char **argv;
+#endif
+{
+  unsigned i;
+  char tmp[64], pat[10], *p;
+  FILE *f=fopen("conftestval","w");
+  if (!f) return 1;
+  for (i=1;i<61;i++) {
+    sprintf(pat, "%%.%ug", i);
+    sprintf(tmp, pat, 1.0/3);
+    if (tmp[0]=='0' && tmp[1]=='.') {
+      p=tmp+2; while (*p=='3') p++;
+      if (*p!='\0') break;
+    }
+  }
+  if (i>1) fprintf(f,".%u",i-1);
+  return 0;
+}],
+      [ac_cv_pts_cfg_printfglen=\""`cat conftestval`"\"],
+      [ac_cv_pts_cfg_printfglen=""],
+      [AC_MSG_ERROR(cross compiling not supported by .._PTS_CFG_PRINTFGLEN)]
+    )
+    test x"$ac_cv_pts_cfg_printfglen" = x && ac_cv_pts_cfg_printfglen=no
+  ])
+  if test x"$ac_cv_pts_cfg_printfglen" = xno; then :; else
+    AC_DEFINE_UNQUOTED(PTS_CFG_PRINTFGLEN, $ac_cv_pts_cfg_printfglen)
+  fi
+])
+
 dnl by pts@fazekas.hu at Thu Dec 12 20:20:41 CET 2002
 AC_DEFUN([AC_PTS_HAVE_SYSTEMF], [
   echo no-original >conftestval

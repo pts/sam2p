@@ -255,10 +255,12 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
   
   // transp=-1; /* With this, transparency will be ignored */
   c=img->getNcols();
-  fprintf(stderr, "GIF89 write transp=%d ncols=%d\n", transp, c);
-  bits_per_pixel=1; while ((c>>bits_per_pixel)!=0) bits_per_pixel++;
-  if (bits_per_pixel>1) bits_per_pixel--; /* BUGFIX at Wed Apr 30 15:55:27 CEST 2003 */
-  assert(bits_per_pixel<=8); 
+  bits_per_pixel=1; while (((c-1)>>bits_per_pixel)!=0) bits_per_pixel++;
+  /* ^^^ (c-1) BUGFIX at Mon Oct 20 15:18:24 CEST 2003 */
+  /* 63 -> 6, 64 -> 6, 65 -> 7 */
+  // if (bits_per_pixel>1) bits_per_pixel--; /* BUGFIX at Wed Apr 30 15:55:27 CEST 2003 */ /* BUGFIX at Mon Oct 20 15:18:14 CEST 2003 */
+  // fprintf(stderr, "GIF89 write transp=%d ncols=%d bpp=%d\n", transp, c, bits_per_pixel);
+  assert(1<=bits_per_pixel && bits_per_pixel<=8); 
   c=3*((1<<bits_per_pixel)-c);
   /* Now: c is the number of padding bytes */
   
@@ -273,9 +275,9 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
   
   out.vi_write(img->getHeadp(), img->getRowbeg()-img->getHeadp()); /* write colormap */
   if (c!=0) {
-    char *padding=new char[c];
-    memset(padding, '\0', c); /* Not automatic! */
-    out.vi_write(padding, c);
+    char *padding=new char[(unsigned char)c]; /* BUGFIX at Fri Oct 17 18:05:09 CEST 2003 */
+    memset(padding, '\0', (unsigned char)c); /* Not automatic! */
+    out.vi_write(padding, (unsigned char)c);
     delete [] padding;
   }
 

@@ -269,9 +269,9 @@ MiniPS::Real::Real(double d_, char const*ptr_, ii_t len_): d(d_), metric(0), dum
 void MiniPS::Real::dump(GenBuffer::Writable &out_, bool dumpPS_force) {
   char buf[64]; /* Imp: should be enough?? */
   if (metric!=0 && (dumpPS_force || dumpPS)) {
-    sprintf(buf, "%g%s", d, me_psfactor[metric]);
+    sprintf(buf, "%"PTS_CFG_PRINTFGLEN"g%s", d, me_psfactor[metric]);
   } else {
-    sprintf(buf, "%g", d*me_factor[metric]);
+    sprintf(buf, "%"PTS_CFG_PRINTFGLEN"g", d*me_factor[metric]);
   }
   out_ << buf;
 }
@@ -1022,8 +1022,8 @@ void MiniPS::dumpAdd3(GenBuffer::Writable &out, MiniPS::VALUE a, MiniPS::VALUE b
     assert((double)ll>=d); /* Imp: verify possible rounding errors */
     out << (rounding>=2 && ll<0 ? 0 : ll);
   } else {
-    char buf[64]; /* Imp: should be enough?? */ /* Imp: precision > %.6g */
-    sprintf(buf, "%g", d);
+    char buf[64]; /* Dat: enough */
+    sprintf(buf, "%"PTS_CFG_PRINTFGLEN"g", d);
     out << buf;
   }
 }

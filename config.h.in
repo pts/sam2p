@@ -134,6 +134,11 @@
 #undef HAVE_ASCII_SYSTEM
 #undef PTS_CFG_P_TMPDIR
 
+/** "" or ".16", so composing "%.16g" for printing doubles with printf(3)
+ * will just print enough digits
+ */
+#define PTS_CFG_PRINTFGLEN ".16"
+
 /* Is the file c_gcc.cpp required for gcc when linking C++ programs? */
 #undef HAVE_PTS_C_LGCC_CPP_REQUIRED
 #undef HAVE_PTS_C_LGCC3_CPP_REQUIRED

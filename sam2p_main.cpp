@@ -944,6 +944,7 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
   // InputFile->term0(); /* always term0() for MiniPS::String */
   if (ufd==NULLP) ufd=new Filter::UngetFILED(InputFile->begin_(), stdin,
     Filter::UngetFILED::CM_closep|Filter::UngetFILED::CM_keep_stdinp);
+  // fprintf(stderr, "ufd=%p\n", ufd);
   Image::SampledInfo info(Image::load(
     #if 0
       InputFile->begin_(), /* knows about stdin `-' */

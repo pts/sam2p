@@ -1222,7 +1222,6 @@ Image::Sampled *Image::load(Image::Loader::UFD* ufd0, SimBuffer::Flat const& loa
   /* Dat: do not read the trailer onto buf+Loader::MAGIC_LEN, because no ->checker() uses it yet. */
   Loader *p=first;
   Loader::reader_t reader;
-  // ufd.getUnget().vi_write(buf, ret);
   ufd.unread(buf, ret); /* tries to seek back, on failure calls ufd.getUnget().vi_write() */
   // ^^^ rewind(f); /* checker might have read */
   /* ^^^ do this early for the checkers */
@@ -1232,6 +1231,7 @@ Image::Sampled *Image::load(Image::Loader::UFD* ufd0, SimBuffer::Flat const& loa
      && (Loader::checker_t)NULLP!=p->checker
      && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints, ufd0))
        ) {
+      // fprintf(stderr, "%p %p\n", ufd0, &ufd);
       return reader(ufd0, loadHints);
     }
     p=p->next;

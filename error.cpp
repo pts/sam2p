@@ -141,7 +141,7 @@ void Error::cexit(int exitCode) {
     // fprintf(stderr, "hand %p\n", first_cleanup);
     if (exitCode<(exit2=first_cleanup->handler(first_cleanup))) exitCode=exit2;
     next=first_cleanup->next;
-    delete first_cleanup; /* Allocated from as an array, but has no destructors. */
+    delete [] (char*)first_cleanup; /* Allocated from as an array, but has no destructors. */
     first_cleanup=next;
   }
   #if _MSC_VER > 1000
@@ -153,8 +153,8 @@ void Error::cexit(int exitCode) {
 
 Error::Cleanup* Error::newCleanup(Error::Cleanup::handler_t handler, void *data, slen_t size) {
   param_assert(handler!=0);
-  slen_t num_packets=(size+sizeof(Cleanup)-1)/sizeof(Cleanup);
-  Cleanup *new_=new Cleanup[1+num_packets];
+  // slen_t num_packets=(size+sizeof(Cleanup)-1)/sizeof(Cleanup);
+  Cleanup *new_=(Cleanup*)new char[size+sizeof(Cleanup)]; /* new Cleanup[1+num_packets]; */
   /* ^^^ should be a new Cleanup + new char[size]; now we can avoid alignment
    *     problems
    */

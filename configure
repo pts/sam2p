@@ -4854,6 +4854,88 @@ _ACEOF
 fi
 
 
+  echo "$as_me:$LINENO: checking for width of printf .g" >&5
+echo $ECHO_N "checking for width of printf .g... $ECHO_C" >&6
+if test "${ac_cv_pts_cfg_printfglen+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+    if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cross compiling not supported by .._PTS_CFG_PRINTFGLEN" >&5
+echo "$as_me: error: cross compiling not supported by .._PTS_CFG_PRINTFGLEN" >&2;}
+   { (exit 1); exit 1; }; }
+
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#define __USE_SVID 1
+#define __USE_GNU  1
+#include <stdio.h>
+
+int main
+#ifdef __STDC__
+(int argc, char **argv)
+#else
+(argc, argv) int argc; char **argv;
+#endif
+{
+  unsigned i;
+  char tmp[64], pat[10], *p;
+  FILE *f=fopen("conftestval","w");
+  if (!f) return 1;
+  for (i=1;i<61;i++) {
+    sprintf(pat, "%%.%ug", i);
+    sprintf(tmp, pat, 1.0/3);
+    if (tmp[0]=='0' && tmp[1]=='.') {
+      p=tmp+2; while (*p=='3') p++;
+      if (*p!='\0') break;
+    }
+  }
+  if (i>1) fprintf(f,".%u",i-1);
+  return 0;
+}
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_pts_cfg_printfglen=\""`cat conftestval`"\"
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+ac_cv_pts_cfg_printfglen=""
+fi
+rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+    test x"$ac_cv_pts_cfg_printfglen" = x && ac_cv_pts_cfg_printfglen=no
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_pts_cfg_printfglen" >&5
+echo "${ECHO_T}$ac_cv_pts_cfg_printfglen" >&6
+  if test x"$ac_cv_pts_cfg_printfglen" = xno; then :; else
+    cat >>confdefs.h <<_ACEOF
+#define PTS_CFG_PRINTFGLEN $ac_cv_pts_cfg_printfglen
+_ACEOF
+
+  fi
+
+
   echo "$as_me:$LINENO: checking for tmpdir" >&5
 echo $ECHO_N "checking for tmpdir... $ECHO_C" >&6
 if test "${ac_cv_pts_cfg_p_tmpdir+set}" = set; then
@@ -7419,7 +7501,7 @@ fi
 rm -f Makedep
 ac_n="${ac_n:-$ECHO_N}"
 echo $ac_n "running make Makedep""... $ac_c" 1>&6
-echo "configure:7422: running make Makedep" >&5
+echo "configure:7504: running make Makedep" >&5
 if >&5 2>&5 make Makedep; then :
   echo "$as_me:$LINENO: result: ok" >&5
 echo "${ECHO_T}ok" >&6
@@ -7432,7 +7514,7 @@ echo "$as_me: error: cannot compute depends" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-echo "configure:7435: all OK" >&5
+echo "configure:7517: all OK" >&5
 
 echo "configure done. Now you should run: make; make install"
 

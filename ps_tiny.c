@@ -168,7 +168,9 @@ static void setword(int c, char const*word, int slash) {
   /* assert(c<3 || findword(word)==c); */
 }
 
-#define IBUFSIZE 512
+/** So a long string from ps_tiny --copy <bts2.ttt will fit */
+/* #define IBUFSIZE 512 */
+#define IBUFSIZE 32000
 
 /** Input buffer for several operations. */
 char ibuf[IBUFSIZE];
@@ -462,6 +464,8 @@ static void newline(void) {
   } else assert(wlastclosed);
 }
 
+/** 2: "\\n"; 1: "\n" */
+static int pstrq_litn_pp=2;
 
 /** @return the byte length of a string as a quoted PostScript ASCII string
  * literal
@@ -470,7 +474,8 @@ static slen_t pstrqlen(register char const* p, char const* pend) {
   slen_t olen=2; /* '(' and ')' */
   char c;
   p=ibuf; pend=ibufb;  while (p!=pend) {
-    if ((c=*(unsigned char const*)p++)=='\n' || c=='\r' || c=='\t' || c=='\010' || c=='\f') olen+=2;
+    if ((c=*(unsigned char const*)p++)=='\r' || c=='\t' || c=='\010' || c=='\f' || c=='(' || c==')') olen+=2;
+    else if (c=='\n') olen+=pstrq_litn_pp;
     else if (c>=32 && c<=126) olen++;
     else if (c>=64 || p==pend || ULE(*p-'0','7'-'0')) olen+=4;
     else if (c>=8) olen+=3;
@@ -486,13 +491,17 @@ static void pstrqput(register char const* p, char const* pend) {
   char c;
   putchar('('); 
   p=ibuf; pend=ibufb;  while (p!=pend) {
-    if (ULE((c=*(unsigned char const*)p++)-32, 126-32)) { putchar(c); continue; }
+    if ((ULE((c=*(unsigned char const*)p++)-32, 126-32) && c!='(' && c!=')')
+     || (c=='\n' && pstrq_litn_pp==1)
+       ) { putchar(c); continue; }
     putchar('\\');
          if (c=='\n')   putchar('n');
     else if (c=='\r')   putchar('r');
     else if (c=='\t')   putchar('t');
     else if (c=='\010') putchar('b');
     else if (c=='\f')   putchar('f');
+    else if (c=='(')    putchar(')');
+    else if (c==')')    putchar(')');
     else if (c>=64 || p==pend || ULE(*p-'0','7'-'0')) {
       putchar((c>>6&7)+'0');
       putchar((c>>3&7)+'0');
@@ -505,14 +514,20 @@ static void pstrqput(register char const* p, char const* pend) {
   putchar(')');
 }
 
+static int copy_longstr_warn_p=1;
+
 /** Copies PostScript code from input to output. Strips comments, superfluous
  * whitespace etc., substitutes words etc.
+ * @param tag may be NULL, this signals: copy till EOF, doesn't substitute
+ *   words
  */
 static void copy(char const*tag) {
   int c;
   slen_t len, olen;
   while (1) switch (gettok()) {
-   case 0: erri("eof before close tag: ", tag);
+   case 0:
+    if (tag) erri("eof before close tag: ", tag);
+    return;
    case '[': case ']':
     if (wcolc+(len=ibufb-ibuf)>MAXLINE) newline();
     wlastclosed=1;
@@ -521,7 +536,7 @@ static void copy(char const*tag) {
     fwrite(ibuf, 1, len, stdout); wcolc+=len;
     break;
    case '/':
-    if ((len=ibufb-ibuf)<IBUFSIZE && !(*ibufb='\0') && (c=findword(ibuf))>=0) {
+    if ((len=ibufb-ibuf)<IBUFSIZE && tag && !(*ibufb='\0') && (c=findword(ibuf))>=0) {
       ibuf[0]='/';
       ibuf[1]=c;
       ibufb=ibuf+2;
@@ -532,6 +547,7 @@ static void copy(char const*tag) {
     goto write;
    case '<': erri("tag unexpected",0);
    case '>':
+    if (!tag) erri("close tag unexpected",0);
     if (strlen(tag)!=(len=ibufb-ibuf) || 0!=memcmp(ibuf,tag,len)) erri("this close tag expected: ", tag);
     /* wlastclosed is left unmodified */
     gettagbeg();
@@ -539,14 +555,14 @@ static void copy(char const*tag) {
    case '(':
     olen=pstrqlen(ibuf,ibufb);
     if (wcolc+olen>MAXLINE) newline();
-    if (olen>MAXLINE) fprintf(stderr, "%s: warning: output string too long\n", PROGNAME);
+    if (olen>MAXLINE && copy_longstr_warn_p) fprintf(stderr, "%s: warning: output string too long\n", PROGNAME);
     /* putchar(ibuf[1]); */
     wcolc+=olen; pstrqput(ibuf,ibufb);
     wlastclosed=1;
     break;
    default: /* case '1': case '.': case 'E': */
     /* fprintf(stderr,"fw(%s) %c\n", ibuf, findword("32768")); */
-    if ((len=ibufb-ibuf)<IBUFSIZE && !(*ibufb='\0') && (c=findword_stripslash(ibuf))>=0) {
+    if ((len=ibufb-ibuf)<IBUFSIZE && tag && !(*ibufb='\0') && (c=findword_stripslash(ibuf))>=0) {
       ibuf[0]=c;
       ibufb=ibuf+1;
       len=1;
@@ -654,13 +670,18 @@ int main(int argc, char**argv) {
   slen_t acount, xcount, inlining, slen;
   char tmp[40];
   (void)argc;
-  (void)argv;
 
   /* freopen("t.pin","rb",stdin); */
 
   sbuff();
   rewindd();
   prepare();
+  if (argv[0] && argv[1] && 0==strcmp(argv[1],"--copy")) {
+    copy_longstr_warn_p=0;
+    pstrq_litn_pp=1;
+    copy((char const*)0);
+    return 0;
+  }
 
   { char tok=gettok();
     slen_t len;

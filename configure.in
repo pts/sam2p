@@ -159,6 +159,7 @@ AC_PTS_CHECK_HEADER(sys/stat.h, lstat, lstat_in_sys_stat,[struct stat st; return
 AC_PTS_CHECK_STRING
 AC_PTS_CHECK_MALLOC
 AC_FUNC_ALLOCA
+AC_PTS_CFG_PRINTFGLEN
 AC_PTS_CFG_P_TMPDIR
 AC_PTS_HAVE_POPEN_
 if test $ac_cv_pts_have_popen_ = yes; then

@@ -726,7 +726,7 @@ CGIFFF GifFileType *CGIFFF DGifOpenFILE(void/*FILE*/ *f) {
     Private->File = (FILE*)f;
     Private->FileState = 0;   /* Make sure bit 0 = 0 (File open for read). */
 
-    /* Lets see if this is a GIF file: */
+    /* Let's see if this is a GIF file: */
     if (fread(Buf, 1, GIF_STAMP_LEN, Private->File) != GIF_STAMP_LEN) {
 	_GifError = D_GIF_ERR_READ_FAILED;
 	free((char *) Private);
@@ -783,8 +783,9 @@ int CGIFFF DGifGetScreenDesc(CGIFFF GifFileType *GifFile)
     GifFile->SColorResolution = (((Buf[0] & 0x70) + 1) >> 4) + 1;
     BitsPerPixel = (Buf[0] & 0x07) + 1;
     GifFile->SBackGroundColor = Buf[1];
+    // fprintf(stderr, "colres=%d bpp=%d bgcol=%d\n", GifFile->SColorResolution, BitsPerPixel, GifFile->SBackGroundColor);
     if (Buf[0] & 0x80) {		     /* Do we have global color map? */
-
+        // fprintf(stderr, "have gcolormap\n");
 	GifFile->SColorMap = MakeMapObject(1 << BitsPerPixel, NULL);
 
 	/* Get the global color map: */
@@ -821,18 +822,13 @@ int CGIFFF DGifGetRecordType(CGIFFF GifFileType *GifFile, CGIFFF GifRecordType *
 	return GIF_ERROR;
     }
 
+    // fprintf(stderr, "record %d at offset %ld\n", Buf&255, ftell(Private->File));
     switch (Buf) {
-	case ',':
-	    *Type = IMAGE_DESC_RECORD_TYPE;
-	    break;
-	case '!':
-	    *Type = EXTENSION_RECORD_TYPE;
-	    break;
-	case ';':
-	    *Type = TERMINATE_RECORD_TYPE;
-	    break;
-	default:
-	    *Type = UNDEFINED_RECORD_TYPE;
+	case ',': *Type = IMAGE_DESC_RECORD_TYPE; break;
+	case '!': *Type = EXTENSION_RECORD_TYPE;  break;
+	case ';': *Type = TERMINATE_RECORD_TYPE;  break;
+	default:  *Type = UNDEFINED_RECORD_TYPE;
+	    // fprintf(stderr, "wrong record %d at offset %ld\n", Buf&255, ftell(Private->File));
 	    _GifError = D_GIF_ERR_WRONG_RECORD;
 	    return GIF_ERROR;
     }

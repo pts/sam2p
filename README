@@ -1910,23 +1910,22 @@ A37. Use
      no applicable OutputRule', it very probably means that your GIF is
      transparent. Remove the transparent color within an image editor first.
 
-Q3. How do I convert a GIF file to PostScript Level2 EPS?
+Q38. Can sam2p _load_ PDF or EPS files?
 
-A3. Check that sam2p has been compiled with GIF support: run sam2p, and
-    examine its console output. It should contain a line:
+A38. Yes, if you have Ghostscript installed, and your input EPS file is not
+     too exotic. This has been tested on Linux only. If you experience
+     problems loading EPS files, but no problems loading PDF files, please
+     run a2ping.pl written by the author of sam2p to make your EPS file more
+     compatible.
 
-	Available Loaders: ... GIF ...
+Q39. Can sam2p load and and EPS file with an arbitrary resoultion?
 
-    If GIF doesn't appear in the line, please recompile sam2p with:
+A39. Yes. For example use
 
+	sam2p -l:gs=-r216 in.eps out.png
 
-    After that, run sam2p again, and check for the line above again.
-
-    In one-liner mode, just run:
-
-	./sam2p <INPUT.gif> <OUTPUT.eps>
-	Example: ./sam2p try.gif try.eps
-
+     to have resoultion 216 DPI (image scaled 3 times to both directions).
+     Without scaling, 72 DPI is the default.
 
 Upsampling
 ~~~~~~~~~~
@@ -2400,6 +2399,18 @@ Are the problems I'm dealing about already solved?
    -- Is there a utility for creating a (semi-)transparent EPS or PDF files
       from pixel images?
 
+Compilation problems
+""""""""""""""""""""
+Mårten Svantesson wrote:
+
+> Another problem was that the configure script didn't realise that it
+> couldn't use the forte CC-compiler. This lead to several errors. For
+> example it don't accept the option -ansi, so several tests fails of
+> this reason.
+
+I don't have access to the a forte CC-compiler. The configure script has
+been designed for use with GCC and G++.
+
 History
 ~~~~~~~
 0.29 Apr 4 2002
@@ -2452,6 +2463,7 @@ Further changes moved to debian/changelog.
 
 Missing feature list
 ~~~~~~~~~~~~~~~~~~~~
+!! cannot read t.pnm "P4 1 1 1" doesn't end with \S
 !! ./sam2p ../pts.ppm t.gif -> sam2p: out_gif.cpp:260: void out_gif_write(GenBuffer::Writable&, Image::Indexed*): Assertion `bits_per_pixel<=8' failed.
 !! why so large PNG? sam2p examples/chessboard_ascii.pnm t.png
 !! easy seek back to 0 in in_*.cpp
@@ -2535,6 +2547,34 @@ Missing feature list
 /* Imp: pre-transformation: making grayscale */
 /* Imp: pre-transformation: down-bit-sampling */
 /* Imp: pre-transformation: down-palette-sampling (``generate optimal palette'') */
+
+==6750== 
+==6750== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==6750== malloc/free: in use at exit: 3741 bytes in 102 blocks.
+==6750== malloc/free: 2296 allocs, 2194 frees, 170451 bytes allocated.
+==6750== For counts of detected errors, rerun with: -v
+==6750== searching for pointers to 102 not-freed blocks.
+==6750== checked 4227304 bytes.
+==6750== 
+==6750== 12 bytes in 1 blocks are definitely lost in loss record 3 of 15
+==6750==    at 0x400254FF: __builtin_new (vg_replace_malloc.c:172)
+==6750==    by 0x806ABC3: MiniPS::Parser::parse1(int, int) (minips.cpp:789)
+==6750==    by 0x806B378: MiniPS::Parser::parse1(int, int) (minips.cpp:856)
+==6750==    by 0x804DBD5: run_sam2p_engine(Files::FILEW &, Files::FILEW &, char const *const *, bool) (sam2p_main.cpp:923)
+==6750== 
+==6750== 
+==6750== 808 bytes in 81 blocks are possibly lost in loss record 14 of 15
+==6750==    at 0x400255E9: __builtin_vec_new (vg_replace_malloc.c:197)
+==6750==    by 0x8060C94: Mapping::DoubleHash::set(char const *, unsigned int, char const *) (mapping.cpp:43)
+==6750==    by 0x806A18B: MiniPS::Dict::put(char const *, unsigned int, int) (minips.cpp:461)
+==6750==    by 0x8069FF1: MiniPS::Dict::put(char const *, int) (minips.cpp:431)
+==6750== 
+==6750== LEAK SUMMARY:
+==6750==    definitely lost: 12 bytes in 1 blocks.
+==6750==    possibly lost:   808 bytes in 81 blocks.
+==6750==    still reachable: 2921 bytes in 20 blocks.
+==6750==         suppressed: 0 bytes in 0 blocks.
+
 
 Fixed bugs
 ~~~~~~~~~~

@@ -387,10 +387,14 @@ void Filter::UngetFILED::unread(char const *s, slen_t slen) {
     if (!unget.isEmpty() || 0!=fseek(f, -slen, SEEK_CUR)) {
       assert(unget.isEmpty()); // !!
       unget.vi_write(s, slen); /* complete garbage unless unget was empty */
+      assert(unget.getLength());
     }
   }
+  // fprintf(stderr, "%d..\n", unget.getLength());
 }
 void Filter::UngetFILED::appendLine(GenBuffer::Writable &buf, int delimiter) {
+  // fprintf(stderr, "this=%p %d (%p)\n", this, unget.getLength(), unget());
+  unget.term0();
   if (delimiter<0) {
     char rbuf[4096];
     slen_t got;
@@ -404,6 +408,7 @@ void Filter::UngetFILED::appendLine(GenBuffer::Writable &buf, int delimiter) {
     }
   } else {
     char const *p=unget()+ofs, *p0=p, *pend=unget.end_();
+    assert(ofs<=unget.getLength());
     while (p!=pend && *p!=delimiter) p++;
     ftell_at+=p-p0;
     if (p==pend) { buf.vi_write(p0, p-p0); ofs=0; unget.forgetAll(); goto do_getc; }
@@ -427,6 +432,9 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
       break;
      case 'i': /* the optional integer passed in param `i' */
       redir_cmd << i;
+      break;
+     case '*': /* the optional unsafe string passed in param `i' */
+      redir_cmd << (char const*)i;
       break;
      case 'd': case 'D': /* temporary file for encoded data output */
       pp=&tmpname;
@@ -548,6 +556,9 @@ Filter::PipeD::PipeD(GenBuffer::Readable &in_, char const*pipe_tmpl, slendiff_t 
       break;
      case 'i': /* the optional integer passed in param `i' */
       redir_cmd << i;
+      break;
+     case '*': /* the optional unsafe string passed in param `i' */
+      redir_cmd << (char const*)i;
       break;
      case 'd': case 'D': /* temporary file for encoded data output */
       pp=&tmpname;
