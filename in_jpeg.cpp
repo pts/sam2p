@@ -24,7 +24,9 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
     // GenBuffer::Writable &out_, char *pipe_tmpl, slendiff_t i=0)
   }
   virtual void vi_copy(FILE *f) {
-    img=Image::load("PNM", (Image::filep_t)f, SimBuffer::B());
+    // !! load
+    img=Image::load("-", SimBuffer::B(), (Image::filep_t)f, (char const*)"PNM");
+    // img=Image::load("PNM", (Image::filep_t)f, SimBuffer::B());
     /* fclose(f); */
   }
   inline Image::Sampled *getImg() const { return img; }
@@ -32,15 +34,15 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
   Image::Sampled *img;
 };
 
-static Image::Sampled *in_jpeg_reader(Image::filep_t file_, SimBuffer::Flat const&) {
+static Image::Sampled *in_jpeg_reader(Image::Loader::UFD *ufd, SimBuffer::Flat const&) {
   // Error::sev(Error::EERROR) << "Cannot load JPEG images yet." << (Error*)0;
   HelperE helper("djpeg"); /* Run external process `djpeg' to convert JPEG -> PNM */
-  Encoder::writeFrom(*(Filter::PipeE*)&helper, (FILE*)file_);
+  Encoder::writeFrom(*(Filter::PipeE*)&helper, *(Filter::UngetFILED*)ufd);
   ((Filter::PipeE*)&helper)->vi_write(0,0); /* Signal EOF */
   return helper.getImg();
 }
 
-static Image::Loader::reader_t in_jpeg_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const& loadHints, Image::filep_t) {
+static Image::Loader::reader_t in_jpeg_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const& loadHints, Image::Loader::UFD*) {
   return (0==memcmp(buf, "\xff\xd8", 2)) && loadHints.findFirst((char const*)",asis,",6)==loadHints.getLength()
          ? in_jpeg_reader : 0;
 }

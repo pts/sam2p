@@ -173,6 +173,15 @@ void Encoder::writeFrom(GenBuffer::Writable& out, FILE *f) {
   }
   delete [] buf;
 }
+void Encoder::writeFrom(GenBuffer::Writable& out, GenBuffer::Readable& in) {
+  char *buf=new char[BUFLEN];
+  int wr;
+  while (1) {
+    if ((wr=in.vi_read(buf, BUFLEN))<1) break;
+    out.vi_write(buf, wr);
+  }
+  delete [] buf;
+}
 
 /* --- */
 
@@ -188,9 +197,16 @@ void Filter::FILEE::close() {
 }
 
 /* --- */
+       
+static FILE* fopenErr(char const* filename, char const* errhead) {
+  FILE *f;
+  if (NULLP==(f=fopen(filename,"rb")))
+    Error::sev(Error::EERROR) << errhead << ": error open4read: " << FNQ2(filename,strlen(filename)) << (Error*)0;
+  return f;
+}
 
 Filter::FILED::FILED(char const* filename) {
-  if (NULLP==(f=fopen(filename,"rb"))) Error::sev(Error::EERROR) << "Filter::FILED: error open4read: " << FNQ2(filename,strlen(filename)) << (Error*)0;
+  f=fopenErr(filename, "Filter::FileD");
   closep=true;
 }
 slen_t Filter::FILED::vi_read(char *buf, slen_t len) {
@@ -199,6 +215,180 @@ slen_t Filter::FILED::vi_read(char *buf, slen_t len) {
 }
 void Filter::FILED::close() {
   if (closep) { fclose(f); f=(FILE*)NULLP; closep=false; }
+}
+
+/* --- */
+
+Filter::UngetFILED::UngetFILED(char const* filename_, FILE *stdin_f, closeMode_t closeMode_) {
+  if (stdin_f!=NULLP && (filename_==NULLP || (filename_[0]=='-' && filename_[1]=='\0'))) {
+    f=stdin_f;
+    Files::set_binary_mode(fileno(f), true);
+    closeMode_&=~CM_unlinkp;
+    if (0!=(closeMode_&CM_keep_stdinp)) closeMode_&=~CM_closep;
+  } else {
+    f=fopenErr(filename_, "Filter::UngetFileD");
+  }
+  if (filename_!=NULLP) strcpy(const_cast<char*>(filename=new char[strlen(filename_)+1]), filename_);
+                   else filename=(char*)NULLP;
+  closeMode=closeMode_;
+  ftell_at=0;
+  ofs=0;
+}
+// Filter::UngetFILED::checkFILE() { }
+slen_t Filter::UngetFILED::vi_read(char *buf, slen_t len) {
+  slen_t delta;
+  if (len==0) {
+    close(); return 0;
+  } else if (unget.getLength()==0) { delta=0; do_read_f:
+    delta+=(f==NULLP ? 0 : fread(buf, 1, len, f));
+    ftell_at+=delta;
+    return delta;
+    // delta+=fread(buf, 1, len, f);  // write(1, buf, delta);  // return delta;
+  } else if (ofs+len<=unget.getLength()) {
+    // printf("\nul=%d ft=%ld\n", unget.getLength(), ftell(f)); fflush(stdout);
+    memcpy(buf, unget()+ofs, len); /* Dat: don't remove from unget yet */
+    ftell_at+=len;
+    // write(1, buf, len);
+    if ((ofs+=len)==unget.getLength()) { unget.forgetAll(); ofs=0; }
+    return len;
+  } else {
+    // printf("\num=%d ft=%d\n", unget.getLength(), ftell(f)); fflush(stdout);
+    delta=unget.getLength()-ofs; /* BUGFIX at Sat Apr 19 17:15:50 CEST 2003 */
+    memcpy(buf, unget()+ofs, delta);
+    // write(1, buf, delta);
+    unget.forgetAll(); ofs=0;
+    buf+=delta;
+    len-=delta;
+    goto do_read_f;
+  }
+}
+void Filter::UngetFILED::close() {
+  if (0!=(closeMode&CM_closep)) { fclose(f); f=(FILE*)NULLP; closeMode&=~CM_closep; }
+  unget.forgetAll(); ofs=0;
+  if (filename!=NULLP) {
+    if (0!=(closeMode&CM_unlinkp)) { remove(filename); }
+    delete [] filename;
+  }
+}
+
+int Filter::UngetFILED::vi_getcc() {
+  if (unget.getLength()==0) { do_getc:
+    int i=-1;
+    if (f!=NULLP && (i=MACRO_GETC(f))!=-1) ftell_at++;
+    return i;
+  }
+  if (ofs==unget.getLength()) { ofs=0; unget.forgetAll(); goto do_getc; }
+  ftell_at++;
+  return unget[ofs++];
+}
+int Filter::UngetFILED::getc_seekable() {
+  /* Glibc stdio doesn't allow fseek() even if the seek would go into the
+   * read buffer, and fseek(f, 0, SEEK_CUR) fails for unseekable files. Fine.
+   */
+  int c=MACRO_GETC(f);
+  return 0==fseek(f, -1L, SEEK_CUR) ? -2 : c;
+}
+bool Filter::UngetFILED::isSeekable() {
+  long pos, posend;
+  if (f==NULLP || 0!=(closeMode&CM_seekablep)) return true;
+  // return false;
+  clearerr(f); /* clears both the EOF and error indicators */
+  if (-1L==(pos=ftell(f)) /* sanity checks on ftell() and fseek() */
+   || 0!=fseek(f, 0L, SEEK_CUR)
+   || pos!=ftell(f)
+   || 0!=fseek(f, 0L, SEEK_END)
+   || (posend=ftell(f))==0 || posend<pos
+   || 0!=fseek(f, 0L, SEEK_SET)
+   || 0!=ftell(f)
+   || 0!=fseek(f, pos, SEEK_SET)
+   || pos!=ftell(f)
+   ) return false;
+  int c;
+  if ((c=getc_seekable())==-2 && pos==ftell(f)) {
+    // if (0!=fseek(f, -1L, SEEK_CUR) || pos!=ftell(f))
+    //  Error::sev(Error::EERROR) << "Filter::UngetFILED: cannot seek back" << (Error*)0;
+    return true;
+  }
+  unget << (char)c; /* not seekable, must unget the test character just read */
+  return false;
+}
+FILE* Filter::UngetFILED::getFILE(bool seekable_p) {
+  FILE *tf;
+  if (!unget.isEmpty() || (seekable_p && !isSeekable())) { do_temp:
+    /* must create a temporary file */
+    SimBuffer::B tmpnam;
+    if (filename==NULLP) Error::sev(Error::NOTICE) << "Filter::UngetFILED" << ": using temp for" << " `-' (stdin)" << (Error*)0;
+		    else Error::sev(Error::NOTICE) << "Filter::UngetFILED" << ": using temp for" << ": " << FNQ2(filename,strlen(filename)) << (Error*)0;
+    if (NULLP==(tf=Files::open_tmpnam(tmpnam, "wb+"))) {
+      if (filename==NULLP) Error::sev(Error::EERROR) << "Filter::UngetFILED" << ": cannot open temp file for" << " `-' (stdin)" << (Error*)0;
+                      else Error::sev(Error::EERROR) << "Filter::UngetFILED" << ": cannot open temp file for" << ": " << FNQ2(filename,strlen(filename)) << (Error*)0;
+    }
+    tmpnam.term0();
+    /* vvv change filename, so CM_unlinkp can work */
+    if (filename!=NULLP) {
+      if (0!=(closeMode&CM_unlinkp)) { remove(filename); }
+      delete [] filename;
+    }
+    strcpy(const_cast<char*>(filename=new char[tmpnam.getLength()+1]), tmpnam());
+    Files::tmpRemoveCleanup(filename);
+    if (unget.getLength()-ofs==fwrite(unget()+ofs, 1, unget.getLength()-ofs, tf)) {
+      static const slen_t BUFSIZE=4096; /* BUGFIX at Sat Apr 19 15:43:59 CEST 2003 */
+      char *buf=new char[BUFSIZE];
+      unsigned got;
+      // fprintf(stderr, "ftf=%ld ofs=%d\n", ftell(f), ofs);
+      while ((0<(got=fread(buf, 1, BUFSIZE, f)))
+             && got==fwrite(buf, 1, got, tf)) {}
+      // fprintf(stderr,"got=%d ftell=%d\n", got, ftell(tf));
+      delete [] buf;
+    }
+    unget.forgetAll(); ofs=0;
+    fflush(tf); rewind(tf);
+    if (ferror(tf) || ferror(f))
+      Error::sev(Error::EERROR) << "Filter::UngetFILED" << ": cannot write temp file" << (Error*)0;
+    if (0!=(closeMode&CM_closep)) fclose(f);
+    closeMode|=CM_closep|CM_unlinkp; /* close and unlink the temporary file */
+    /* ^^^ Imp: verify VC++ compilation, +others */
+    f=tf;
+  } else if (f==NULLP) { /* no real file open */
+    #if OS_COTY==COTY_UNIX
+      tf=fopen("/dev/null","rb");
+    #else
+      #if OS_COPTY==COTY_WIN9X || OS_COTY==COTY_WINNT
+        tf=fopen("nul","rb");
+      #else
+        tf=(FILE*)NULLP;
+      #endif
+    #endif
+    if (tf==NULLP) goto do_temp; /* perhaps inside chroot() */
+    close();
+    closeMode|=CM_closep|CM_unlinkp; /* close and unlink the temporary file */
+    f=tf;
+  }
+  closeMode|=CM_seekablep;
+  return f;
+}
+void Filter::UngetFILED::seek(long abs_ofs) {
+  if (abs_ofs==vi_tell()) return;
+  (void) getFILE(true); /* ensure seekability */
+  if (0!=fseek(f, abs_ofs, SEEK_SET))
+    Error::sev(Error::EERROR) << "Filter::UngetFILED" << ": cannot seek" << (Error*)0;
+  assert(unget.isEmpty());
+  assert(ofs==0);
+  ftell_at=abs_ofs;
+}
+void Filter::UngetFILED::unread(char const *s, slen_t slen) {
+  ftell_at-=slen;
+  if (slen==0) {
+  } else if (slen<=ofs) {
+    ofs-=slen;
+  } else {
+    slen-=ofs;
+    ofs=0;
+    if (!unget.isEmpty() || 0!=fseek(f, -slen, SEEK_CUR)) {
+      assert(unget.isEmpty()); // !!
+      unget.vi_write(s, slen); /* complete garbage unless unget was empty */
+    }
+  }
 }
 
 /* --- */
@@ -474,14 +664,14 @@ slen_t Filter::BufR::vi_read(char *to_buf, slen_t max) {
 }
 void Filter::BufR::vi_rewind() { bufp->first_sub(sub); }
 
-Filter::FlatR::FlatR(char const* s_, slen_t slen_): s(s_), sbeg(s_), slen(slen_) {}
-Filter::FlatR::FlatR(char const* s_): s(s_), sbeg(s_), slen(strlen(s_)) {}
-void Filter::FlatR::vi_rewind() { s=sbeg; }
-int Filter::FlatR::vi_getcc() {
+Filter::FlatD::FlatD(char const* s_, slen_t slen_): s(s_), sbeg(s_), slen(slen_) {}
+Filter::FlatD::FlatD(char const* s_): s(s_), sbeg(s_), slen(strlen(s_)) {}
+void Filter::FlatD::vi_rewind() { s=sbeg; }
+int Filter::FlatD::vi_getcc() {
   if (slen==0) return -1;
   slen--; return *(unsigned char const*)s++;
 }
-slen_t Filter::FlatR::vi_read(char *to_buf, slen_t max) {
+slen_t Filter::FlatD::vi_read(char *to_buf, slen_t max) {
   if (max>slen) max=slen;
   memcpy(to_buf, s, max);
   s+=max; slen-=max;
@@ -524,7 +714,7 @@ FILE *Files::try_dir(SimBuffer::B &dir, SimBuffer::B const&fname, char const*s1,
 #  define DIR_SEP "/"
 #endif
 
-FILE *Files::open_tmpnam(SimBuffer::B &dir, bool binary_p, char const*extension) {
+FILE *Files::open_tmpnam(SimBuffer::B &dir, char const*open_mode, char const*extension) {
   /* Imp: verify / on Win32... */
   /* Imp: ensure uniqueness on NFS */
   /* Imp: short file names */
@@ -540,7 +730,7 @@ FILE *Files::open_tmpnam(SimBuffer::B &dir, bool binary_p, char const*extension)
   if (extension) fname << extension;
   fname.term0();
   FILE *f=(FILE*)NULLP;
-  char const* open_mode=binary_p ? "wb" : "w"; /* Dat: "bw" is bad */
+  // char const* open_mode=binary_p ? "wb" : "w"; /* Dat: "bw" is bad */
   (void)( ((FILE*)NULLP!=(f=try_dir(dir, fname, 0, 0, open_mode))) ||
           ((FILE*)NULLP!=(f=try_dir(dir, fname, PTS_CFG_P_TMPDIR, 0, open_mode))) ||
           ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("TMPDIR"), 0, open_mode))) ||

@@ -1333,7 +1333,7 @@ class JPEGSOF0Encode: public PSEncoder {
 JPEGSOF0Encode::JPEGSOF0Encode(GenBuffer::Writable &out_): out(out_) {}
 void JPEGSOF0Encode::vi_write(char const*bufr, slen_t len) {
   if (len==0) {
-    { Filter::FlatR flatd(buf(), buf.getLength());
+    { Filter::FlatD flatd(buf(), buf.getLength());
       jai_parse_jpeg(&gi, &flatd);
     }
     slen_t len=buf.getLength();

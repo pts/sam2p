@@ -10,14 +10,15 @@
 
 #include "image.hpp"
 #include "error.hpp"
+#include "gensio.hpp" /* Filter::UngetFILED */
 
 #if USE_IN_TGA
 
 #include "input-tga.ci" /* defines tga_load_image */
 
-static Image::Sampled *in_tga_reader(Image::filep_t file_, SimBuffer::Flat const&) {
+static Image::Sampled *in_tga_reader(Image::Loader::UFD *ufd, SimBuffer::Flat const&) {
   Image::Sampled *ret=0;
-  bitmap_type bitmap=tga_load_image((char*)(void*)file_);
+  bitmap_type bitmap=tga_load_image(((Filter::UngetFILED*)ufd)->getFILE(/*seekable:*/false));
   /* Imp: Work without duplicated memory allocation */
   if (BITMAP_PLANES(bitmap)==1) {
     Image::Gray *img=new Image::Gray(BITMAP_WIDTH(bitmap), BITMAP_HEIGHT(bitmap), 8);
@@ -32,9 +33,7 @@ static Image::Sampled *in_tga_reader(Image::filep_t file_, SimBuffer::Flat const
   return ret;
 }
 
-static Image::Loader::reader_t in_tga_checker(char buf[Image::Loader::MAGIC_LEN], char bufend[Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
-  (void)buf;
-  (void)bufend;
+static Image::Loader::reader_t in_tga_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::Loader::UFD*) {
   /* vvv Unfortunately not all targa images have that footer */
   /* return 0==memcmp(bufend+Image::Loader::MAGIC_LEN-18, "TRUEVISION-XFILE", 16) */
   /* vvv 30..127: Aladdin Ghostscript adds 58 bytes of header */

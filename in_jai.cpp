@@ -187,6 +187,7 @@ void jai_parse_jpeg(struct jai_gfxinfo *result, DecoderTeller *fp, bool must_be_
   if (c!=M_SOI) return;
 
   result->bad=1;
+  // fprintf(stderr, "welcome ofs=%ld\n", fp->vi_tell()); 
   while (1) {
    if ((c=fp->vi_getcc())!=0xFF) { result->bad=8; return; }
    while ((c=fp->vi_getcc())==0xFF) ;
@@ -196,6 +197,7 @@ void jai_parse_jpeg(struct jai_gfxinfo *result, DecoderTeller *fp, bool must_be_
       if (result->bad!=1) { result->bad=4; return; } /* only one M_SOF allowed */
       result->SOF_type=c-M_SOF0;
       result->SOF_offs=fp->vi_tell();
+      // fprintf(stderr, "SOF_offs=%d\n", result->SOF_offs);
       /* handle SOFn block */
       length=jai_read2(fp);
       result->bpc = fp->vi_getcc();
@@ -316,18 +318,19 @@ char *jai_errors[]={
   // /*10*/ "not ending with EOI", /* not output by jai_handle_jpeg! */
 };
 
-static Image::Sampled *in_jai_reader(Image::filep_t file_, SimBuffer::Flat const&) {
+static Image::Sampled *in_jai_reader(Image::Loader::UFD* ufd, SimBuffer::Flat const&) {
   // assert(0);
   struct jai_gfxinfo gi;
-  Filter::FILED filed((FILE*)file_, /*closep:*/false);
-  jai_parse_jpeg(&gi, &filed);
+  Filter::UngetFILED* ufdd=(Filter::UngetFILED*)ufd;
+  FILE *file_=ufdd->getFILE(/*seekable:*/true);
+  jai_parse_jpeg(&gi, ufdd);
   // jai_parse_jpeg(&gi, (FILE*)file_);
   // long ftel=ftell((FILE*)file_);
   if (gi.bad!=0) Error::sev(Error::EERROR) << "JAI: " << jai_errors[gi.bad] << (Error*)0;
   // printf("ftell=%lu\n", ftell((FILE*)file_));
   fseek((FILE*)file_, 0L, 2); /* EOF */
-  long flen=ftell((FILE*)file_); /* skip extra bytes after EOI */
-  // printf("flen=%lu\n", flen);
+  long flen=ftell((FILE*)file_); /* skip extra bytes after EOI. Imp: no need to do this */
+  // fprintf(stderr, "flen=%lu\n", flen);
   assert(flen>2);
   rewind((FILE*)file_);
   JAI *ret=new JAI(gi.width,gi.height,gi.bpc,gi.colorspace,flen,gi.SOF_offs,gi.hvs);
@@ -340,13 +343,15 @@ static Image::Sampled *in_jai_reader(Image::filep_t file_, SimBuffer::Flat const
   return ret;
 }
 
-static Image::Loader::reader_t in_jai_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const& loadHints, Image::filep_t file_) {
+static Image::Loader::reader_t in_jai_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const& loadHints, Image::Loader::UFD* ufd) {
   if (0!=memcmp(buf, "\xff\xd8\xff", 3)
    || !(loadHints.findFirst((char const*)",jpeg-asis,",6)!=loadHints.getLength() || loadHints.findFirst((char const*)",asis,",6)!=loadHints.getLength())
      ) return 0;
-  rewind((FILE*)file_);
-  Filter::FILED filed((FILE*)file_, /*closep:*/false);
-  return jai_is_baseline_jpeg(&filed) ? in_jai_reader : 0;
+  Filter::UngetFILED* ufdd=(Filter::UngetFILED*)ufd;
+  ufdd->seek(0);
+  Image::Loader::reader_t ret=jai_is_baseline_jpeg(ufdd) ? in_jai_reader : 0;
+  ufdd->seek(0);
+  return ret;
 }
 
 #if 0 /* Filter::FlatR* used by JPEGSOF0Encode::vi_write() in appliers.cpp */
@@ -360,16 +365,24 @@ void jai_parse_jpeg(struct jai_gfxinfo *result, FILE *f) {
 }
 #endif
 
-/* by pts@fazekas.hu at Tue Mar 11 20:27:56 CET 2003 */
+#if 0 /* unused */
 int jai_is_baseline_jpeg(char const* filename) {
+  /* by pts@fazekas.hu at Tue Mar 11 20:27:56 CET 2003 */
   FILE *f=fopen(filename, "rb");
   if (!f) return -1;
   Filter::FILED filed(f, /*closep:*/true);
   return jai_is_baseline_jpeg(&filed);
 }
-int jai_is_baseline_jpeg(DecoderTeller *fp) {
+#endif
+int jai_is_baseline_jpeg(/*DecoderTeller*/Filter::UngetFILED *fp) {
+  char buf[3];
   struct jai_gfxinfo gi;
+  bool qfalse=(3!=fp->vi_read(buf, 3) || 0!=memcmp(buf, "\xff\xd8\xff", 3));
+  fp->unread(buf, 3);
+  if (qfalse) return false;
+  fp->getFILE(/*seekable*/true); /* make it seekable, so the caller can seek back */
   jai_parse_jpeg(&gi, fp, /*must_be_baseline:*/false);
+  fp->seek(0);
   return gi.bad!=0 ? -1 : gi.SOF_type==0;
 }
 #else

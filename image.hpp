@@ -247,11 +247,14 @@ class Image {
   
   /** Describes a driver that can load a specific image file format. */
   struct Loader {
+    /** Filter::UngetFILED */
+    class UFD;
     /** A function that can (allocate and) load a sampled image. Never
      * returns NULL. On error, it calls Error::.... The filep_t argument
      * should be really cast back to FILE*. The reader must fclose the FILE*.
      */
-    typedef Sampled*(*reader_t)(filep_t, SimBuffer::Flat const& loadHints);
+    // typedef Sampled*(*reader_t)(filep_t, SimBuffer::Flat const& loadHints);
+    typedef Sampled*(*reader_t)(UFD* ufd, SimBuffer::Flat const& loadHints);
     BEGIN_STATIC_ENUM1(unsigned) MAGIC_LEN=64 END_STATIC_ENUM()
     /** A function that checks the magic numbers at the beginning of a file
      * (already read into buf), and returns NULL if it cannot load an image
@@ -260,7 +263,7 @@ class Image {
      * @param f may read from freely if necessary (MAGIC_LEN is short), but
      *   has to call rewind(f) before reading
      */
-    typedef reader_t(*checker_t)(char buf[MAGIC_LEN], char bufend[MAGIC_LEN], SimBuffer::Flat const& loadHints, filep_t f);
+    typedef reader_t(*checker_t)(char buf[MAGIC_LEN], char bufend[MAGIC_LEN], SimBuffer::Flat const& loadHints, UFD* ufd);
     /** A null-terminated, compact string describing (not defining!) the image
      * file format.
      * Examples: "GIF", "XPM", "PNM"
@@ -276,10 +279,12 @@ class Image {
    * first
    */
   static void register0(Loader *);
-  /** Loads the image contained in te file `filename'. */
-  static Sampled* load(char const *filename, SimBuffer::Flat const& loadHints);
-  /** @param format: an Image::Loader::format already registered */
-  static Sampled* load(char const* format, filep_t f, SimBuffer::Flat const& loadHints);
+  /** Loads the image contained in te file `filename'.
+   * @param format NULLP is unknown (load any format)
+   *   or an Image::Loader::format already registered
+   */
+  static Sampled* load(Loader::UFD* ufd, SimBuffer::Flat const& loadHints, char const* format);
+  static Sampled* load(char const *filename, SimBuffer::Flat const& loadHints, filep_t stdin_f=(filep_t*)NULLP, char const* format=(char const*)NULLP);
   /* Prints the list of available Loaders (->format), separated by spaces.
    * Returns the number of available Loaders. Prepends a space if >= loaders.
    */

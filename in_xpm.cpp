@@ -25,7 +25,7 @@
 #include "xpmc.h"
 
 #include <string.h> /* memchr() */
-#include <stdio.h>
+#include "gensio.hpp"
 
 #define USGE(a,b) ((unsigned char)(a))>=((unsigned char)(b))
 
@@ -216,9 +216,9 @@ Image::Sampled::rgb_t XPMTok::getColor() {
   return 0; /*notreached*/
 }
 
-static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const&) {
+static Image::Sampled *in_xpm_reader(Image::Loader::UFD *ufd, SimBuffer::Flat const&) {
   // Error::sev(Error::EERROR) << "Cannot load XPM images yet." << (Error*)0;
-  XPMTok tok((FILE*)file_);
+  XPMTok tok(((Filter::UngetFILED*)ufd)->getFILE(/*seekable:*/false));
   Image::Sampled::dimen_t wd=tok.getDimen();
   Image::Sampled::dimen_t ht=tok.getDimen();
   Image::Sampled::dimen_t colors=tok.getDimen();
@@ -398,7 +398,7 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
   return ret;
 }
 
-static Image::Loader::reader_t in_xpm_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
+static Image::Loader::reader_t in_xpm_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::Loader::UFD*) {
   return (0==memcmp(buf, "/* XPM */", 9)) ? in_xpm_reader : 0;
 }
 

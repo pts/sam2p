@@ -26,17 +26,18 @@
 #include "cgif.c" /* _POSIX_SOURCE */
 #include "image.hpp"
 #include "error.hpp"
+#include "gensio.hpp"
 
 #undef CGIFFF
 #define CGIFFF CGIF::
 
-static Image::Sampled *in_gif_reader(Image::filep_t file_, SimBuffer::Flat const&) {
+static Image::Sampled *in_gif_reader(Image::Loader::UFD *ufd, SimBuffer::Flat const&) {
   Image::Indexed *img;
   CGIFFF GifFileType *giff;
   CGIFFF SavedImage *sp;
   CGIFFF ColorMapObject *cm;
   
-  if (0==(giff=CGIFFF DGifOpenFILE(file_)) || GIF_ERROR==CGIFFF DGifSlurp(giff))
+  if (0==(giff=CGIFFF DGifOpenFILE(((Filter::UngetFILED*)ufd)->getFILE(/*seekable:*/false))) || GIF_ERROR==CGIFFF DGifSlurp(giff))
     Error::sev(Error::EERROR) << "GIF: " << (CGIFFF GetGifError() || "unknown error") << (Error*)0;
   if (giff->ImageCount<1)
     Error::sev(Error::EERROR) << "GIF: no image in file" << (Error*)0;
@@ -59,7 +60,7 @@ static Image::Sampled *in_gif_reader(Image::filep_t file_, SimBuffer::Flat const
   return img;
 }
 
-static Image::Loader::reader_t in_gif_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
+static Image::Loader::reader_t in_gif_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::Loader::UFD*) {
   return (0==memcmp(buf,"GIF87a",6) || 0==memcmp(buf,"GIF89a",6)) ? in_gif_reader : 0;
 }
 

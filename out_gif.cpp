@@ -255,9 +255,10 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
   
   // transp=-1; /* With this, transparency will be ignored */
   c=img->getNcols();
-  // fprintf(stderr, "GIF89 write transp=%d ncols=%d\n", transp, c);
+  fprintf(stderr, "GIF89 write transp=%d ncols=%d\n", transp, c);
   bits_per_pixel=1; while ((c>>bits_per_pixel)!=0) bits_per_pixel++;
-  assert(bits_per_pixel<=8);
+  if (bits_per_pixel>1) bits_per_pixel--; /* BUGFIX at Wed Apr 30 15:55:27 CEST 2003 */
+  assert(bits_per_pixel<=8); 
   c=3*((1<<bits_per_pixel)-c);
   /* Now: c is the number of padding bytes */
   

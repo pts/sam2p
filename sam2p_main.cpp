@@ -251,6 +251,7 @@ static inline void one_setdimen2(char const*&Dimen1, char const*&Dimen2, char co
 } while(0)
 #endif
 
+static Filter::UngetFILED *ufd;
 static bool do_DisplayJobFile;
 static bool buildProfile_quiet=false;
 /** Creates an in-memory job file according to the command-line options.
@@ -557,32 +558,38 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
      normal_label:
       if (InputFile==(char const*)NULLP) {
         InputFile=p; /* set it even on error */
-        if (p[0]=='-' && p[1]=='\0') { /* Filename: STDIN */
-          Files::set_binary_mode(0, true);
-          if (0!=fseek(stdin, 0L, 0)) { unseekable:
-#if 0
-            Error::sev(Error::ERROR_CONT) << "one_liner: `-' (stdin) not allowed as InputFile (stdin unseekable)" << (Error*)0;
-            badp=true; continue;
-#endif
-            FILE *f=Files::open_tmpnam(tmpnam);
-            if (!f) { Error::sev(Error::ERROR_CONT) << "one_liner: cannot open" << " temporary file for `-' (stdin)" << (Error*)0; badp=true; continue; }
-            tmpnam.term0();
-            Files::tmpRemoveCleanup(InputFile=tmpnam());
-            char *buf=new char[4096];
-            unsigned got;
-            while (
-                 (0<(got=fread(buf, 1, sizeof(buf), stdin)))
-              && got==fwrite(buf, 1, sizeof(buf), f)) {}
-            if (ferror(f) || 0!=fclose(f) || ferror(stdin))
-              { Error::sev(Error::ERROR_CONT) << "one_liner: cannot write" << " temporary file for `-' (stdin)" << (Error*)0; badp=true; continue; }
-            // fprintf(stderr, "if=(%s)\n", InputFile);
-            continue;
-            /* Imp: report `-' as filename on errors etc. */
-          }
-          int c=MACRO_GETC(stdin);
-          if (0!=fseek(stdin, 0L, 0)) { if (c>=0) ungetc(c, stdin); goto unseekable; } /* active test */
-          /* ungetc() is not necessary because of fseek() */
-        }
+	/* vvv since Sat Apr 19 13:37:57 CEST 2003:
+	 * Possibly unseekable STDIN is handled by Filter::UngetFILED
+	 */
+	#if 0
+	  if (p[0]=='-' && p[1]=='\0') { /* Filename: STDIN */
+	    Files::set_binary_mode(0, true);
+	    if (0!=fseek(stdin, 0L, 0)) { unseekable:
+	      #if 0
+		Error::sev(Error::ERROR_CONT) << "one_liner: `-' (stdin) not allowed as InputFile (stdin unseekable)" << (Error*)0;
+		badp=true; continue;
+	      #endif
+	      FILE *f=Files::open_tmpnam(tmpnam);
+	      if (!f) { Error::sev(Error::ERROR_CONT) << "one_liner: cannot open" << " temporary file for `-' (stdin)" << (Error*)0; badp=true; continue; }
+	      tmpnam.term0();
+	      Files::tmpRemoveCleanup(InputFile=tmpnam());
+	      char *buf=new char[4096];
+	      unsigned got;
+	      while (
+		   (0<(got=fread(buf, 1, sizeof(buf), stdin)))
+		&& got==fwrite(buf, 1, sizeof(buf), f)) {}
+	      delete [] buf;
+	      if (ferror(f) || 0!=fclose(f) || ferror(stdin))
+		{ Error::sev(Error::ERROR_CONT) << "one_liner: cannot write" << " temporary file for `-' (stdin)" << (Error*)0; badp=true; continue; }
+	      // fprintf(stderr, "if=(%s)\n", InputFile);
+	      continue;
+	      /* Imp: report `-' as filename on errors etc. */
+	    }
+	    int c=MACRO_GETC(stdin);
+	    if (0!=fseek(stdin, 0L, 0)) { if (c>=0) ungetc(c, stdin); goto unseekable; } /* active test */
+	    /* ungetc() is not necessary because of fseek() */
+	  }
+	#endif
       } else if (OutputFile==(char const*)NULLP) { /* Filename: STDOUT */
         Files::set_binary_mode(1, true);
         OutputFile=p;
@@ -703,10 +710,26 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
 
   unsigned coc=colen;
 
-  /* Smart verify whether CO_JAI may be applied */
+  /* Smart verify whether /Compression/JAI is requested. If so, and the input
+   * file is JPEG, then load it as-is. Our heuristic is that if the user
+   * allowed /Compression/JAI among others, and the input file is a baseline
+   * JPEG, then /Compression/JAI will be the best (and only) compression
+   * method.
+   */
   bool jaip=cox[Rule::Cache::CO_JAI]!=0;
-  /* vvv Imp: no error handling */
-  if (jaip && 1!=jai_is_baseline_jpeg(InputFile)) { jaip=false; coc--; cox[Rule::Cache::CO_JAI]=0; }
+  if (jaip) {
+    if (ufd==NULLP) ufd=new Filter::UngetFILED(InputFile, stdin,
+      Filter::UngetFILED::CM_closep|Filter::UngetFILED::CM_keep_stdinp);
+    /* vvv Imp: no error handling */
+    if (1!=jai_is_baseline_jpeg(ufd)) { jaip=false; coc--; cox[Rule::Cache::CO_JAI]=0; }
+    ufd->seek(0);
+#if 0
+    assert(ufd->vi_getcc()==255);
+    assert(ufd->vi_getcc()==0xd8);
+    assert(ufd->vi_getcc()==255+0);
+    assert(0);
+#endif
+  }
   
   if (jaip) {
     APPEND_sf(Image::SF_Asis);
@@ -821,7 +844,7 @@ void init_sam2p_engine(char const*argv0) {
   Error::long_argv0=argv0==(char const*)NULLP ? "sam2p" : argv0;
   Error::argv0=Files::only_fext(Error::long_argv0);
   Error::tmpargv0="_sam2p_";
-  Error::banner0="sam2p v0.43";
+  Error::banner0="sam2p v0.44";
 }
 
 /* --- */
@@ -832,7 +855,8 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
   /* --- Parse arguments, generate/read .job file */
   
   MiniPS::VALUE job=MiniPS::Qundef;
-  Filter::FlatR bts(bts_ttt);
+  Filter::FlatD bts(bts_ttt);
+  ufd=(Filter::UngetFILED*)NULLP;
   if (!helpp && argv1[0]!=(char const*)NULLP && argv1[1]==(char const*)NULLP) {
     /* A single argument: must be the name of the .job file */
     MiniPS::Parser p(argv1[0]);
@@ -851,7 +875,7 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
     SimBuffer::B jobss;
     if (one_liner(jobss, argv1)) goto help;
     if (do_DisplayJobFile) displayJob(sout, jobss);
-    Filter::FlatR jobr(jobss(), jobss.getLength());
+    Filter::FlatD jobr(jobss(), jobss.getLength());
     MiniPS::Parser p(&jobr);
     p.addSpecRun("%bts", &bts); /* bts: Built-in TemplateS, the bts.ttt file in the sources */
     if (MiniPS::Qerror==(job=p.parse1(p.EOF_ILLEGAL, Error::ERROR_CONT))
@@ -887,7 +911,7 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
   // MiniPS::dump(sout, job, 1);
   Files::tmpRemove=TmpRemove==MiniPS::Qtrue;
   if (MiniPS::Qnull==(MiniPS::VALUE)Rule::Templates) {
-    Filter::FlatR flatd("<< (%bts) run >>");
+    Filter::FlatD flatd("<< (%bts) run >>");
     MiniPS::Parser p(&flatd);
     p.addSpecRun("%bts", &bts);
     Rule::Templates=(MiniPS::Dict*)p.parse1();
@@ -912,16 +936,21 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
   /* Imp: eliminate memory leak from default LoadHints */
   /* vvv may raise tons of error messages */
   // InputFile->term0(); /* always term0() for MiniPS::String */
+  if (ufd==NULLP) ufd=new Filter::UngetFILED(InputFile->begin_(), stdin,
+    Filter::UngetFILED::CM_closep|Filter::UngetFILED::CM_keep_stdinp);
   Image::SampledInfo info(Image::load(
-#if 0 /* Image::load() knows about stdin */
-    InputFile->getLength()!=1 || InputFile->begin_()[0]!='-' ? InputFile->begin_() : (const char*)NULLP,
-#else
-    InputFile->begin_(),
-#endif
-    SimBuffer::B(",",1, LoadHints->begin_(),LoadHints->getLength(), ",",1 ).term0()
+    #if 0
+      InputFile->begin_(), /* knows about stdin `-' */
+      SimBuffer::B(",",1, LoadHints->begin_(),LoadHints->getLength(), ",",1 ).term0() /* three-way concatentation */
+    #else
+      (Image::Loader::UFD*)ufd,
+      SimBuffer::B(",",1, LoadHints->begin_(),LoadHints->getLength(), ",",1 ).term0(), /* three-way concatentation */
+      /*format:*/(char const*)NULLP
+    #endif
   ));
   Error::sev(Error::NOTICE) << "job: read InputFile: " <<
     FNQ2STDOK(InputFile->begin_(),InputFile->getLength()) << (Error*)0;
+  delete ufd;
   // assert(0);
 
   bool overwrite=false;

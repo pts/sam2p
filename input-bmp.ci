@@ -64,8 +64,11 @@ static unsigned char        *ReadImage     (FILE *,
 				   int,
 				   int);
 
-bitmap_type
-bmp_load_image (at_string filename)
+#if PTS_SAM2P
+bitmap_type bmp_load_image (FILE* filename)
+#else
+bitmap_type bmp_load_image (at_string filename)
+#endif
 {
   FILE *fd;
   unsigned char buffer[64];
@@ -74,7 +77,7 @@ bmp_load_image (at_string filename)
   bitmap_type image;
 
   #if PTS_SAM2P /**** pts ****/
-    fd=(FILE*)(void*)filename;
+    fd=filename;
   #else
     fd = fopen (filename, "rb");
 

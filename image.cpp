@@ -10,7 +10,7 @@
 #include "image.hpp"
 #include "error.hpp"
 #include <string.h> /* strlen() */
-#include <stdio.h> /* fopen()... */
+#include "gensio.hpp"
 
 /* --- 4-byte hashing */
 
@@ -1167,38 +1167,58 @@ void Image::register0(Image::Loader *anew) {
   first=anew;
 }
 
+#if 0 /* removed by code refactoring */
 Image::Sampled* Image::load(char const* format, filep_t f_, SimBuffer::Flat const& loadHints) {
-  static char buf[2*Loader::MAGIC_LEN];
-  FILE *f=(FILE*)f_;
-  unsigned got=0;
-  slen_t ret=fread(buf, 1, Loader::MAGIC_LEN, f);
+#endif
+
+// #include <unistd.h> /* sleep() */
+
+Image::Sampled *Image::load(Image::Loader::UFD* ufd0, SimBuffer::Flat const& loadHints, char const* format) {
+  Filter::UngetFILED &ufd=*(Filter::UngetFILED*)ufd0;
+  /* Dat: format arg used in in_pnm.cpp */
+  static char buf[Loader::MAGIC_LEN];
+  slen_t ret=ufd.vi_read(buf, Loader::MAGIC_LEN);
   /* vvv Imp: clarify error message: may be a read error */
-  if (ret==0) Error::sev(Error::EERROR) << "Zero-length image file" << (Error*)0;
+  if (ret==0) Error::sev(Error::EERROR) << "Zero-length image file: " << FNQ(ufd.getFilenameDefault("-")) << (Error*)0;
   if (ret<Loader::MAGIC_LEN) memset(buf+ret, '\0', Loader::MAGIC_LEN-ret);
-  if (0
-   || (rewind(f), 0)
-   || ferror(f))
-    Error::sev(Error::EERROR) << "I/O error in image file" << (Error*)0;
-  if (got!=0 && got!=Loader::MAGIC_LEN) memmove(buf+2*Loader::MAGIC_LEN-got, buf+Loader::MAGIC_LEN, got);
+  if (ufd.hadError()) Error::sev(Error::EERROR) << "I/O error pre in image file: " << FNQ(ufd.getFilenameDefault("-")) << (Error*)0;
+  /* Dat: do not read the trailer onto buf+Loader::MAGIC_LEN, because no ->checker() uses it yet. */
   Loader *p=first;
   Loader::reader_t reader;
+  // ufd.getUnget().vi_write(buf, ret);
+  ufd.unread(buf, ret); /* tries to seek back, on failure calls ufd.getUnget().vi_write() */
+  // ^^^ rewind(f); /* checker might have read */
+  /* ^^^ do this early for the checkers */
   while (p!=NULLP) {
+    /* vvv each checker() must rewind ufd for itself */
     if ((format==(char const*)NULLP || 0==strcmp(p->format, format))
      && (Loader::checker_t)NULLP!=p->checker
-     && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints, f))) {
-      rewind(f); /* checker might have read */
-      return reader(f, loadHints);
+     && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints, ufd0))
+       ) {
+      return reader(ufd0, loadHints);
     }
     p=p->next;
   }
-  Error::sev(Error::EERROR) << "Unknown input image format" << (Error*)0;
+  // sleep(1000);
+  Error::sev(Error::EERROR) << "Unknown input image format: " << FNQ(ufd.getFilenameDefault("-")) << (Error*)0;
   return 0; /*notreached*/
 }
 
-Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHints) {
+#if 0 /* not used anywhere */
+Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHints, filep_t stdin_f, char const* format) {
+  Filter::UngetFILED ufd(filename, stdin_f==NULLP ? stdin : (FILE*)stdin_f,
+    Filter::UngetFILED::CM_closep|Filter::UngetFILED::CM_keep_stdinp);
+  return load((Image::Loader::UFD*)&ufd, loadHints, format);
+  // Imp: better error message, something like: if (f==NULLP) Error::sev(Error::EERROR) << "Cannot open/read image file: " << FNQ(filename) << (Error*)0;
+}
+#endif
+
+#if 0 /* before Sat Apr 19 13:42:04 CEST 2003 */
+Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHints, filep_t stdin_f, char const* format) {
+  /* Dat: format arg used in in_pnm.cpp */
   static char buf[2*Loader::MAGIC_LEN];
   bool stdin_p=filename[0]=='-' && filename[1]=='\0';
-  FILE *f=stdin_p? stdin : fopen(filename, "rb");
+  FILE *f=!stdin_p ? fopen(filename, "rb") : stdin_f!=NULLP ? (FILE*)stdin_f : stdin;
   unsigned got=0;
   if (f==NULLP) Error::sev(Error::EERROR) << "Cannot open/read image file: " << FNQ(filename) << (Error*)0;
   slen_t ret=fread(buf, 1, Loader::MAGIC_LEN, f);
@@ -1206,6 +1226,7 @@ Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHin
   if (ret==0) Error::sev(Error::EERROR) << "Zero-length image file: " << FNQ(filename) << (Error*)0;
   if (ret<Loader::MAGIC_LEN) memset(buf+ret, '\0', Loader::MAGIC_LEN-ret);
 #if 0
+  /* Dat: do not read the trailer, because no ->checker() uses it yet. */
   unsigned long pos=fseek(f, 0, SEEK_END);
   pos=(pos<=Loader::MAGIC_LEN)?0:pos-Loader::MAGIC_LEN;
   if (0!=fseek(f, pos, SEEK_SET)
@@ -1220,7 +1241,10 @@ Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHin
   Loader *p=first;
   Loader::reader_t reader;
   while (p!=NULLP) {
-    if ((Loader::checker_t)NULLP!=p->checker && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints, f))) {
+    if ((format==(char const*)NULLP || 0==strcmp(p->format, format))
+     && (Loader::checker_t)NULLP!=p->checker
+     && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints, f))
+       ) {
       rewind(f); /* checker might have read */
       Image::Sampled *ret=reader(f, loadHints);
       if (ferror(f) || (!stdin_p && 0!=fclose(f))) /* don't close stdin */
@@ -1234,6 +1258,7 @@ Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHin
   // Error::sev(Error::WARNING) << "Zero-length image2." << (Error*)0;
   return 0; /*notreached*/
 }
+#endif
 
 unsigned Image::printLoaders(GenBuffer::Writable &out) {
   unsigned num=0;

@@ -11,10 +11,12 @@
 /**** pts ****/
 #include "config2.h"
 #include "image.hpp"
+
 #if USE_IN_PCX
 #include "error.hpp"
-#include <stdio.h>
+#include "gensio.hpp"
 #include <string.h>
+
 
 /* Imp: palette handling etc. according to PCX_VER, see decode.c */
 #define dimen Image::Sampled::dimen_t
@@ -117,9 +119,9 @@ static Image::Sampled *LoadPCX
 /*******************************************/
 {
   Image::Sampled *ret=(Image::Sampled*)NULLP;
-  long   filesize;
   byte   hdr[128];
 #if 0 /**** pts ****/
+  long   filesize;
   char  *bname;
   FILE  *fp;
   char *errstr; byte *image;
@@ -139,13 +141,12 @@ static Image::Sampled *LoadPCX
   if (!fp) return_pcxError(bname, "unable to open file");
 #endif
 
-  
-
+#if 0 /**** pts ****/
   /* figure out the file size */
   fseek(fp, 0L, 2);
   filesize = ftell(fp);
   fseek(fp, 0L, 0);
-
+#endif
 
   /* read the PCX header */
   fread(hdr, (size_t) 128, (size_t) 1, fp);
@@ -512,11 +513,11 @@ static int pcxError(fname,st)
 }
 #endif
 
-static Image::Sampled *in_pcx_reader(Image::filep_t file_, SimBuffer::Flat const&) {
+static Image::Sampled *in_pcx_reader(Image::Loader::UFD *ufd, SimBuffer::Flat const&) {
   PICINFO pinfo_;
-  return LoadPCX((FILE*)file_, &pinfo_);
+  return LoadPCX(((Filter::UngetFILED*)ufd)->getFILE(/*seekable:*/false), &pinfo_);
 }
-static Image::Loader::reader_t in_pcx_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
+static Image::Loader::reader_t in_pcx_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::Loader::UFD*) {
   return buf[PCX_ID]==0x0a
       && (unsigned char)buf[PCX_VER]<=5
       && buf[PCX_ENC]==1

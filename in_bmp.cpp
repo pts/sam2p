@@ -13,11 +13,12 @@
 
 #if USE_IN_BMP
 
+#include "gensio.hpp"
 #include "input-bmp.ci"
 
-static Image::Sampled *in_bmp_reader(Image::filep_t file_, SimBuffer::Flat const&) {
+static Image::Sampled *in_bmp_reader(Image::Loader::UFD *ufd, SimBuffer::Flat const&) {
   Image::Sampled *ret=0;
-  bitmap_type bitmap=bmp_load_image((char*)(void*)file_);
+  bitmap_type bitmap=bmp_load_image(((Filter::UngetFILED*)ufd)->getFILE(/*seekable:*/false));
   /* Imp: Work without duplicated memory allocation */
   if (BITMAP_PLANES(bitmap)==1) {
     Image::Gray *img=new Image::Gray(BITMAP_WIDTH(bitmap), BITMAP_HEIGHT(bitmap), 8);
@@ -32,7 +33,7 @@ static Image::Sampled *in_bmp_reader(Image::filep_t file_, SimBuffer::Flat const
   return ret;
 }
 
-static Image::Loader::reader_t in_bmp_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
+static Image::Loader::reader_t in_bmp_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::Loader::UFD*) {
   return (buf[0]=='B' && buf[1]=='M'
    && buf[6]==0 && buf[7]==0 && buf[8]==0 && buf[9]==0
    && (unsigned char)(buf[14])<=64 && buf[15]==0 && buf[16]==0 && buf[17]==0)
@@ -41,6 +42,6 @@ static Image::Loader::reader_t in_bmp_checker(char buf[Image::Loader::MAGIC_LEN]
 
 #else
 #define in_bmp_checker NULLP
-#endif /* USE_IN_XPM */
+#endif /* USE_IN_BMP */
 
 Image::Loader in_bmp_loader = { "BMP", in_bmp_checker, 0 };

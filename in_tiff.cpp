@@ -25,7 +25,8 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
     // GenBuffer::Writable &out_, char *pipe_tmpl, slendiff_t i=0)
   }
   virtual void vi_copy(FILE *f) {
-    img=Image::load("PNM", (Image::filep_t)f, SimBuffer::B());
+    // img=Image::load("PNM", (Image::filep_t)f, SimBuffer::B());
+    img=Image::load("-", SimBuffer::B(), (Image::filep_t)f, (char const*)"PNM");
     /* fclose(f); */
   }
   inline Image::Sampled *getImg() const { return img; }
@@ -33,7 +34,7 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
   Image::Sampled *img;
 };
 
-static Image::Sampled *in_tiff_reader(Image::filep_t file_, SimBuffer::Flat const&) {
+static Image::Sampled *in_tiff_reader(Image::Loader::UFD *ufd, SimBuffer::Flat const&) {
   // Error::sev(Error::EERROR) << "Cannot load TIFF images yet." << (Error*)0;
   // HelperE helper("tifftopnm %S"); /* Cannot extract alpha channel */
   // HelperE helper("tif22pnm -rgba %S"); /* tif22pnm <= 0.07 */
@@ -52,12 +53,12 @@ static Image::Sampled *in_tiff_reader(Image::filep_t file_, SimBuffer::Flat cons
     #endif
   #endif
   HelperE helper(cmd);
-  Encoder::writeFrom(*(Filter::PipeE*)&helper, (FILE*)file_);
+  Encoder::writeFrom(*(Filter::PipeE*)&helper, *(Filter::UngetFILED*)ufd);
   ((Filter::PipeE*)&helper)->vi_write(0,0); /* Signal EOF */
   return helper.getImg();
 }
 
-static Image::Loader::reader_t in_tiff_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
+static Image::Loader::reader_t in_tiff_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::Loader::UFD*) {
   /* MM\x00\x2a: TIFF image data, big-endian
    * II\x2a\x00: TIFF image data, little-endian
    * The second word of TIFF files is the TIFF version number, 42, which has 

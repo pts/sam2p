@@ -19,7 +19,7 @@
 #if USE_IN_LBM
 
 #include <string.h> /* memchr() */
-#include <stdio.h> /* printf() */
+#include "gensio.hpp"
 
 #define FORM 0x464f524dL
 #define ILBM 0x494c424dL
@@ -261,11 +261,12 @@ Image::Sampled *LBMRead::doit() {
   return img;
 }
 
-static Image::Sampled *in_lbm_reader(Image::filep_t file_, SimBuffer::Flat const&) {
-  return LBMRead((FILE*)file_).doit(); /* Destructor: fclose((FILE*)file_); */
+static Image::Sampled *in_lbm_reader(Image::Loader::UFD *ufd, SimBuffer::Flat const&) {
+  return LBMRead(((Filter::UngetFILED*)ufd)->getFILE(/*seekable:*/false)).doit();
+  /* ^^^ Destructor: fclose((FILE*)file_); */
 }
 
-static Image::Loader::reader_t in_lbm_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
+static Image::Loader::reader_t in_lbm_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::Loader::UFD*) {
   return (0==memcmp(buf,"FORM",4) && 0==memcmp(buf+8,"ILBM",4)) ? in_lbm_reader : 0;
 }
 

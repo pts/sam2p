@@ -33,18 +33,24 @@ class Encoder: public GenBuffer::Writable { public:
   virtual void vi_write(char const*buf, slen_t len) =0;
   /** Copies all data (till EOF) from stream `f' to (this). */
   static void writeFrom(GenBuffer::Writable& out, FILE *f);
+  /** Copies all data (till EOF) from stream `f' to (this). */
+  static void writeFrom(GenBuffer::Writable& out, GenBuffer::Readable &in);
 }; /* class Encoder */
 
-/** Implementors must redefine vi_read(), and they may redefine vi_getcc(). */
+/** Implementors must redefine vi_read(), and they may redefine vi_getcc().
+ * A .vi_read(?,0) has special meaning in a Decoder (but not in a normal
+ * Readable).
+ */
 class Decoder: public GenBuffer::Readable { public:
   /** Calls vi_read(&ret,1). Note that this is the inverse of
-   * GenBuffer::Writable, because there vi_read() calls vi_getcc(). Decoders
+   * GenBuffer::Readable, because there vi_read() calls vi_getcc(). Decoders
    * may be stacked atop of each other.
    */
   virtual int vi_getcc();
   /** vi_read() must be called with positive slen_t for normal reading, and
    * vi_read(?,0); must be called to signal that the caller would not read from
-   * the Decoder again. After that, it is prohibited to call vi_write() either way.
+   * the Decoder again, so the decoder is allowed to release the resources
+   * used. After that, it is prohibited to call vi_read() either way.
    */
   virtual slen_t vi_read(char *to_buf, slen_t max) =0;
 }; /* class Decoder */
@@ -180,6 +186,7 @@ class Filter { public:
    public:
     inline FILED(FILE *f_,bool closep_): f(f_), closep(closep_) {}
     FILED(char const* filename);
+    inline virtual ~FILED() { close(); }
     inline virtual int vi_getcc() { return MACRO_GETC(f); }
     virtual slen_t vi_read(char *buf, slen_t len);
     void close();
@@ -187,6 +194,70 @@ class Filter { public:
    protected:
     FILE *f;
     bool closep;
+  };
+
+  /**
+   * Sat Apr 19 12:05:49 CEST 2003
+   * Always opens the file in binary mode.
+   * First reads from the unget buffer, then reads from a FILE*. A typical
+   * usage is:
+   *   { Filter::UngetFILED f("in.txt"); // fopen("in.txt","rb"), true);
+   *     f.getUnget() << "Prepend this in front of first line.\n";
+   *     int c;
+   *     while ((c=f.vi_getcc()!=-1)) putchar(c);
+   *   }
+   */
+  class UngetFILED: public DecoderTeller {
+   public:
+    GenBuffer::Writable& getUnget() { return unget; }
+    BEGIN_STATIC_ENUM(unsigned char, closeMode_t)
+      CM_closep=1,
+      CM_unlinkp=2,
+      CM_keep_stdinp=4, /* CM_unlinkp, but keep STDIN open */
+      CM_seekablep=8, /* it is sure that this->f is seekable */
+      CM_MAX=4
+    END_STATIC_ENUM()
+    inline UngetFILED(FILE *f_, closeMode_t closep_): f(f_), closeMode(closep_), ftell_at(0), ofs(0) {}
+    UngetFILED(char const* filename_, FILE* stdin_f=(FILE*)NULLP, closeMode_t closeMode_=CM_closep);
+    inline virtual ~UngetFILED() { close(); }
+    virtual int vi_getcc();
+    virtual slen_t vi_read(char *buf, slen_t len);
+    void close();
+    // void checkFILE();
+    inline virtual long vi_tell() const { return ftell_at; } // return ftell_add+ofs+(f!=NULLP ? ftell(f) : 0); }
+    /**
+     * @return equivalent to getc(f) if this->f is not seekable, but returns
+     *   -2 if this->f is seekable.
+     */
+    int getc_seekable();
+    /**
+     * Actively tests whether FILE* is seekable. Doesn't work for regular files
+     * of 0 bytes.
+     */
+    bool isSeekable();
+    /** Reading (this) and reading the returned FILE* will be equivalent
+     * (unless this->getUnget() is used later).
+     * Creates a temporary file if this->unget is not empty.
+     * @param seekable_p if true, the returned FILE* must be seekable. Possibly
+     *   creates a temporary file.
+     */
+    FILE* getFILE(bool seekable_p);
+    /** Implies a getFILE() */
+    void seek(long abs_ofs);
+    /** Tries to do an fseek(f, -slen, SEEK_CUR). On failure, appends to unget.
+     * The user should only unread() data obtained from vi_read().
+     */
+    void unread(char const *s, slen_t slen);
+    inline char const* getFilename() const { return filename; }
+    inline char const* getFilenameDefault(char const *def) const { return filename==NULLP ? def : filename; }
+    inline bool hadError() const { return f!=NULLP && ferror(f); }
+   protected:
+    FILE *f;
+    unsigned char closeMode;
+    slen_t ftell_at;
+    slen_t ofs;
+    SimBuffer::B unget;
+    char const* filename;
   };
 
   /** Reads from a memory of a GenBuffer via first_sub and next_sub. The
@@ -207,10 +278,10 @@ class Filter { public:
   /** Reads from a consecutive memory area, which won't be
    * delete()d by (this)
    */
-  class FlatR: public DecoderTeller /*GenBuffer::Readable*/ {
+  class FlatD: public DecoderTeller /*GenBuffer::Readable*/ {
    public:
-    FlatR(char const* s_, slen_t slen_);
-    FlatR(char const* s_);
+    FlatD(char const* s_, slen_t slen_);
+    FlatD(char const* s_);
     virtual int vi_getcc();
     virtual slen_t vi_read(char *to_buf, slen_t max);
     virtual void vi_rewind();
@@ -240,7 +311,7 @@ class Files {
     FILE *f;
   };
 
-  /** Formerly `class ReadableFILE' */
+  /** Formerly `class ReadableFILE'. Doesn't close the its FILE* automatically. */
   class FILER: public GenBuffer::Readable {
    public:
     inline FILER(FILE *f_): f(f_) {}
@@ -270,10 +341,12 @@ class Files {
    *        Creates the new file with 0 size.
    * @param extension NULLP or a string specifying the extension of the file
    *        to create (should beginn with ".")
+   * @param open_mode "w", "wb" or "wb+"
    * @return FILE* opened for writing for success, NULLP on failure
    * --return true on success, false on failure
    */
-  static FILE *open_tmpnam(SimBuffer::B &dir, bool binary_p=true, char const*extension=(char const*)NULLP);
+  static FILE *open_tmpnam(SimBuffer::B &dir, char const*open_mode="wb", char const*extension=(char const*)NULLP);
+  // static FILE *open_tmpnam(SimBuffer::B &dir, bool binary_p=true, char const*extension=(char const*)NULLP);
   static bool find_tmpnam(SimBuffer::B &dir);
   /** Calls lstat().
    * @return (slen_t)-1 on error, the size otherwise

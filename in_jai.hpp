@@ -38,7 +38,7 @@ extern char *jai_errors[];
   extern void jai_parse_jpeg(struct jai_gfxinfo *result, DecoderTeller *fp, bool must_be_baseline=true);
   /** Doesn't treat `-' as a special filename. @return 0, 1, or -1 on I/O error */
   extern int jai_is_baseline_jpeg(char const* filename);
-  extern int jai_is_baseline_jpeg(DecoderTeller *fp);
+  extern int jai_is_baseline_jpeg(/*DecoderTeller*/ Filter::UngetFILED *fp);
 #endif
 
 #endif

@@ -1825,6 +1825,27 @@ A32. You cannot. (Use -m to specify the margins.) The page size is
      If you really have to specify the page size, edit the .ps file and
      insert the `a4 ' or `letter ' command after the last %% line.
 
+Q33. How do I control ZIP compression ratio?
+
+A33. Use
+
+	sam2p -c:zip:1:0 in.img out.png  # uncompressed
+	sam2p -c:zip:1:1 in.img out.png  # normal compression
+	sam2p -c:zip:1:9 in.img out.png  # maximum compression
+
+Q34. ImageMagick convert creates smaller PNGs. Why?
+
+     You are probably trying to convert a JPEG or other true color photo to
+     PNG. Try one of the following compression options:
+
+      	sam2p -c:zip:12:7   # 464727 bytes
+	sam2p -c:zip:12:8   # 454271 bytes
+	sam2p -c:zip:12:9   # 447525 bytes
+	sam2p -c:zip:13:9   # 488748 bytes
+	sam2p -c:zip:14:9   # 454182 bytes
+	sam2p -c:zip:15:9   # 453080 bytes
+	convert -quality ?  # 454438 bytes
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
@@ -2349,6 +2370,9 @@ Further changes moved to debian/changelog.
 
 Missing feature list
 ~~~~~~~~~~~~~~~~~~~~
+!! ./sam2p ../pts.ppm t.gif -> sam2p: out_gif.cpp:260: void out_gif_write(GenBuffer::Writable&, Image::Indexed*): Assertion `bits_per_pixel<=8' failed.
+!! why so large PNG? sam2p examples/chessboard_ascii.pnm t.png
+!! easy seek back to 0 in in_*.cpp
 !! rxvt_bug.png -> useful Win98 .bmp
 ??
      (expected) !!
