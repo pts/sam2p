@@ -225,11 +225,13 @@ Filter::UngetFILED::UngetFILED(char const* filename_, FILE *stdin_f, closeMode_t
     Files::set_binary_mode(fileno(f), true);
     closeMode_&=~CM_unlinkp;
     if (0!=(closeMode_&CM_keep_stdinp)) closeMode_&=~CM_closep;
+    filename_=(char const*)NULLP; /* BUGFIX at Tue Jan  4 23:45:31 CET 2005 */
   } else {
     f=fopenErr(filename_, "Filter::UngetFileD");
   }
   if (filename_!=NULLP) strcpy(const_cast<char*>(filename=new char[strlen(filename_)+1]), filename_);
                    else filename=(char*)NULLP;
+  /* fprintf(stderr,"filename:%s\n",filename); */
   closeMode=closeMode_;
   ftell_at=0;
   ofs=0;

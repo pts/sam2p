@@ -1964,7 +1964,7 @@ A42. No. There are two main problems: See also Q40 and Q41.
 Q43. How do I convert a TIFF image to a 1-bit black-and-white PDF? Should I
      use `sam2p -c:fax test.tif test.pdf'?
 
-     This above will ensure that fax compression is used. What you need for
+A43. This above will ensure that fax compression is used. What you need for
      ensuring that the output is 1-bit black-and-white is:
 
         sam2p -s:gray1:stop test.tif test.pdf
@@ -1980,8 +1980,8 @@ Q43. How do I convert a TIFF image to a 1-bit black-and-white PDF? Should I
         sam2p: Error: applyProfile: invalid combination, no applicable OutputRule
 
      then your input test.tif is not really black-and-white. Open it in an
-     image editing program and ensure that the colors are #000000 and
-     #ffffff only.
+     image editing program and ensure that the colors are only #000000 and
+     #ffffff.
 
      > The tiff is black and white, bilevel - I just want to avoid the 
      > test.pdf from using 8bpp by default (like it does in imagemagick)
@@ -1989,6 +1989,42 @@ Q43. How do I convert a TIFF image to a 1-bit black-and-white PDF? Should I
      The default for sam2p is not 8bpp. To see what the default is, run sam2p
      with the `-j' option and check `OutputRule #1' on the console output.
      What you are interested in is the /SampleFormat field.
+
+Q43. Acrobat Reader (5.0 and 6.0) cannot read the PDFs converted from a JPEG
+     with sam2p. I get the message: `There was an error processing a page.
+     Expected `EI' while parsing an image.'.
+     (The same problem happens with Ghostscript 6.50 with a different error
+     message. xpdf-1.0 reports: bad DCT trailer.)
+
+A43. Very probably the JPEG stream of your original input image file is
+     rejected by the PDF viewers. (In fact, Ghostscript 7.x doesn't
+     complain.) sam2p doesn't do strict JPEG validation when converting JPEG
+     to PDF -- it just blindly assumes that the JPEG file is correct. To
+     ensure this, you have to re-encode the JPEG.
+
+     Instead of this:
+
+       sam2p bad.jpeg bad.pdf
+
+     do this:
+
+       sam2p -c ijg:50 bad.jpeg good.pdf  # much slower!
+
+     or this:
+
+       <bad.jpeg djpeg | cjpeg -quality 50 | sam2p - good.pdf
+
+     or this:
+
+	djpeg <bad.jpeg >temp.pnm
+	cjpeg -quality 50 <temp.pnm >temp.jpeg
+	sam2p temp.jpeg good.pdf
+
+     The real reason why Acrobat Reader rejects the JPEG is unknown to me.
+     I also don't know of any baseline JPEG compliance testing software.
+     (But if you re-encode with djpeg and cjpeg, it becomes compliant.)
+
+     (thanks to Thomas Kraemer for reporting the problem)
 
 Upsampling
 ~~~~~~~~~~
