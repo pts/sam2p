@@ -52,7 +52,10 @@ Imp: eliminate from config2.h: #define OS_COTY COTY_UNIX
 Imp: gensi.cpp appendFnq()
 Imp: integrate tif22pnm
 Imp: integrate png22pnm
-Imp: verify all system() calls
+Imp: win32 pngtopnm
+Imp: verify all system(3) calls for filenames ...
+Imp: copy config.h etc. -> VC6.0
+OK : 0.41 mingw
 OK : #undef HAVE_PTS_VSNPRINTF, because msvcrt.dll has a completely buggy vsnprintf()
 OK : verify no "\r\n" output file
 OK : Win32 (VC++, mingw): either fopen(...,"rb") or setmode(..., O_BINARY) OK
@@ -64,4 +67,4 @@ OK : xpmc.h ""\
 OK : bts2.tth ""\
 OK : chmod +x ./configure
 OK : grep '!!' UNIX
-OK : autoconf lstat
+OK : autoconf lstat(2)

@@ -528,7 +528,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
         else if (GenBuffer::nocase_strbegins(p, "PNG:"))  FileFormat=Rule::Cache::FF_PNG;
         else if (GenBuffer::nocase_strbegins(p, "XPM:"))  FileFormat=Rule::Cache::FF_XPM;
         else if (GenBuffer::nocase_strbegins(p, "BMP:")
-              || GenBuffer::nocase_strbegins(p, "RLE:"))  { FileFormat=Rule::Cache::FF_BMP; APPEND_co(Rule::Cache::CO_RLE); }
+              || GenBuffer::nocase_strbegins(p, "RLE:"))  { FileFormat=Rule::Cache::FF_BMP; /*APPEND_co(Rule::Cache::CO_RLE);*/ }
         else if (GenBuffer::nocase_strbegins(p, "XWD:"))  FileFormat=Rule::Cache::FF_XWD;
         else if (GenBuffer::nocase_strbegins(p, "X11:"))  FileFormat=Rule::Cache::FF_X11;
         else {
@@ -580,7 +580,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
             else if (0==GenBuffer::nocase_strcmp(pend, "png"))  FileFormat=Rule::Cache::FF_PNG;
             else if (0==GenBuffer::nocase_strcmp(pend, "xpm"))  FileFormat=Rule::Cache::FF_XPM;
             else if (0==GenBuffer::nocase_strcmp(pend, "bmp")
-                  || 0==GenBuffer::nocase_strcmp(pend, "rle"))  { FileFormat=Rule::Cache::FF_BMP; APPEND_co(Rule::Cache::CO_RLE); }
+                  || 0==GenBuffer::nocase_strcmp(pend, "rle"))  { FileFormat=Rule::Cache::FF_BMP; /*APPEND_co(Rule::Cache::CO_RLE);*/ }
             else if (0==GenBuffer::nocase_strcmp(pend, "xwd"))  FileFormat=Rule::Cache::FF_XWD;
             // else if (0==GenBuffer::nocase_strcmp(pend, "x11"))  FileFormat=Rule::Cache::FF_X11;
             /* ^^^ .x11 extension is useless */
@@ -609,7 +609,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   if (badp) return true;
   
   if (colen==0) { /* apply default if Compression is unspecified */
-    // Error::sev(Error::NOTICE) << "FileFormat=" << (unsigned)FileFormat << (Error*)0;
+    // Error::sev(Error::FATAL) << "FileFormat=" << (unsigned)FileFormat << (Error*)0;
     switch (FileFormat) {
      case Rule::Cache::FF_TIFF:
      case Rule::Cache::FF_eps: case Rule::Cache::FF_PSL2:
@@ -622,6 +622,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
       APPEND_co(Rule::Cache::CO_None); break;
      case Rule::Cache::FF_BMP:
      case Rule::Cache::FF_PSL1: case Rule::Cache::FF_PSLC:
+      /* assert(0); */
       APPEND_co(Rule::Cache::CO_RLE);
       APPEND_co(Rule::Cache::CO_None); break;
      case Rule::Cache::FF_PSL3:
@@ -801,7 +802,7 @@ int main(int, char const*const* argv) {
   char const *long_argv0=argv[0]==(char const*)NULLP ? "sam2p" : argv[0];
   Error::argv0=Files::only_fext(long_argv0);
   Error::tmpargv0="_sam2p_";
-  Error::banner0="sam2p v0.40";
+  Error::banner0="sam2p v0.41";
 
   if (versionp) {
     sout << "This is " << Error::banner0 << ".\n";

@@ -143,6 +143,12 @@
 #undef HAVE_PTS_VSNPRINTF_OLD
 #undef HAVE_PTS_VSNPRINTF_C99
 
+/** What shell does the C library system(3) function call? */
+#undef HAVE_PTS_SYSTEMF
+#undef HAVE_PTS_SYSTEMF_WIN32
+#undef HAVE_PTS_SYSTEMF_UNIX
+#undef HAVE_PTS_SYSTEMF_OTHER
+
 /** popen("...","wb") and "rb" works binary */
 #undef HAVE_PTS_POPEN_B
 

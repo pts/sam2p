@@ -252,8 +252,22 @@ char *alloca ();
 #define COTY_MAC   5
 #define COTY_OTHER 6
 
-/* Imp: autodetect this with configure */
-#define OS_COTY COTY_UNIX
+#if HAVE_PTS_SYSTEMF_UNIX
+#  define OS_COTY COTY_UNIX
+#else
+#  if HAVE_PTS_SYSTEMF_WIN32
+#    define OS_COTY COTY_WIN9X
+#  else
+#    define OS_COTY COTY_OTHER
+#  endif
+#endif
+
+/* vvv Imp: autodetect this */
+#if defined(__MSDOS__) || defined(__CYGWIN__) || defined(__MINGW32__) || _MSC_VER > 1000
+#  define HAVE_DOS_BINARY 1
+#else
+#  undef  HAVE_DOS_BINARY
+#endif
 
 /* #define PTS_dynamic_cast(ptrtype,ptr) dynamic_cast<ptrtype>(ptr) -- would include special G++ symbols into .o */
 #define PTS_dynamic_cast(ptrtype,ptr) ((ptrtype)(ptr))
@@ -314,10 +328,5 @@ typedef int bool;
 #  endif
 #endif
 
-#if defined(__MSDOS__) || defined(__CYGWIN__) || defined(__MINGW32__) || _MSC_VER > 1000
-#  define HAVE_DOS_BINARY 1
-#else
-#  undef  HAVE_DOS_BINARY
-#endif
 
 #endif /* config2.h */

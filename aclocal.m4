@@ -555,6 +555,67 @@ int main
   AC_DEFINE_UNQUOTED(PTS_CFG_P_TMPDIR, $ac_cv_pts_cfg_p_tmpdir)
 ])
 
+dnl by pts@fazekas.hu at Thu Dec 12 20:20:41 CET 2002
+AC_DEFUN([AC_PTS_HAVE_SYSTEMF], [
+  echo no-original >conftestval
+  AC_CACHE_CHECK(for working system(3), ac_cv_pts_systemf, [
+    AC_TRY_RUN([
+#include <stdio.h>
+#include <stdlib.h> /* system() */
+
+int main
+#ifdef __STDC__
+(int argc, char **argv)
+#else
+(argc, argv) int argc; char **argv;
+#endif
+{ 
+  (void)argc;
+  (void)argv;
+  if (0!=system("echo \"let  it\" be  e >conftestval")) {
+    FILE *f=fopen("conftestval","w");
+    if (f) {
+      fprintf(f,"runtime-error\n");
+      fclose(f);
+    }
+  }
+  return 0;
+}
+],    [ac_cv_pts_systemf="`cat conftestval`"; ac_cv_pts_systemf="${ac_cv_pts_systemf:-invalid}"],
+      [ac_cv_pts_systemf=compile-error], 
+      [AC_MSG_ERROR(cross compiling not supported by .._PTS_HAVE_VSNPRINTF)]
+    )
+    # echo "($ac_cv_pts_systemf)"
+    if test x"$ac_cv_pts_systemf" = x'"let  it" be  e '; then
+      ac_cv_pts_systemf=win32
+    elif test x"$ac_cv_pts_systemf" = x"let  it be e"; then
+      ac_cv_pts_systemf=unix
+    fi
+  ])
+  if test x"$ac_cv_pts_systemf" = xwin32; then
+    ac_cv_pts_have_systemf=yes
+    AC_DEFINE(HAVE_PTS_SYSTEMF)
+    AC_DEFINE(HAVE_PTS_SYSTEMF_WIN32)
+  elif test x"$ac_cv_pts_systemf" = xunix; then
+    ac_cv_pts_have_systemf=yes
+    AC_DEFINE(HAVE_PTS_SYSTEMF)
+    AC_DEFINE(HAVE_PTS_SYSTEMF_UNIX)
+  elif test x"$ac_cv_pts_systemf" = x"invalid"; then
+    ac_cv_pts_have_systemf=no
+  elif test x"$ac_cv_pts_systemf" = x"compile-error"; then
+    ac_cv_pts_have_systemf=no
+  elif test x"$ac_cv_pts_systemf" = x"runtime-error"; then
+    ac_cv_pts_have_systemf=no
+  elif test x"$ac_cv_pts_systemf" = x"no-original"; then
+    ac_cv_pts_have_systemf=no
+  else
+    ac_cv_pts_have_systemf=yes
+    # ac_cv_pts_systemf=other
+    AC_DEFINE(HAVE_PTS_SYSTEMF)
+    AC_DEFINE(HAVE_PTS_SYSTEMF_OTHER)
+  fi
+])
+
 dnl by pts@fazekas.hu at Fri Mar 22 16:40:22 CET 2002
 AC_DEFUN([AC_PTS_HAVE_POPEN_B], [
   AC_CACHE_CHECK(for binary popen_b, ac_cv_pts_have_popen_b, [

@@ -153,6 +153,7 @@ if test $ac_cv_pts_have_popen_ = yes; then
 fi
 AC_PTS_HAVE_POPEN_B
 AC_PTS_HAVE_VSNPRINTF
+AC_PTS_HAVE_SYSTEMF
 
 dnl Checks for integral/pointer sizes.
 

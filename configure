@@ -4957,6 +4957,119 @@ _ACEOF
   fi
 
 
+  echo no-original >conftestval
+  echo "$as_me:$LINENO: checking for working system(3)" >&5
+echo $ECHO_N "checking for working system(3)... $ECHO_C" >&6
+if test "${ac_cv_pts_systemf+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+    if test "$cross_compiling" = yes; then
+  { { echo "$as_me:$LINENO: error: cross compiling not supported by .._PTS_HAVE_VSNPRINTF" >&5
+echo "$as_me: error: cross compiling not supported by .._PTS_HAVE_VSNPRINTF" >&2;}
+   { (exit 1); exit 1; }; }
+
+else
+  cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+#include <stdio.h>
+#include <stdlib.h> /* system() */
+
+int main
+#ifdef __STDC__
+(int argc, char **argv)
+#else
+(argc, argv) int argc; char **argv;
+#endif
+{
+  (void)argc;
+  (void)argv;
+  if (0!=system("echo \"let  it\" be  e >conftestval")) {
+    FILE *f=fopen("conftestval","w");
+    if (f) {
+      fprintf(f,"runtime-error\n");
+      fclose(f);
+    }
+  }
+  return 0;
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_pts_systemf="`cat conftestval`"; ac_cv_pts_systemf="${ac_cv_pts_systemf:-invalid}"
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+( exit $ac_status )
+ac_cv_pts_systemf=compile-error
+fi
+rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+    # echo "($ac_cv_pts_systemf)"
+    if test x"$ac_cv_pts_systemf" = x'"let  it" be  e '; then
+      ac_cv_pts_systemf=win32
+    elif test x"$ac_cv_pts_systemf" = x"let  it be e"; then
+      ac_cv_pts_systemf=unix
+    fi
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_pts_systemf" >&5
+echo "${ECHO_T}$ac_cv_pts_systemf" >&6
+  if test x"$ac_cv_pts_systemf" = xwin32; then
+    ac_cv_pts_have_systemf=yes
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_PTS_SYSTEMF 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_PTS_SYSTEMF_WIN32 1
+_ACEOF
+
+  elif test x"$ac_cv_pts_systemf" = xunix; then
+    ac_cv_pts_have_systemf=yes
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_PTS_SYSTEMF 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_PTS_SYSTEMF_UNIX 1
+_ACEOF
+
+  elif test x"$ac_cv_pts_systemf" = x"invalid"; then
+    ac_cv_pts_have_systemf=no
+  elif test x"$ac_cv_pts_systemf" = x"compile-error"; then
+    ac_cv_pts_have_systemf=no
+  elif test x"$ac_cv_pts_systemf" = x"runtime-error"; then
+    ac_cv_pts_have_systemf=no
+  elif test x"$ac_cv_pts_systemf" = x"no-original"; then
+    ac_cv_pts_have_systemf=no
+  else
+    ac_cv_pts_have_systemf=yes
+    # ac_cv_pts_systemf=other
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_PTS_SYSTEMF 1
+_ACEOF
+
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_PTS_SYSTEMF_OTHER 1
+_ACEOF
+
+  fi
+
+
 
 
 
@@ -6897,7 +7010,7 @@ fi
 rm -f Makedep
 ac_n="${ac_n:-$ECHO_N}"
 echo $ac_n "running make Makedep""... $ac_c" 1>&6
-echo "configure:6900: running make Makedep" >&5
+echo "configure:7013: running make Makedep" >&5
 if >&5 2>&5 make Makedep; then :
   echo "$as_me:$LINENO: result: ok" >&5
 echo "${ECHO_T}ok" >&6
@@ -6910,7 +7023,7 @@ echo "$as_me: error: cannot compute depends" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-echo "configure:6913: all OK" >&5
+echo "configure:7026: all OK" >&5
 
 echo "configure done. Now you should run: make; make install"
 

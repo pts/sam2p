@@ -2103,9 +2103,27 @@ Rule::Applier::cons_t out_bmp_work(GenBuffer::Writable& out, Rule::OutputRule*or
     data.vi_write("\0\1", 2); /* signal end of bitmap */
   } else {
     unsigned pad=(4-(rlen&3))&3; /* Dat: pad rows to 32 bits */
-    while (htc--!=0) { /* BMP stores rows from down */
-      data.vi_write(pend-=rlen, rlen);
-      if (pad!=0) data.vi_write("\0\0\0", pad);
+    if (or_->cache.SampleFormat==Image::SF_Rgb8) { /* SWAP RGB values */
+      /* BUGFIX at Thu Dec 12 21:36:57 CET 2002 */
+      char *buf=new char[rlen];
+      while (htc--!=0) { /* BMP stores rows from down */
+        char const*pxend=pend, *px=pend-=rlen;
+        char *q=buf;
+        while (px!=pxend) {
+          *q++=px[2];
+          *q++=px[1];
+          *q++=px[3];
+          px+=3;
+        }          
+        data.vi_write(buf, rlen);
+        if (pad!=0) data.vi_write("\0\0\0", pad);
+      }
+      delete [] buf;
+    } else {
+      while (htc--!=0) { /* BMP stores rows from down */
+        data.vi_write(pend-=rlen, rlen);
+        if (pad!=0) data.vi_write("\0\0\0", pad);
+      }
     }
   }
   assert(pend==img->getRowbeg());
