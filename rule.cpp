@@ -201,7 +201,8 @@ Image::sf_t Rule::Cache::parseSampleFormat(char const*s, slen_t slen) {
 char const* Rule::Cache::dumpFileFormat(ff_t FileFormat, co_t Compression) {
   switch (FileFormat) {
    case FF_eps:   return Compression==CO_ZIP ? "PSL3" : "PSL2";
-   case FF_pdf:   return Compression==CO_ZIP ? "PDFB1.2" : "PDFB1.0";
+   case FF_pdf:   return Compression==CO_ZIP ? "PDF1.2" : "PDF1.0";
+   case FF_pdfb:  return Compression==CO_ZIP ? "PDFB1.2" : "PDFB1.0";
    case FF_PSL1:  return "PSL1";
    case FF_PSLC:  return "PSLC";
    case FF_PSL2:  return "PSL2";
@@ -433,6 +434,7 @@ void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
 }
 
 void Rule::OutputRule::doSampleFormat(Image::SampledInfo *info, bool separatep) {
+  /* Dat: called from appliers.cpp:out_*_work(); the sample format is final */
   bool separatep2=
       separatep &&
     ( cache.SampleFormat==Image::SF_Transparent2
@@ -623,6 +625,20 @@ void Rule::applyProfile(GenBuffer::Writable& out, OutputRule*rule_list, Image::S
   OutputRule *or_;
   // unsigned tryc=0; /* Wed Jul  3 19:30:33 CEST 2002 */
   Error::pushPolicy((Error::level_t)0, Error::NOTICE, Error::NOTICE_DEFER, (GenBuffer::Writable*)NULLP);
+  Image::Sampled::rgb_t Transparent=0x1000000UL;
+  if (rule_list->dict!=NULLP) {
+    Transparent=rule_list->cache.Transparent;
+    for (or_=rule_list+1; or_->dict!=NULLP; or_++) {
+      if (Transparent!=rule_list->cache.Transparent) {
+        /* Imp: make different copies, based on different or_->cache.Transparent -- or not? */
+        Error::sev(Error::EERROR) << "applyProfile: ambiguous /Transparent" << (Error*)0;
+      }
+    }
+  }
+  /* Dat: -transparent ... makes the specified color transparent, but it cannot
+   *      be used to remove transparenct
+   */
+  // printf("Transparent=0x%lx\n",Transparent);
   for (or_=rule_list; or_->dict!=NULLP; or_++) {
     /* ^^^ Try each OutputRule (or_) in reverse order of registration */
     Error::sev(Error::NOTICE_DEFER) << "applyProfile: trying OutputRule #" << or_->c << (Error*)0;
@@ -1002,7 +1018,7 @@ void Rule::writeTTM(
       if (ii>0) { /* an offset */
         if (ii>i) Error::sev(Error::EERROR) << "writeTTM: cannot predict chunk offset" << (Error*)0;
         if (MiniPS::T_ARRAY==MiniPS::getType(chunkArray->get(ii)))
-               chunks[i].write_num(offsets[ii], 10);
+               chunks[i].write_num(offsets[ii], 10); /* Dat: 10: 10 digits (for PDF xref table), not base 10 */
           else chunks[i] << offsets[ii];
       } else { /* a length */
         chunks[i] << chunks[-ii].getLength();

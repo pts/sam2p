@@ -101,8 +101,9 @@ class MiniPS {
   };
   /** Always null-terminated. */
   class String: public Value { public:
+    /** Copies from ptr_ */
     String(char const*ptr_, ii_t len_);
-    /* Replaces (this) with a copy of (a).(b) */
+    /** Replaces (this) with a copy of (a).(b) */
     void replace(char const*ap, slen_t alen, char const*bp, slen_t blen);
   };
   class Sname: public Value { public:

@@ -149,6 +149,7 @@ static char *bts_ttt=
 
 /* --- One-liner mode */
 
+/** Dat: mod 16 does matter: expected # args etc. */
 static const unsigned
   OPT_unknown=0,
   OPT_SampleFormat=0x02,
@@ -168,7 +169,8 @@ static const unsigned
   OPT_InputFile=0xE2,
   OPT_OutputFile=0xF2,
   OPT_Scale=0x101,
-  OPT_Margins=0x112;
+  OPT_Margins=0x112,
+  OPT_Transparent=0x122;
 
 /** @param s an option (lower/upper case intact), without leading `-'s
  * @param slen length of option 
@@ -204,6 +206,7 @@ static unsigned sam2p_optval(char const* s, slen_t slen) {
     /* printf("buf=(%s)\n", buf); */
     if (0==strcmp(buf, "sampleformat")) return OPT_SampleFormat;
     if (0==strcmp(buf, "loadhints")) return OPT_LoadHints;
+    if (0==strcmp(buf, "transparent")) return OPT_Transparent;
     if (0==strcmp(buf, "hints")) return OPT_Hints;
     if (0==strcmp(buf, "ps")
      || 0==strcmp(buf, "eps")) return OPT_PS;
@@ -282,6 +285,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   Rule::Cache::te_t TransferEncoding=Rule::Cache::TE_default;
   do_DisplayJobFile=false;
   bool do_stop_SampleFormat=false;
+  char const *Transparent=(char const*)NULLP; /* change 1 color to transparent unless NULL */
   char const *OutputFile=(char const*)NULLP, *InputFile=(char const*)NULLP;
   // SimBuffer::B tmp;
   char const *TopMargin=(char const*)NULLP, *BottomMargin=(char const*)NULLP, 
@@ -348,6 +352,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
       /* Dat: now opt, paramlen and param are correct */
       switch (opt) {
        case OPT_LoadHints: LoadHints << ',' << param; break;
+       case OPT_Transparent: Transparent=param; break; /* Imp: is this good memory management */
        case OPT_Hints: Hints << '\n' << param; break;
        case OPT_PSL1: FileFormat=Rule::Cache::FF_PSL1; break;
        case OPT_PSLC: FileFormat=Rule::Cache::FF_PSLC; break;
@@ -414,7 +419,9 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
         else goto inv_par;
         break;
        case OPT_PDF:
-             if (param==(char const*)NULLP || param[0]=='\0') FileFormat=Rule::Cache::FF_pdf;
+             if (param==(char const*)NULLP || param[0]=='\0') FileFormat=Rule::Cache::FF_pdfb;
+        else if (0==GenBuffer::nocase_strcmp(param, "b")) FileFormat=Rule::Cache::FF_pdfb; /* BI */
+        else if (0==GenBuffer::nocase_strcmp(param, "x")) FileFormat=Rule::Cache::FF_pdf; /* XObject */
         else if (0==GenBuffer::nocase_strcmp(param, "b0")) FileFormat=Rule::Cache::FF_PDFB10;
         else if (0==GenBuffer::nocase_strcmp(param, "b2")) FileFormat=Rule::Cache::FF_PDFB12;
         else if (0==GenBuffer::nocase_strcmp(param, "0"))  FileFormat=Rule::Cache::FF_PDF10;
@@ -524,7 +531,9 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
         else if (GenBuffer::nocase_strbegins(p, "PSL1:")) FileFormat=Rule::Cache::FF_PSL1;
         else if (GenBuffer::nocase_strbegins(p, "PSLC:")) FileFormat=Rule::Cache::FF_PSLC;
         else if (GenBuffer::nocase_strbegins(p, "PSL3:")) FileFormat=Rule::Cache::FF_PSL3;
-        else if (GenBuffer::nocase_strbegins(p, "PDF:"))  FileFormat=Rule::Cache::FF_pdf;
+        else if (GenBuffer::nocase_strbegins(p, "PDF:")
+              || GenBuffer::nocase_strbegins(p, "PDF:"))  FileFormat=Rule::Cache::FF_pdfb;
+        else if (GenBuffer::nocase_strbegins(p, "PDFX:")) FileFormat=Rule::Cache::FF_pdf;
         else if (GenBuffer::nocase_strbegins(p, "PDFB1.0:")) FileFormat=Rule::Cache::FF_PDFB10;
         else if (GenBuffer::nocase_strbegins(p, "PDFB1.2:")) FileFormat=Rule::Cache::FF_PDFB12;
         else if (GenBuffer::nocase_strbegins(p, "PDF1.0:"))  FileFormat=Rule::Cache::FF_PDF10;
@@ -609,7 +618,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
                   || 0==GenBuffer::nocase_strcmp(pend, "epsi")
                   || 0==GenBuffer::nocase_strcmp(pend, "epsf")) FileFormat=Rule::Cache::FF_eps;
             else if (0==GenBuffer::nocase_strcmp(pend, "ps"))   { FileFormat=Rule::Cache::FF_eps; if (Scale==Rule::CacheHints::SC_default) Scale=Rule::CacheHints::SC_RotateOK; }
-            else if (0==GenBuffer::nocase_strcmp(pend, "pdf"))  FileFormat=Rule::Cache::FF_pdf;
+            else if (0==GenBuffer::nocase_strcmp(pend, "pdf"))  FileFormat=Rule::Cache::FF_pdfb;
             else if (0==GenBuffer::nocase_strcmp(pend, "gif"))  FileFormat=Rule::Cache::FF_GIF89a;
             else if (0==GenBuffer::nocase_strcmp(pend, "pnm"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Gray1); APPEND_sf(Image::SF_Gray8); APPEND_sf(Image::SF_Rgb8); APPEND_sf(Image::SF_Transparent8); do_stop_SampleFormat=true; }
             else if (0==GenBuffer::nocase_strcmp(pend, "pbm"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Gray1); do_stop_SampleFormat=true; }
@@ -672,7 +681,8 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
       APPEND_co(Rule::Cache::CO_RLE);
       APPEND_co(Rule::Cache::CO_None); break;
      case Rule::Cache::FF_PSL3:
-     case Rule::Cache::FF_pdf: /* BUGFIX at Sun Sep 22 14:57:03 CEST 2002 */
+     case Rule::Cache::FF_pdfb: /* BUGFIX at Sun Sep 22 14:57:03 CEST 2002 */
+     case Rule::Cache::FF_pdf:
      case Rule::Cache::FF_PDFB12: case Rule::Cache::FF_PDF12:
       APPEND_co(Rule::Cache::CO_JAI);
       APPEND_co(Rule::Cache::CO_ZIP);
@@ -737,7 +747,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
 #endif
   }
   
-  if (jaip) {
+  if (jaip) { /* Dat: might have changed to false */
     APPEND_sf(Image::SF_Asis);
     LoadHints << ",jpeg-asis,";
     cot[0]=Rule::Cache::CO_JAI; colen=1; /* disable all other compression */
@@ -804,7 +814,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   unsigned coi, sfi;
   slen_t orc=0;
   for (sfi=0;sfi<sflen;sfi++) { for (coi=0;coi<colen;coi++) {
-  // for (coi=0;coi<colen;coi++) { for (sfi=0;sfi<sflen;sfi++) {
+  // for (coi=0;coi<colen;coi++) for (sfi=0;sfi<sflen;sfi++)
       if (cot[coi]==Rule::Cache::CO_JAI) {
         if (!jaip || sft[sfi]!=Image::SF_Asis) continue;
       }
@@ -814,8 +824,13 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
             << "\n  /SampleFormat /" << protect_null(Rule::Cache::dumpSampleFormat(sft[sfi]))
             << "\n  /Compression /"  << protect_null(Rule::Cache::dumpCompression (cot[coi]))
             << "\n  /Predictor " << (cot[coi]==Rule::Cache::CO_LZW || cot[coi]==Rule::Cache::CO_ZIP ? Predictor : 1)
-            << "\n  /Hints << " << Hints
-            << " >>\n>>\n";
+            << "\n  /Hints << " << Hints << " >>";
+      // jobss << "  /Transparent (\377\377\377)\n";
+      if (Transparent!=NULL) {
+        jobss << "\n  /Transparent ";
+        jobss.appendDumpPS(SimBuffer::Static(Transparent), true);
+      }
+      jobss  << "\n>>\n";
     }
   }
   jobss << "]>>% __EOF__\n";

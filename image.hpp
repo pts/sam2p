@@ -116,6 +116,7 @@ class Image {
     inline virtual ~Sampled() { delete [] const_cast<char*>(beg); }
     /** Copies whichrow as wd*3 bytes (R0,G0,B0,R1,G1,B1...) to `to' */
     virtual void copyRGBRow(char *to, dimen_t whichrow) const =0;
+    virtual bool hasPixelRGB(Image::Sampled::rgb_t rgb) const;
     inline char *getRowbeg() const { return rowbeg; }
     inline dimen_t getWd() const { return wd; }
     inline dimen_t getHt() const { return ht; }
@@ -167,6 +168,7 @@ class Image {
     /** @return new hasTransp */
     bool setTranspc(rgb_t color);
     virtual void copyRGBRow(char *to, dimen_t whichrow) const;
+    /* virtual bool hasPixelRGB(Image::Sampled::rgb_t rgb) const; */
     /** Packs (compresses) the palette so that it will be continuous in
      * 0..ncols-1, and each color will be used exactly once. The
      * transparent color (if present) will become black. As a side-effect,
@@ -219,6 +221,7 @@ class Image {
    public:
     Gray(dimen_t wd_, dimen_t ht_, unsigned char bpc_);
     virtual void copyRGBRow(char *to, dimen_t whichrow) const;
+    virtual bool hasPixelRGB(Image::Sampled::rgb_t rgb) const;
     virtual void to8();
     virtual /*Image::*/Indexed* toIndexed();
     virtual bool canGray() const;
@@ -233,6 +236,7 @@ class Image {
    public:
     RGB(dimen_t wd_, dimen_t ht_, unsigned char bpc_);
     virtual void copyRGBRow(char *to, dimen_t whichrow) const;
+    /* virtual bool hasPixelRGB(Image::Sampled::rgb_t rgb) const; */
     virtual void to8();
     virtual /*Image::*/Indexed* toIndexed();
     virtual bool canGray() const;

@@ -1,3 +1,12 @@
+sam2p (0.44-5) unstable; urgency=low
+
+  * Added -pdf:x (generate PDF with /XObject{}s).
+  * Changed PDF output so elements of /Kids are indirect references
+    (see the PDF Reference 1.5 for details).
+  * Added option: -transparent "#abcdef"
+
+ -- Szabó Péter <pts@winter>  Sat,  8 Jan 2005 12:29:10 +0100
+
 sam2p (0.44-4) unstable; urgency=low
 
   * Some glitches of g++-3.4 avoided. Now sam2p compiles fine.

@@ -278,6 +278,7 @@ Options (case insensitive):
 -- -3  -ps:3 PSL3:: [pts] hint /FileFormat/PSL3 among /PSL*
 -- -pdf:b0 PDFB1.0:: [pts] hint /FileFormat/PDFB1.0 among /PDF*
 -- -pdf:b2 PDFB1.2:: [pts] default hint /FileFormat/PDFB1.2 among /PDF*
+-- -pdf:x PDB1.2:: [pts] default hint /FileFormat/PDF1.2 among /PDF*
 -- -pdf:0 PDF1.0:: [pts] hint /FileFormat/PDF1.0 among /PDF*
 -- -pdf:2 PDF1.2:: [pts] hint /FileFormat/PDF1.2 among /PDF*
 -- EPS: EPSF:: [pts] hint /FileFormat/PSL2 or /FileFormat/PSL3 (for /Compression/ZIP)
@@ -345,6 +346,10 @@ Options (case insensitive):
    `dimen'
 -- -m:bottom:(dimen) -m:b:(dimen) -m:down:(dimen) -m:d:(dimen): set
    /BottomMargin to `dimen'
+
+-- -transparent:(rgb) Change the all pixels having the specified RGB color
+   to transparent. Previously transparent pixels are not changed. See FAQ
+   answer A44 for an exampe.
 
 -- -- as last arg: OutputFile:=InputFile
 -- -- earlier: treat other args as filenames
@@ -988,7 +993,8 @@ Output rule entries:
    /PSL3 -- PostScript Level3
    /PDFB1.0 -- PDF version 1.0, BI inline image, see 4.8.6 in PDFRef.pdf
    /PDFB1.2 -- PDF version 1.2, BI inline image, see 4.8.6 in PDFRef.pdf
-   /PDF1.0 -- PDF version 1.0, XObject image, see 4.8.4 in PDFRef.pdf
+   /PDF1.0 -- PDF version 1.0, XObject image, see 4.8.4 in PDFRef.pdf (takes
+     more space on disk than BI inline image)
    /PDF1.2 -- PDF version 1.2, XObject image, see 4.8.4 in PDFRef.pdf
    /GIF89a
    /Empty
@@ -2030,6 +2036,14 @@ A43. Very probably the JPEG stream of your original input image file is
 
      (thanks to Thomas Kraemer for reporting the problem)
 
+Q44. How do I create an 1x1 transparent GIF and PNG?
+
+A44. Do
+
+	echo "P1 1 1 0" >one.pbm
+	sam2p -transparent:ffffff one.pbm one.gif
+	sam2p -transparent:ffffff one.pbm one.png
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
@@ -2581,9 +2595,10 @@ Missing feature list
      faster GIF input??, make install, .deb (debhelper?), .rpm,
      normal `image' instead of `colorimage'
      CUPS raster input and output,
-     PS and PDF input,
      /Background option (-bg) to change transparent pixels -> bg color
      LZW and ZIP compressed for indexed etc.
+/* OK : PS and PDF input */
+/* Imp: parse bts2.ttt just after generating (balance of [ << ... >> ])
 /* Imp: command line option for /Transparent */
 /* Imp: avoid 3 warnings in: ./sam2p examples/pts2.pbm t.ppm */
 /* OK : margins for all PS, EPS and PDF (Sat Sep  7 16:17:58 CEST 2002 */

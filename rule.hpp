@@ -22,6 +22,7 @@ class Rule { public:
       FF_default=0, /* only for one-liner */
       FF_eps=71, /* only for one-liner, temporary */
       FF_pdf=72, /* only for one-liner, temporary */
+      FF_pdfb=73, /* only for one-liner, temporary */
       FF_PSL1=110,
       FF_PSLC=115,
       FF_PSL2=120,

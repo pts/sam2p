@@ -34,11 +34,32 @@ static inline bool is_ps_name(char c) {
   /* Dat: PS avoids: /{}<>()[]% \n\r\t\000\f\040 */
 }
 
-/** @param b: assume null-terminated @return true on error */
+/** @param b: assume null-terminated @return true on erro
+ * @return false on error
+ */
 static inline bool toInteger(SimBuffer::Flat const&b, signed long &ret) {
   int n=0; /* BUGFIX?? found by __CHECKER__ */
   // b.term0();
   return sscanf(b(), "%li%n", &ret, &n)<1 || b[n]!='\0';
+}
+
+static inline bool toHex(char const*s, unsigned long &ret) {
+  int n=0;
+  return sscanf(s, "%lx%n", &ret, &n)<1 || s[n]!='\0';
+}
+
+static inline bool toHex3(char const*s, char ret[3]) {
+  unsigned long l;
+  if (toHex(s, l)) return true;
+  ret[0]=((l>>8)&15)*17; ret[1]=((l>>4)&15)*17; ret[2]=(l&15)*17;
+  return false;
+}
+
+static inline bool toHex6(char const*s, char ret[3]) {
+  unsigned long l;
+  if (toHex(s, l)) return true;
+  ret[0]=(l>>16)&255; ret[1]=(l>>8)&255; ret[2]=l&255;
+  return false;
 }
 
 /** @param b: assume null-terminated @return true on error */
@@ -884,6 +905,7 @@ void MiniPS::scanf_dict(VALUE job, bool show_warnings, ...) {
   Dict *dict=RDICT(job);
   char *key;
   unsigned ty;
+  char hex3[3];
   VALUE default_, *dst, got;
   if (getType(job)!=T_DICT) Error::sev(Error::EERROR) << "scanf_dict: dict expected" << (Error*)0;
   PTS_va_start(ap, show_warnings);
@@ -906,7 +928,13 @@ void MiniPS::scanf_dict(VALUE job, bool show_warnings, ...) {
       /* type of default value is unchecked deliberately */
     } else switch (ty) {
      case S_RGBSTR:
-      if (getType(got)!=T_STRING || RSTRING(got)->getLength()!=3) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be an RGB color triplet" << (Error*)0;
+      /* Dat: red is: (\377\0\0), (#f00), (#ff0000) */
+      if (getType(got)!=T_STRING || !(
+             RSTRING(got)->getLength()==3 /* Imp: `transparent -red' shouldn't work */
+          || RSTRING(got)->getLength()==4 && RSTRING(got)->begin_()[0]=='#' && !toHex3(RSTRING(got)->begin_()+1, hex3) && (got=(VALUE)new String(hex3, 3), true)
+          || RSTRING(got)->getLength()==7 && RSTRING(got)->begin_()[0]=='#' && !toHex6(RSTRING(got)->begin_()+1, hex3) && (got=(VALUE)new String(hex3, 3), true)
+          || RSTRING(got)->getLength()==6 && !toHex6(RSTRING(got)->begin_(), hex3) && (got=(VALUE)new String(hex3, 3), true)
+         )) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be an RGB color triplet" << (Error*)0;
       break;
      case S_SENUM:
       if (getType(got)!=T_SNAME) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be an enum value (name)" << (Error*)0;

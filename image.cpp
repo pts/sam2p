@@ -406,6 +406,47 @@ unsigned char Image::Sampled::minRGBBpc() const {
   return 1+minbpb;
 }
 
+bool Image::Sampled::hasPixelRGB(Image::Sampled::rgb_t rgb) const {
+  /* by pts@fazekas.hu at Sat Jan  8 13:24:19 CET 2005 */
+  /* Dat: this dumb implementation will be overridden */
+  if (rgb>0xffffffUL) return false;
+  unsigned char *crow=new unsigned char[wd*3], *p, *pend=crow+wd*3, t[3];
+  dimen_t htc;
+  t[0]=(rgb>>16)&255; t[1]=(rgb>>8)&255; t[2]=rgb&255;
+  for (htc=0;htc<ht;htc++) {
+    copyRGBRow((char*)crow, htc);
+    for (p=crow; p!=pend; p+=3) {
+      if (t[0]==p[0] && t[1]==p[1] && t[2]==p[2]) { delete [] crow; return true; }
+    }
+  }
+  delete [] crow;
+  return false;
+}
+
+bool Image::Gray::hasPixelRGB(Image::Sampled::rgb_t rgb) const {
+  /* by pts@fazekas.hu at Sat Jan  8 13:24:19 CET 2005 */
+  /* Dat: faster than Image::Sampled::hasPixelRGB */
+  if (rgb>0xffffffUL) return false;
+  unsigned char t[3];
+  t[0]=(rgb>>16)&255; t[1]=(rgb>>8)&255; t[2]=rgb&255;
+  if (t[0]!=t[1] || t[0]!=t[2]) return false;
+  if (bpc==8) {
+    unsigned char *p=(unsigned char*)rowbeg, *pend=p+wd*ht;
+    /* Imp: use memchr() if available */
+    while (p!=pend && t[0]!=p[0]) p++;
+    return p!=pend;
+  }
+  unsigned char *crow=new unsigned char[wd*3], *p, *pend=crow+wd*3;
+  dimen_t htc;
+  for (htc=0;htc<ht;htc++) {
+    copyRGBRow((char*)crow, htc); /* Imp: avoid this if bpp==8 */
+    p=crow; while (p!=pend && t[0]!=p[0]) p+=3;
+    if (p!=pend) { delete [] crow; return true; }
+  }
+  delete [] crow;
+  return false;
+}
+
 Image::Indexed* Image::Sampled::addAlpha0(Image::Sampled *img, Image::Gray *al) {
   Image::Indexed *iimg=(Image::Indexed*)img;
   unsigned ncols=0;
@@ -1350,7 +1391,7 @@ void Image::SampledInfo::separate() {
 
 bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly, Sampled::rgb_t Transparent) {
   /* at Sat Jun 15 11:48:51 CEST 2002: added transparency warnings */
-  // fprintf(stderr, "sf=%u sf_=%u\n", sf, sf_);
+  /* fprintf(stderr, "sf=%u sf_=%u transparent=0x%lx\n", sf, sf_, Transparent+0UL); */
   // assert(sf_==SF_Asis);
   Indexed *iimg;
   Sampled *bak=img;
@@ -1380,7 +1421,8 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     sf=SF_Transparent; return true;
    case SF_Gray1:
     /* vvv strict hasTransp added at Mon Sep  9 22:53:24 CEST 2002 */
-    if (nncols>2 || !canGray || minRGBBpc>1 || zero || hasTransp) return false;
+    if (nncols>2 || !canGray || minRGBBpc>1 || zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
+    /* ^^^ Imp: !! make the hasPixelRFB() check a lot faster (cache results) */
     if (TryOnly) return WarningOK || (nncols>=2 && !hasTransp);
     if (hasTransp) {
       if (!WarningOK) return false;
@@ -1399,7 +1441,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img->getBpc()==1);
     sf=SF_Gray1; return true;
    case SF_Indexed1:
-    if (nncols>2 || hasTransp || zero) return false;
+    if (nncols>2 || zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
     if (TryOnly) return WarningOK || nncols>=2;
     if (nncols<2) {
       if (!WarningOK) return false;
@@ -1413,7 +1455,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     // assert(img!=NULLP); if (bak!=img) delete bak;
     { iimg=PTS_dynamic_cast(Indexed*,img);
       iimg->setBpc(1);
-      if (iimg->setTranspc(Transparent)) return false;
+      if (iimg->setTranspc(Transparent)) return false; /* Dat: false if must be changed to become transparent; Imp: undo changes */
     }
     sf=SF_Indexed1; return true;
    case SF_Mask:
@@ -1432,14 +1474,19 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     { iimg=PTS_dynamic_cast(Indexed*,img);
       iimg->setBpc(1);
       if (!iimg->setTranspc(Transparent)) return false;
+      iimg->packPal();
     }
-    assert(PTS_dynamic_cast(Indexed*,img)->getTransp()==-1 || PTS_dynamic_cast(Indexed*,img)->getTransp()==1);
+    /* printf("gett=%d\n", PTS_dynamic_cast(Indexed*,img)->getTransp()); */
+    assert(PTS_dynamic_cast(Indexed*,img)->getTransp()==-1 || PTS_dynamic_cast(Indexed*,img)->getTransp()+0U<1U);
     /* ^^^ color 0 is opaque, color 1 is transparent, thanks to
-     * img->packPal() called in SampleInfo()
+     * img->packPal() called in SampleInfo() -- but setTranspc may have changed this
      */
     sf=SF_Mask; return true;
    case SF_Transparent2:
-    if (nncols==4) PTS_dynamic_cast(Indexed*,img)->setTranspc(Transparent);
+    if (nncols==4) {
+      (iimg=PTS_dynamic_cast(Indexed*,img))->setTranspc(Transparent); /* Imp: are we Indexed*?? */
+      hasTransp=iimg->hasTransp();
+    }
     if (nncols>3 || zero) return false;
     if (TryOnly) return WarningOK || (hasTransp && nncols>=2);
     Error::sev(Error::NOTICE) << "SampleFormat: Transparent2 separates colors" << (Error*)0;
@@ -1459,7 +1506,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     }
     sf=SF_Transparent2; return true;
    case SF_Gray2:
-    if (nncols>4 || !canGray || minRGBBpc>2 || zero || hasTransp) return false;
+    if (nncols>4 || !canGray || minRGBBpc>2 || zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
     if (TryOnly) return WarningOK || (nncols>2 && !hasTransp);
     if (hasTransp) {
       if (!WarningOK) return false;
@@ -1476,7 +1523,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img!=NULLP);
     sf=SF_Gray2; return true;
    case SF_Indexed2:
-    if (nncols>4 || hasTransp || zero) return false;
+    if (nncols>4 || zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
     if (TryOnly) return WarningOK || nncols>2;
     if (nncols<=2) {
       if (!WarningOK) return false;
@@ -1512,7 +1559,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     }
     sf=SF_Transparent4; return true;
    case SF_Rgb1:
-    if (nncols>8 || minRGBBpc>1 || zero || hasTransp) return false;
+    if (nncols>8 || minRGBBpc>1 || zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
     if (TryOnly) return WarningOK || (nncols>4 && !canGray && !hasTransp);
     if (hasTransp) {
       if (!WarningOK) return false;
@@ -1532,7 +1579,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img!=NULLP);
     sf=SF_Rgb1; return true;
    case SF_Gray4:
-    if (nncols>16 || !canGray || minRGBBpc>4 || zero || hasTransp) return false;
+    if (nncols>16 || !canGray || minRGBBpc>4 || zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
     /* ^^^ BUGFIX at Sat Jun  1 18:27:10 CEST 2002 */
     if (TryOnly) return WarningOK || (nncols>4 && !hasTransp);
     if (hasTransp) {
@@ -1550,7 +1597,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img!=NULLP);
     sf=SF_Gray4; return true;
    case SF_Indexed4:
-    if (nncols>16 || hasTransp || zero) return false;
+    if (nncols>16 || zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
     if (TryOnly) return WarningOK || (nncols>4 && minRGBBpc>=4);
     if (nncols<=4) {
       if (!WarningOK) return false;
@@ -1590,7 +1637,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     }
     sf=SF_Transparent8; return true;
    case SF_Rgb2:
-    if (nncols>64 || minRGBBpc>2 || zero || hasTransp) return false;
+    if (nncols>64 || minRGBBpc>2 || zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
     if (TryOnly) return WarningOK || (nncols>16 && !canGray && !hasTransp);
     if (hasTransp) {
       if (!WarningOK) return false;
@@ -1610,7 +1657,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img!=NULLP);
     sf=SF_Rgb2; return true;
    case SF_Gray8:
-    if (nncols>256 || !canGray || zero || hasTransp) return false;
+    if (nncols>256 || !canGray || zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
     if (TryOnly) return WarningOK || (nncols>16 && !hasTransp);
     if (hasTransp) {
       if (!WarningOK) return false;
@@ -1629,7 +1676,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     sf=SF_Gray8; return true;
    case SF_Indexed8:
     // fprintf(stderr, "nncols=%u hasTransp=%u zero=%u\n", nncols, hasTransp, zero);
-    if (nncols>256 || hasTransp || zero) return false;
+    if (nncols>256 || zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
     // assert(0);
     if (TryOnly) return WarningOK || (nncols>16 && minRGBBpc>=8);
     if (nncols<=16) {
@@ -1652,7 +1699,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     sf=SF_Indexed8; return true;
    case SF_Rgb4:
     // fprintf(stderr, "minrgbbpc=%d to=%d\n", minRGBBpc, TryOnly);
-    if (minRGBBpc>4 || zero || hasTransp) return false;
+    if (minRGBBpc>4 || zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
     if (TryOnly) return WarningOK || (nncols>256 && !canGray && !hasTransp);
     if (hasTransp) {
       if (!WarningOK) return false;
@@ -1675,7 +1722,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img!=NULLP);
     sf=SF_Rgb4; return true;
    case SF_Rgb8:
-    if (zero || hasTransp) return false;
+    if (zero || hasTransp || img->hasPixelRGB(Transparent)) return false;
     if (TryOnly) return WarningOK || (nncols>256 && !canGray && minRGBBpc>=8 && !hasTransp);
     if (hasTransp) {
       if (!WarningOK) return false;
