@@ -18,7 +18,6 @@
 #include "gensio.hpp"
 #include <stdlib.h> /* getenv() */
 #include <string.h>
-#include "pts_defl.h" /* Imp: because pts_defl_interface :-( */
 
 /* --- */
 
@@ -73,10 +72,28 @@ class RunLengthEncode: public PSEncoder {
 static int gen_write(char *block, unsigned len, void *zfile);
 
 #if USE_BUILTIN_ZIP
+#include "pts_defl.h" /* Imp: because pts_defl_interface :-( */
 #if OBJDEP
 #  warning REQUIRES: pts_defl
 #endif
 class FlateEncode: public PSEncoder {
+#if PTS_DEFL_RIPPED_ZLIB /* Dat: defined in pts_defl.h */
+ public:
+  /** @param level: 1..9: 9==highest compression */
+  FlateEncode(GenBuffer::Writable &out_, unsigned level_);
+  virtual ~FlateEncode() { zlib_deflateEnd(&zs); } /* Dat: ==Z_OK check (for unflushed buffers) omitted */
+  virtual void vi_write(char const*buf, slen_t len);
+ protected:
+  /** Formerly only one instance of FlateEncode was allowed.
+   * It exists <=> loced==true
+   */
+  // static bool locked;
+  /** Writable that this filter writes to */
+  GenBuffer::Writable &out;
+  char workspace[ZLIB_DEFLATE_WORKSPACESIZE_MIN]; /* big, about 300k */
+  char obuf[4096];
+  /*struct*/ z_stream zs;
+#else /* old, ripped from Info-ZIP 2.2 */
  public:
   /** @param level: 1..9: 9==highest compression */
   FlateEncode(GenBuffer::Writable &out_, unsigned level_);
@@ -100,6 +117,7 @@ class FlateEncode: public PSEncoder {
   s_t s1, s2;
   bool had_header;
   struct pts_defl_interface* fs;
+#endif /* else PTS_DEFL_RIPPED_ZLIB */
 };
 #endif
 
@@ -698,6 +716,50 @@ void RunLengthEncode::vi_write(char const*buf, slen_t len) {
 #if USE_BUILTIN_ZIP
 // bool FlateEncode::locked=false;
 
+#if PTS_DEFL_RIPPED_ZLIB
+FlateEncode::FlateEncode(GenBuffer::Writable &out_, unsigned level_)
+ :out(out_) {
+  // assert(!locked); locked /* locking is not necessary anymore */
+  // pts_deflate_init(&fs); /* obsolete */
+  zs.total_in=0;
+  zs.total_out=0;
+  zs.workspace=workspace;
+  zs.msg=(char*)0;
+  zs.state=(struct zlib_internal_state*)0;
+  zs.data_type=Z_UNKNOWN; /* Imp: do we have to initialize it? */
+  assert(zlib_deflate_workspacesize()+(unsigned)0<sizeof(workspace) && "Flate workspace too small");
+  if (Z_OK!=zlib_deflateInit(&zs, level_))
+    Error::sev(Error::EERROR) << "Flate init error (out of memory?)" << (Error*)0;
+}
+
+void FlateEncode::vi_write(char const*buf, slen_t len) {
+  slen_t got, zgot;
+  /* fprintf(stderr,"wcall\n"); */
+  zs.next_in=(unsigned char*)const_cast<char*>(buf);   zs.avail_in=len;
+  if (len==0) { /* flush all output */
+    do { /* SUXX: C compiler should emit a warning: while (1) { ... } while(...); */
+      zs.next_out=(unsigned char*)obuf; zs.avail_out=sizeof(obuf);
+      /* fprintf(stderr,"wdone zai=%d zao=%d\n", zs.avail_in, zs.avail_out); */
+      if (Z_STREAM_END!=(zgot=zlib_deflate(&zs, Z_FINISH)) && Z_OK!=zgot)
+        Error::sev(Error::EERROR) << "Flate close error: " << zs.msg << (Error*)0;
+      got=sizeof(obuf)-zs.avail_out;
+      /* fprintf(stderr, "got=%u zgot=%d Z_OK=%d\n", got, zgot, Z_OK); */
+      if (got>0) out.vi_write(obuf, got);
+    } while (zgot==Z_OK);
+    /* Dat: zlib_deflateEnd() will be called in the destructur */
+    out.vi_write(0,0); /* Signal EOF */
+    /* Dat: zlib_deflate() adds RFC 1950 header and adler32 checksum automatically */
+  } else {
+    do {
+      /* fprintf(stderr,"writ\n"); */
+      zs.next_out=(unsigned char*)obuf;  zs.avail_out=sizeof(obuf);
+      if (Z_OK!=zlib_deflate(&zs, 0))
+        Error::sev(Error::EERROR) << "Flate write error: " << zs.msg << (Error*)0;
+      if (0<(got=sizeof(obuf)-zs.avail_out)) out.vi_write(obuf, got);
+    } while (0!=zs.avail_in);
+  }
+}
+#else
 FlateEncode::FlateEncode(GenBuffer::Writable &out_, unsigned level_)
  :out(out_)
  ,s1(1)
@@ -778,7 +840,8 @@ void FlateEncode::vi_write(char const*buf, slen_t len) {
   while (len>=0x8000) { fs->deflate2(const_cast<char*>(buf),0x8000, fs); len-=0x8000; buf+=0x8000; }
   if (len!=0) fs->deflate2(const_cast<char*>(buf),len, fs);
 }
-#endif
+#endif /* PTS_DEFL_RIPPED_ZLIB */
+#endif /* USE_BUILTIN_ZIP */
 
 int /*FlateEncode::*/gen_write(char *block, unsigned len, void *zfile) {
   static_cast<GenBuffer::Writable*>(zfile)->vi_write(block, len);

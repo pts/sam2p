@@ -124,11 +124,11 @@ void Image::Sampled::init(slen_t l_comment, slen_t l_header, dimen_t wd_, dimen_
 }
 
 Image::Gray*    Image::Sampled::toGray0(unsigned char bpc_) {
-  unsigned char *crow=new unsigned char[wd*3+7], *p, *pend;
+  unsigned char *crow=new unsigned char[wd*3+7*3], *p, *pend;
   Image::Gray *img=new Image::Gray(wd, ht, bpc_);
   unsigned char *outp=(unsigned char*)img->getRowbeg();
   dimen_t htc;
-  memset(crow+wd*3, '\0', 7);
+  memset(crow+wd*3, '\0', 7*3); /* *3 BUGFIX at Tue Jan 18 17:04:15 CET 2005 */
   unsigned i;
   /* Dat: not optimising for minimal rounding error since caller should ensure
    *      that there is no such error at all.

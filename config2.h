@@ -70,10 +70,12 @@
 #define USE_IN_JAI 1
 #define USE_IN_PDF 1
 #define USE_IN_PS 1
-/* #define USE_OUT_GIF 1 */
+/* #define USE_OUT_GIF 1 -- moved to config.h */
 #define USE_IN_XPM_MAPPING 1
 #define USE_BIG_MEMORY 1
 #define USE_DICT_MAPPING 1
+/* at Tue Jan 18 16:18:34 CET 2005 */
+#define USE_ZLIB_MEM 1
 
 /** Quotes a filename to be displayed in error messages */ 
 /* #define FNQ(str) (str) */
@@ -335,6 +337,7 @@ typedef int bool;
 #    error putc() or fputc() is required
 #  endif
 #endif
+
 
 
 #endif /* config2.h */
