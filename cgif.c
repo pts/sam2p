@@ -63,8 +63,13 @@ EXTERN_C FILE *fdopen (int fildes, const char *mode); /* GCC 3.0 SUXX */
 
 //#include <unistd.h>
 
-#include <io.h>
-#define open _open
+#if USE_CGIF_FDOPEN
+#  if defined(__MINGW32__) || defined(__CYGWIN__) || defined(_MSC_VER)
+#    undef __STRICT_ANSI__
+#    include <io.h>
+     /*#define open _open*/
+#  endif
+#endif
 
 /* --- gif_err.c */
 
@@ -653,8 +658,8 @@ static int DGifBufferedInput(FILE *File, CGIFFF GifByteType *Buf,
 *   Returns GifFileType pointer dynamically allocated which serves as the gif *
 * info record. _GifError is cleared if succesfull.			      *
 ******************************************************************************/
-CGIFFF GifFileType *CGIFFF DGifOpenFileName(const char *FileName)
-{
+CGIFFF GifFileType *CGIFFF DGifOpenFileName(const char *FileName) {
+#if 0 /**** pts ****/
     int FileHandle;
 
     if ((FileHandle = open(FileName, O_RDONLY
@@ -665,11 +670,15 @@ CGIFFF GifFileType *CGIFFF DGifOpenFileName(const char *FileName)
 	_GifError = D_GIF_ERR_OPEN_FAILED;
 	return NULL;
     }
-
     return DGifOpenFileHandle(FileHandle);
+#else
+  FILE *f;
+  if (NULL==(f=fopen(FileName,"rb"))) { _GifError=D_GIF_ERR_OPEN_FAILED; return NULL; }
+  return DGifOpenFILE(f);
+#endif
 }
 
-
+#if USE_CGIF_FDOPEN
 /******************************************************************************
 *   Update a new gif file, given its file handle.			      *
 *   Returns GifFileType pointer dynamically allocated which serves as the gif *
@@ -688,6 +697,7 @@ CGIFFF GifFileType *CGIFFF DGifOpenFileHandle(int FileHandle)
 #endif /* __MSDOS__ */
     return DGifOpenFILE(f);
 }
+#endif
 
 /**** pts ****/
 CGIFFF GifFileType *CGIFFF DGifOpenFILE(void/*FILE*/ *f) {

@@ -44,6 +44,10 @@
 # pragma warning(disable: 4244) /* =' : conversion from 'int ' to 'unsigned char ', possible loss of data */
 #endif
 
+/* at Wed Dec 11 15:33:22 CET 2002 */
+/* #define USE_CGIF_FDOPEN 1 */
+#undef USE_CGIF_FDOPEN
+
 #ifdef __cplusplus
 class CGIF { public:
 #define EXTERN static
@@ -118,7 +122,9 @@ typedef enum {
 ******************************************************************************/
 
 EXTERN GifFileType *DGifOpenFileName(const char *GifFileName);
+#if USE_CGIF_FDOPEN
 EXTERN GifFileType *DGifOpenFileHandle(int GifFileHandle);
+#endif
 EXTERN GifFileType *DGifOpenFILE(void/*FILE*/ *f);
 EXTERN int DGifSlurp(GifFileType *GifFile);
 EXTERN int DGifGetScreenDesc(GifFileType *GifFile);

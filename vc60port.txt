@@ -46,8 +46,8 @@ bts2.tth tul hosszu... fatal error C1076: compiler limit : internal heap limit r
 Imp: pts.xpm: unknown color
 Imp: \r\n
 Imp: warnings
-Imp: sprintf
-Imp:
+Imp: check for sprintf
+OK:
   #define HAVE_STATIC_CONST 1
   class A { static const int i=1; };
 Imp: _open -> fopen()
@@ -57,3 +57,4 @@ Imp: bts2.tth
 Imp: diff -r ""\
 Imp: chmod +x ./configure
 Imp: grep '!!'
+Imp: fopen(...,"rb") OK?
