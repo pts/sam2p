@@ -4,27 +4,28 @@
  *
  * For usage example, see fax_test.c.
  *
- * algorithm ripped from APFL Ghostcript 7.04, implementation and (C):
+ * algorithm ripped from GNU Ghostscript, implementation and (C):
  *
- * Copyright (C) 1993, 1995, 1996, 1997, 1998, 1999 Aladdin Enterprises.  All rights reserved.
- * 
- * [This file is part of AFPL Ghostscript.]
- * 
- * AFPL Ghostscript is distributed with NO WARRANTY OF ANY KIND.  No author or
- * distributor accepts any responsibility for the consequences of using it, or
- * for whether it serves any particular purpose or works at all, unless he or
- * she says so in writing.  Refer to the Aladdin Free Public License (the
- * "License") for full details.
- * 
- * Every copy of AFPL Ghostscript must include a copy of the License, normally
- * in a plain ASCII text file named PUBLIC.  The License grants you the right
- * to copy, modify and redistribute AFPL Ghostscript, but only under certain
- * conditions described in the License.  Among other things, the License
- * requires that the copyright notice and this notice be preserved on all
- * copies.
+Copyright (C) 1993, 1995, 1996, 1997, 1998, 1999 Aladdin Enterprises.  All
+rights reserved.
+
+GNU Ghostscript is free software; you can redistribute it and/or
+modify it under the terms of version 2 of the GNU General Public
+License as published by the Free Software Foundation.
+
+GNU Ghostscript is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program so you can know your rights and responsibilities.
+It should be in a file named doc/COPYING. If not, write to the
+Free Software Foundation, Inc., 59 Temple Place Suite 330, Boston, MA
+02111-1307, USA.
  */
 
-/*$Id: pts_fax.h,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/*$Id: pts_fax.h,v 1.3 2005-02-21 13:09:56 pts Exp $ */
 /* CCITTFax filter state definition */
 /* Requires strimpl.h */
 
@@ -36,7 +37,7 @@
 #endif
 
 /* #include "scommon.h" */
-/*$Id: pts_fax.h,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/*$Id: pts_fax.h,v 1.3 2005-02-21 13:09:56 pts Exp $ */
 /* Definitions common to stream clients and implementors */
 
 /* #ifndef scommon_DEFINED */
@@ -224,7 +225,7 @@ struct stream_state_s {
 
 /**** pts ****/
 /* original strimpl.h coming */
-/*$Id: pts_fax.h,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/*$Id: pts_fax.h,v 1.3 2005-02-21 13:09:56 pts Exp $ */
 /* Definitions for stream implementors */
 /* Requires stdio.h */
 

@@ -133,7 +133,7 @@ Rule::Applier::cons_t out_l2jbin_work(GenBuffer::Writable& out, Rule::OutputRule
   Rule::writeTTT(*op, *tp, *tp, !cache->isPDF()?"l2jbin":cache->isPDFB()?"p0jbb":"p0jbin", or_, sf, Rule::writePalData, strings);
   if (tp!=op) delete tp;
   /* Dat: outve is deleted by C++ scope */
-  if (tp!=op) delete tp;
+  // if (tp!=op) delete tp; /* BUGFIX at Thu Jan 20 15:04:47 CET 2005 */
   return Rule::Applier::OK;
 }
 

@@ -807,7 +807,7 @@ MiniPS::VALUE MiniPS::Parser::parse1(int closer, int sev) {
     return Qerror; /* parse error */
    case '(': {
      beg=tok->lastTokVal().bb->begin_(); len=tok->lastTokVal().bb->getLength();
-     VALUE v=(VALUE)new String(beg, len);
+     VALUE v=(VALUE)new String(beg, len); /* Imp: resolve memory leak here */
      i=tok->yylex();
      beg=tok->lastTokVal().bb->begin_(); len=tok->lastTokVal().bb->getLength();
      if (i!='E' || len!=3 || 0!=memcmp(beg,"run",3)) { unread=i; return v; }

@@ -1,3 +1,11 @@
+sam2p (0.44-7) unstable; urgency=low
+
+  * Updated copyright of pts_fax.c
+  * Updated copyright of cgif.c
+  * BUGFIX of JPEG -> EPS `delete tp' buf in appliers.cpp
+
+ -- Szabó Péter <pts@math.bme.hu>  Thu, 20 Jan 2005 15:11:23 +0100
+
 sam2p (0.44-6) unstable; urgency=low
 
   * Re-ripped pts_defl.c from linux-2.6.8.1 (ZLIB 1.1.3),

@@ -2,26 +2,25 @@
  * pts_fax.c -- a compact CCITTFax compressor and uncompressor) implementation
  * compiled by pts@fazekas.hu at Sun Jul  7 19:51:42 CEST 2002
  *
- * For usage example, see fax_test.c.
+ * algorithm ripped from GNU Ghostscript, implementation and (C):
  *
- * algorithm ripped from APFL Ghostcript 7.04, implementation and (C):
- *
- * Copyright (C) 1993, 1995, 1996, 1997, 1998, 1999 Aladdin Enterprises.  All rights reserved.
- * 
- * [This file is part of AFPL Ghostscript.]
- * 
- * AFPL Ghostscript is distributed with NO WARRANTY OF ANY KIND.  No author or
- * distributor accepts any responsibility for the consequences of using it, or
- * for whether it serves any particular purpose or works at all, unless he or
- * she says so in writing.  Refer to the Aladdin Free Public License (the
- * "License") for full details.
- * 
- * Every copy of AFPL Ghostscript must include a copy of the License, normally
- * in a plain ASCII text file named PUBLIC.  The License grants you the right
- * to copy, modify and redistribute AFPL Ghostscript, but only under certain
- * conditions described in the License.  Among other things, the License
- * requires that the copyright notice and this notice be preserved on all
- * copies.
+Copyright (C) 1993, 1995, 1996, 1997, 1998, 1999 Aladdin Enterprises.  All
+rights reserved.
+
+GNU Ghostscript is free software; you can redistribute it and/or
+modify it under the terms of version 2 of the GNU General Public
+License as published by the Free Software Foundation.
+
+GNU Ghostscript is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program so you can know your rights and responsibilities.
+It should be in a file named doc/COPYING. If not, write to the
+Free Software Foundation, Inc., 59 Temple Place Suite 330, Boston, MA
+02111-1307, USA.
  */
 
 #include "pts_fax.h"
@@ -95,7 +94,7 @@
 /* end of former misc_types.h */
 
 /* gsbittab.h */
-/*$Id: pts_fax.c,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/*$Id: pts_fax.c,v 1.3 2005-02-21 13:09:56 pts Exp $ */
 /* Interface to tables for bit operations */
 
 #ifndef gsbittab_INCLUDED
@@ -165,7 +164,7 @@ intern_const unsigned char byte_acegbdfh_to_abcdefgh[256];
 /* end of former gsbittab.h */
 
 /* shc.h */
-/*$Id: pts_fax.c,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/*$Id: pts_fax.c,v 1.3 2005-02-21 13:09:56 pts Exp $ */
 /* Common definitions for filters using Huffman coding */
 
 #ifndef shc_INCLUDED
@@ -389,7 +388,7 @@ typedef struct hcd_table_s {
 /* end of former shc.h */
 
 /* scf.h */
-/*$Id: pts_fax.c,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/*$Id: pts_fax.c,v 1.3 2005-02-21 13:09:56 pts Exp $ */
 /* Common definitions for CCITTFax encoding and decoding filters */
 
 #ifndef scf_INCLUDED
@@ -589,7 +588,7 @@ END
 #  warning PROVIDES: pts_faxe
 #endif
 /* scfe.c */
-/*$Id: pts_fax.c,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/*$Id: pts_fax.c,v 1.3 2005-02-21 13:09:56 pts Exp $ */
 /* CCITTFax encoding filter */
 /* #include "config2.h" */
 /* #include "scf.h" */
@@ -1101,7 +1100,7 @@ const stream_template s_CFE_template = {
 /* end of former scfe.c */
 
 /* scfetab.c */
-/*$Id: pts_fax.c,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/*$Id: pts_fax.c,v 1.3 2005-02-21 13:09:56 pts Exp $ */
 /* Tables for CCITTFaxEncode filter */
 /* #include "scommon.h" */		/* for scf.h */
 /* #include "scf.h" */
@@ -2192,7 +2191,7 @@ scfdtab_dummy()
 #endif
 /* end of former scfdtab.c */
 /* scfd.c */
-/*$Id: pts_fax.c,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/*$Id: pts_fax.c,v 1.3 2005-02-21 13:09:56 pts Exp $ */
 /* CCITTFax decoding filter */
 /* #include "gstypes.h" */
 /* #include "scf.h" */
@@ -3040,7 +3039,7 @@ const stream_template s_CFD_template =
 
 #if USE_BUILTIN_FAXE || USE_BUILTIN_FAXD
 /* shc.c */
-/*$Id: pts_fax.c,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/*$Id: pts_fax.c,v 1.3 2005-02-21 13:09:56 pts Exp $ */
 /* Support code for shc.h */
 /* #include "scommon.h" */
 /* #include "shc.h" */
@@ -3095,7 +3094,7 @@ hc_put_last_bits_proc(stream_hc_state * ss, unsigned char * q, unsigned int bits
 
 
 /* gsbittab.c */
-/*$Id: pts_fax.c,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/*$Id: pts_fax.c,v 1.3 2005-02-21 13:09:56 pts Exp $ */
 /* Tables for bit operations */
 /* #include "gstypes.h" */
 /* #include "gsbittab.h" */

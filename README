@@ -1963,7 +1963,8 @@ A35. sam2p cannot resize or scale images. So the pixel width and height of
      However, it is possible to specify the quality of the JPEG output of
      sam2p. The quality of 0 means ugly output with small file size, and the 
      quality of 100 means nice output with big file sizes. You can specify 
-     intermediate integer quality values (50 and 75 are recommended). 
+     intermediate integer quality values (50 and 75 are recommended). Be
+     prepared that qualties above 30 (or so) may not work on all JPEG viewers.
      For example:
 
 	 sam2p -c ijg:10 large_input.jpg small_output.jpg
@@ -2134,6 +2135,20 @@ A44. Do
 	echo "P1 1 1 0" >one.pbm
 	sam2p -transparent:ffffff one.pbm one.gif
 	sam2p -transparent:ffffff one.pbm one.png
+
+Q45. Is it possible to specify a resolution other than 72 DPI, so that the
+     dimensions of the resulting PDF are accurate for print-resolution images?
+        
+A45. No, it isn't. But you can specify margins with the `-m' option, for
+     example, `-m:1cm'. If you really need a different resoultion for PDF,
+     consider modifying ``case 'X':'' and ``case 's':'' in rule.cpp and
+     multiply the numbers img->getWd() and img->getHt() found there.
+
+     Use your DTP or word processor program to resize the image properly. For
+     example, after running `sam2p foo.png foo.pdf', in LaTeX, use
+
+        % \usepackage{graphicx}
+        \includegraphics[height=10cm]{foo}
 
 Upsampling
 ~~~~~~~~~~
