@@ -394,11 +394,11 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
   /* Dat: we don't check for EOF. Imp: emit a warning? */
   // Error::sev(Error::DEBUG) << "rp[-1]=" << rp[-1] << (Error*)0;
   // while (-1!=(i=tok.getcc())) { putchar(i); }
-  fclose((FILE*)file_);
+  /* fclose((FILE*)file_); */
   return ret;
 }
 
-static Image::Loader::reader_t in_xpm_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&) {
+static Image::Loader::reader_t in_xpm_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
   return (0==memcmp(buf, "/* XPM */", 9)) ? in_xpm_reader : 0;
 }
 

@@ -148,7 +148,7 @@ tga_load_image (at_string filename) {
 #endif
 
   image = ReadImage (fp, &hdr);
-  fclose (fp);
+  /* fclose (fp); */
   return image;
 }
 

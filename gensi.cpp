@@ -33,16 +33,20 @@ static void iter_copy_sub(char const*beg, slen_t len, void *data) {
   memcpy(CD->to, beg, len);
   CD->to+=len; CD->clen-=len;
 }
-#include <stdio.h>
+// #include <stdio.h>
 slen_t GenBuffer::copyRange(char *to, slen_t cfrom, slen_t clen) const {
   if (clen==0) return getLength();
   copydata_t cd= { to, cfrom, clen, 0 };
   each_sub(iter_copy_sub, &cd);
+#if 1
+  while (cd.clen--!=0) *cd.to++='\0'; /* padding */
+#else
   fprintf(stderr,"cd.clen=%d\n", cd.clen);
   while (cd.clen--!=0) {
     fprintf(stderr,"padded.\n");
     *cd.to++='\0'; /* padding */
   }
+#endif
   return cd.sumlen;
 }
 
@@ -71,7 +75,7 @@ bool GenBuffer::toBool(bool &dst) {
   return false;
 }
 
-#include <stdio.h>
+// #include <stdio.h>
 
 bool GenBuffer::toInteger(unsigned long &dst) {
   /* Imp: several bases (2, 8, 10 and 16), ignore _too_long_ */
@@ -332,7 +336,7 @@ GenBuffer::Writable& GenBuffer::Writable::format(char const *fmt, ...) {
 /* --- */
 
 slen_t SimBuffer::Flat::copyRange(char *to, slen_t cfrom, slen_t clen) const {
-  if (cfrom<len) { /* !! BUGFIX at Fri Mar  7 20:30:07 CET 2003 */
+  if (cfrom<len) { /* added padding BUGFIX at Fri Mar  7 20:30:07 CET 2003 */
     slen_t dlen;
     memcpy(to, beg+cfrom, dlen=cfrom+clen>len ? len-cfrom : clen);
     to+=dlen;
@@ -972,7 +976,7 @@ SimBuffer::B& SimBuffer::B::appendFnq(const SimBuffer::Flat &other, bool preminu
     vi_grow2(0, rlen+2, 0, &dst);
     *dst++='"'; /* Dat: "ab"c" ""def" is perfectly legal and parses to: `abc def' */
     p=other.beg;
-    if (other.beg[0]=='-') { *dst++='.'; *dst++='\\'; }
+    if (preminus && other.beg[0]=='-') { *dst++='.'; *dst++='\\'; }
     for (p=other.beg,pend=p+other.len; p!=pend; p++) {
       if ('\0'==(c=*p) || c=='"') break;
       *dst++=c;
@@ -985,7 +989,7 @@ SimBuffer::B& SimBuffer::B::appendFnq(const SimBuffer::Flat &other, bool preminu
     }
     if (preminus && rlen!=0 && other.beg[0]=='-') rlen+=2; /* ./ */
     vi_grow2(0, rlen, 0, &dst);
-    if (other.beg[0]=='-') { *dst++='.'; *dst++='/'; }
+    if (preminus && other.beg[0]=='-') { *dst++='.'; *dst++='/'; }
     for (p=other.beg,pend=p+other.len; p!=pend; p++) {
       if ('\0'==(c=*p)) break;
       if (is_path(c)) *dst++=c;

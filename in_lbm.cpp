@@ -43,7 +43,7 @@ typedef   signed long s32_t;
 class LBMRead {
  public:
   inline LBMRead(FILE *f_): f(f_) {}
-  inline ~LBMRead() { fclose(f); }
+  /* inline ~LBMRead() { fclose(f); } */
   Image::Sampled *doit();
  protected:
   inline int getcn();
@@ -265,7 +265,7 @@ static Image::Sampled *in_lbm_reader(Image::filep_t file_, SimBuffer::Flat const
   return LBMRead((FILE*)file_).doit(); /* Destructor: fclose((FILE*)file_); */
 }
 
-static Image::Loader::reader_t in_lbm_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&) {
+static Image::Loader::reader_t in_lbm_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
   return (0==memcmp(buf,"FORM",4) && 0==memcmp(buf+8,"ILBM",4)) ? in_lbm_reader : 0;
 }
 

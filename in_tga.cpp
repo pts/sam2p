@@ -13,7 +13,7 @@
 
 #if USE_IN_TGA
 
-#include "input-tga.ci"
+#include "input-tga.ci" /* defines tga_load_image */
 
 static Image::Sampled *in_tga_reader(Image::filep_t file_, SimBuffer::Flat const&) {
   Image::Sampled *ret=0;
@@ -32,7 +32,7 @@ static Image::Sampled *in_tga_reader(Image::filep_t file_, SimBuffer::Flat const
   return ret;
 }
 
-static Image::Loader::reader_t in_tga_checker(char buf[Image::Loader::MAGIC_LEN], char bufend[Image::Loader::MAGIC_LEN], SimBuffer::Flat const&) {
+static Image::Loader::reader_t in_tga_checker(char buf[Image::Loader::MAGIC_LEN], char bufend[Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
   (void)buf;
   (void)bufend;
   /* vvv Unfortunately not all targa images have that footer */

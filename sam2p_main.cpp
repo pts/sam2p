@@ -10,6 +10,7 @@
 #include "minips.hpp"
 #include "rule.hpp"
 #include "main.hpp"
+#include "in_jai.hpp"
 
 /* Sat Jul  6 16:39:19 CEST 2002
  * empirical checkerg++ helper routines for gcc version 2.95.2 20000220 (Debian GNU/Linux)
@@ -293,6 +294,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   char const *param=""; /* pacify VC6.0 */
   char const *p2;
   slen_t paramlen;
+  SimBuffer::B tmpnam; /* any dir -- keep on stack frame */
   
   buildProfile_quiet=true;
 
@@ -554,13 +556,34 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
       }
      normal_label:
       if (InputFile==(char const*)NULLP) {
-        if (p[0]=='-' && p[1]=='\0') { /* Filename: STDIN or STDOUT */
-          // Files::set_binary_mode(0, true);
-          Error::sev(Error::ERROR_CONT) << "one_liner: `-' (stdin) not allowed as InputFile (stdin unseekable)" << (Error*)0;
-          badp=true;
-          continue;
-        } else InputFile=p;
-      } else if (OutputFile==(char const*)NULLP) {
+        InputFile=p; /* set it even on error */
+        if (p[0]=='-' && p[1]=='\0') { /* Filename: STDIN */
+          Files::set_binary_mode(0, true);
+          if (0!=fseek(stdin, 0L, 0)) { unseekable:
+#if 0
+            Error::sev(Error::ERROR_CONT) << "one_liner: `-' (stdin) not allowed as InputFile (stdin unseekable)" << (Error*)0;
+            badp=true; continue;
+#endif
+            FILE *f=Files::open_tmpnam(tmpnam);
+            if (!f) { Error::sev(Error::ERROR_CONT) << "one_liner: cannot open" << " temporary file for `-' (stdin)" << (Error*)0; badp=true; continue; }
+            tmpnam.term0();
+            Files::tmpRemoveCleanup(InputFile=tmpnam());
+            char *buf=new char[4096];
+            unsigned got;
+            while (
+                 (0<(got=fread(buf, 1, sizeof(buf), stdin)))
+              && got==fwrite(buf, 1, sizeof(buf), f)) {}
+            if (ferror(f) || 0!=fclose(f) || ferror(stdin))
+              { Error::sev(Error::ERROR_CONT) << "one_liner: cannot write" << " temporary file for `-' (stdin)" << (Error*)0; badp=true; continue; }
+            // fprintf(stderr, "if=(%s)\n", InputFile);
+            continue;
+            /* Imp: report `-' as filename on errors etc. */
+          }
+          int c=MACRO_GETC(stdin);
+          if (0!=fseek(stdin, 0L, 0)) { if (c>=0) ungetc(c, stdin); goto unseekable; } /* active test */
+          /* ungetc() is not necessary because of fseek() */
+        }
+      } else if (OutputFile==(char const*)NULLP) { /* Filename: STDOUT */
         Files::set_binary_mode(1, true);
         OutputFile=p;
         if (FileFormat==Rule::Cache::FF_default) { /* OutputFile; determine FileFormat from extension */
@@ -682,16 +705,12 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
 
   /* Smart verify whether CO_JAI may be applied */
   bool jaip=cox[Rule::Cache::CO_JAI]!=0;
-  if (jaip) {
-    FILE *f=fopen(InputFile, "rb");
-    /* vvv verify JPEG magic header. Imp: verify _baseline_ JPEG */
-    if (f==(FILE*)NULLP || MACRO_GETC(f)!=0xFF || MACRO_GETC(f)!=0xD8 || MACRO_GETC(f)!=0xFF) { jaip=false; coc--; cox[Rule::Cache::CO_JAI]=0; }
-    if (f!=(FILE*)NULLP) fclose(f);
-  }
+  /* vvv Imp: no error handling */
+  if (jaip && 1!=jai_is_baseline_jpeg(InputFile)) { jaip=false; coc--; cox[Rule::Cache::CO_JAI]=0; }
   
   if (jaip) {
     APPEND_sf(Image::SF_Asis);
-    LoadHints << ",asis,";
+    LoadHints << ",jpeg-asis,";
     cot[0]=Rule::Cache::CO_JAI; colen=1; /* disable all other compression */
   } else if (coc==1 && cox[Rule::Cache::CO_Fax]!=0) {
     APPEND_sf(Image::SF_Opaque);
@@ -883,7 +902,7 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
 
   if ((MiniPS::VALUE)LoadHints==MiniPS::Qnull) { /* smart default */
     if (!rule_list[0].isEOL() && rule_list[0].cache.Compression==Rule::Cache::CO_JAI) {
-      LoadHints=new MiniPS::String("asis",4); /* used by in_jai.cpp and in_jpeg.cpp; even TIFF/JPEG */
+      LoadHints=new MiniPS::String("jpeg-asis",4); /* used by in_jai.cpp and in_jpeg.cpp; even TIFF/JPEG */
     } else {
       LoadHints=new MiniPS::String("",0);
     }
@@ -892,11 +911,17 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
       
   /* Imp: eliminate memory leak from default LoadHints */
   /* vvv may raise tons of error messages */
+  // InputFile->term0(); /* always term0() for MiniPS::String */
   Image::SampledInfo info(Image::load(
+#if 0 /* Image::load() knows about stdin */
+    InputFile->getLength()!=1 || InputFile->begin_()[0]!='-' ? InputFile->begin_() : (const char*)NULLP,
+#else
     InputFile->begin_(),
+#endif
     SimBuffer::B(",",1, LoadHints->begin_(),LoadHints->getLength(), ",",1 ).term0()
   ));
-  Error::sev(Error::NOTICE) << "job: read InputFile: " << FNQ2(InputFile->begin_(),InputFile->getLength()) << (Error*)0;
+  Error::sev(Error::NOTICE) << "job: read InputFile: " <<
+    FNQ2STDOK(InputFile->begin_(),InputFile->getLength()) << (Error*)0;
   // assert(0);
 
   bool overwrite=false;
@@ -908,7 +933,7 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
   FILE *of=stdout;
   if (OutputFile->getLength()!=1 || OutputFile->begin_()[0]!='-') {
     if ((of=fopen(OutputFile->begin_(), "wb"))==(FILE*)NULLP) {
-      Error::sev(Error::EERROR) << "job: cannot rewrite OutputFile: " << FNQ2(OutputFile->begin_(),OutputFile->getLength()) << (Error*)0;
+      Error::sev(Error::EERROR) << "job: cannot rewrite OutputFile: " << FNQ2STDOK(OutputFile->begin_(),OutputFile->getLength()) << (Error*)0;
     }
     /*if (!overwrite)*/
     Files::tmpRemoveCleanup(OutputFile->begin_(), &of);
@@ -924,7 +949,7 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
   fflush(of);
   if (ferror(of)) {
     /* FILE *backup=of; of=(FILE*)NULLP; fclose(backup); */
-    Error::sev(Error::EERROR) << "job: error writing OutputFile: " << FNQ2(OutputFile->begin_(),OutputFile->getLength()) << (Error*)0;
+    Error::sev(Error::EERROR) << "job: error writing OutputFile: " << FNQ2STDOK(OutputFile->begin_(),OutputFile->getLength()) << (Error*)0;
   }
   if (of!=stdout) { /* Don't interfere with tmpRemoveCleanup() */
     FILE *backup=of; of=(FILE*)NULLP; fclose(backup);
@@ -935,7 +960,7 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
       Error::sev(Error::EERROR) << "job: error renaming, InputFile left intact" << (Error*)0;
     }
   }
-  Error::sev(Error::NOTICE) << "job: written OutputFile: " << FNQ2(OutputFile->begin_(),OutputFile->getLength()) << (Error*)0;
+  Error::sev(Error::NOTICE) << "job: written OutputFile: " << FNQ2STDOK(OutputFile->begin_(),OutputFile->getLength()) << (Error*)0;
 
   /* Freeing memory may cause segfaults because of possibly 
    * bad code design :-(. Luckily we have already saved the output file.

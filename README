@@ -1807,6 +1807,13 @@ A30. Please download the newest sources from
 
 	http://www.inf.bme.hu/~pts/tif22pnm-latest.tar.gz
 
+Q31. Why don't use libjpeg/libtiff/libpng/zlib or any other library with
+     sam2p?
+
+A31. -- library and .h incompatibilities
+     -- to avoid forced dependencies
+     -- checkergcc wouldn't work
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
@@ -2326,6 +2333,8 @@ History
 0.43 Fri Feb  7 11:32:10 CET 2003
      PDF generation bugfixes
      PDF /MediaBox is output into a separate line near the beginning of file (graphicP compatibility)
+
+Further changes moved to debian/changelog.
 
 Missing feature list
 ~~~~~~~~~~~~~~~~~~~~

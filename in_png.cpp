@@ -24,7 +24,7 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
   }
   virtual void vi_copy(FILE *f) {
     img=Image::load("PNM", (Image::filep_t)f, SimBuffer::B());
-    fclose(f);
+    /* fclose(f); */
   }
   inline Image::Sampled *getImg() const { return img; }
  protected:
@@ -61,7 +61,7 @@ static Image::Sampled *in_png_reader(Image::filep_t file_, SimBuffer::Flat const
   return helper.getImg();
 }
 
-static Image::Loader::reader_t in_png_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&) {
+static Image::Loader::reader_t in_png_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
   return 0==memcmp(buf,"\211PNG\r\n\032\n",8) ? in_png_reader : 0;
 }
 

@@ -257,8 +257,10 @@ class Image {
      * (already read into buf), and returns NULL if it cannot load an image
      * of that type, or a reader_t that will load the image. If (and only if!)
      * file is shorter than 64 bytes, the buf is padded with '\000' bytes.
+     * @param f may read from freely if necessary (MAGIC_LEN is short), but
+     *   has to call rewind(f) before reading
      */
-    typedef reader_t(*checker_t)(char buf[MAGIC_LEN], char bufend[MAGIC_LEN], SimBuffer::Flat const& loadHints);
+    typedef reader_t(*checker_t)(char buf[MAGIC_LEN], char bufend[MAGIC_LEN], SimBuffer::Flat const& loadHints, filep_t f);
     /** A null-terminated, compact string describing (not defining!) the image
      * file format.
      * Examples: "GIF", "XPM", "PNM"

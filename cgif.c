@@ -1093,10 +1093,12 @@ int CGIFFF DGifCloseFile(CGIFFF GifFileType *GifFile)
 	FreeSavedImages(GifFile);
     free(GifFile);
 
+#if 0 /**** pts ****/
     if (fclose(File) != 0) {
 	_GifError = D_GIF_ERR_CLOSE_FAILED;
 	return GIF_ERROR;
     }
+#endif
     return GIF_OK;
 }
 

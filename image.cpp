@@ -1185,7 +1185,10 @@ Image::Sampled* Image::load(char const* format, filep_t f_, SimBuffer::Flat cons
   while (p!=NULLP) {
     if ((format==(char const*)NULLP || 0==strcmp(p->format, format))
      && (Loader::checker_t)NULLP!=p->checker
-     && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints))) { return reader(f, loadHints); }
+     && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints, f))) {
+      rewind(f); /* checker might have read */
+      return reader(f, loadHints);
+    }
     p=p->next;
   }
   Error::sev(Error::EERROR) << "Unknown input image format" << (Error*)0;
@@ -1194,7 +1197,8 @@ Image::Sampled* Image::load(char const* format, filep_t f_, SimBuffer::Flat cons
 
 Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHints) {
   static char buf[2*Loader::MAGIC_LEN];
-  FILE *f=fopen(filename, "rb");
+  bool stdin_p=filename[0]=='-' && filename[1]=='\0';
+  FILE *f=stdin_p? stdin : fopen(filename, "rb");
   unsigned got=0;
   if (f==NULLP) Error::sev(Error::EERROR) << "Cannot open/read image file: " << FNQ(filename) << (Error*)0;
   slen_t ret=fread(buf, 1, Loader::MAGIC_LEN, f);
@@ -1211,12 +1215,18 @@ Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHin
 #endif
    || (rewind(f), 0)
    || ferror(f))
-    Error::sev(Error::EERROR) << "I/O error in image file: " << FNQ(filename) << (Error*)0;
+    Error::sev(Error::EERROR) << "I/O error pre in image file: " << FNQ(filename) << (Error*)0;
   if (got!=0 && got!=Loader::MAGIC_LEN) memmove(buf+2*Loader::MAGIC_LEN-got, buf+Loader::MAGIC_LEN, got);
   Loader *p=first;
   Loader::reader_t reader;
   while (p!=NULLP) {
-    if ((Loader::checker_t)NULLP!=p->checker && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints))) { return reader(f, loadHints); }
+    if ((Loader::checker_t)NULLP!=p->checker && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints, f))) {
+      rewind(f); /* checker might have read */
+      Image::Sampled *ret=reader(f, loadHints);
+      if (ferror(f) || (!stdin_p && 0!=fclose(f))) /* don't close stdin */
+        Error::sev(Error::EERROR) << "I/O error post in image file: " << FNQ(filename) << (Error*)0;
+      return ret;
+    }
     p=p->next;
   }
   Error::sev(Error::EERROR) << "Unknown input image format: " << FNQ(filename) << (Error*)0;

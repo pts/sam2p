@@ -58,7 +58,7 @@ static Image::Sampled *in_pnm_reader(Image::filep_t file_, SimBuffer::Flat const
   return ret;
 }
 
-static Image::Loader::reader_t in_pnm_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&) {
+static Image::Loader::reader_t in_pnm_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
   return (buf[0]=='P' && (buf[1]>='1' && buf[1]<='6') &&
     (buf[2]=='\t' || buf[2]==' ' || buf[2]=='\r' || buf[2]=='\n' || buf[2]=='#'))
    ? in_pnm_reader : 0;

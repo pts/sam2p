@@ -81,7 +81,7 @@ Image::Gray   * JAI::toGray(unsigned char) { assert(0); return 0; }
 /* --- The following code is based on standard/image.c from PHP4 */
 
 /* some defines for the different JPEG block types */
-#define M_SOF0  0xC0			/* Start Of Frame N */
+#define M_SOF0  0xC0			/* Start Of Frame0: Baseline JPEG */
 #define M_SOF1  0xC1			/* N indicates which compression process */
 #define M_SOF2  0xC2			/* Only SOF0-SOF2 are now in common use */
 #define M_SOF3  0xC3
@@ -143,26 +143,33 @@ static unsigned int jai_next_marker(FILE *fp)
 }
 #endif
 
+#if 0
 static inline int getc_(FILE *f) { return MACRO_GETC(f); }
 static inline long ftell_(FILE *f) { return ftell(f); }
-
 template <class T>
-static unsigned short jai_read2(T *fp) {
+static unsigned short jai_read2(T *fp);
+template <class T>
+static void jai_handle_jpeg(struct jai_gfxinfo *result, T *fp) {
+#endif
+/* Dat: removed templates at Tue Mar 11 19:59:16 CET 2003, because decoding
+ * JPEG headers isn't time-critical
+ */
+
+static inline unsigned short jai_read2(GenBuffer::Readable *fp) {
 #if 0
   unsigned char a[ 2 ];
   /* just return 0 if we hit the end-of-file */
   if (fread(a,sizeof(a),1,fp) != 1) return 0;
   return (((unsigned short) a[ 0 ]) << 8) + ((unsigned short) a[ 1 ]);
 #else
-  int a=getc_(fp), b=getc_(fp);
+  int a=fp->vi_getcc(), b=fp->vi_getcc();
   /* just return 0 if we hit the end-of-file */
   return a>=0 && b>=0 ? (a<<8)+b : 0;
 #endif
 }
 
 /** main loop to parse JPEG structure */
-template <class T>
-static void jai_handle_jpeg(struct gfxinfo *result, T *fp) {
+void jai_parse_jpeg(struct jai_gfxinfo *result, DecoderTeller *fp, bool must_be_baseline) {
   int c;
   unsigned int length;
   unsigned char had_adobe;
@@ -175,34 +182,35 @@ static void jai_handle_jpeg(struct gfxinfo *result, T *fp) {
 
   /* Verify JPEG header */
   /* Dat: maybe 0xFF != '\xFF' */
-  if ((c=getc_(fp))!=0xFF) return;
-  while ((c=getc_(fp))==0xFF) ;
+  if ((c=fp->vi_getcc())!=0xFF) return;
+  while ((c=fp->vi_getcc())==0xFF) ;
   if (c!=M_SOI) return;
 
   result->bad=1;
   while (1) {
-   if ((c=getc_(fp))!=0xFF) { result->bad=8; return; }
-   while ((c=getc_(fp))==0xFF) ;
+   if ((c=fp->vi_getcc())!=0xFF) { result->bad=8; return; }
+   while ((c=fp->vi_getcc())==0xFF) ;
    if (c==-1) { result->bad=2; return; }
    switch (c) {
-    case M_SOF0:
+    case M_SOF0: do_SOF:
       if (result->bad!=1) { result->bad=4; return; } /* only one M_SOF allowed */
-      result->SOF_offs=ftell_(fp);
+      result->SOF_type=c-M_SOF0;
+      result->SOF_offs=fp->vi_tell();
       /* handle SOFn block */
       length=jai_read2(fp);
-      result->bpc = getc_(fp);
+      result->bpc = fp->vi_getcc();
       result->height = jai_read2(fp);
       result->width = jai_read2(fp);
-      result->cpp = getc_(fp);
+      result->cpp = fp->vi_getcc();
       if ((length-=8)!=3U*result->cpp) return;
       if (result->bpc!=8) { result->bad=6; return; }
       if (result->cpp!=1 && result->cpp!=3 && result->cpp!=4) { result->bad=5; return; }
       assert(length>=3);
       if (result->cpp==3) {
-        result->id_rgb =getc_(fp)=='R';  result->hvs=getc_(fp); getc_(fp);
-        result->id_rgb&=getc_(fp)=='G';  getc_(fp); getc_(fp);
-        result->id_rgb&=getc_(fp)=='B';  getc_(fp); getc_(fp);
-      } else { length-=2; getc_(fp); result->hvs=getc_(fp); while (length--!=0) getc_(fp); }
+        result->id_rgb =fp->vi_getcc()=='R';  result->hvs=fp->vi_getcc(); fp->vi_getcc();
+        result->id_rgb&=fp->vi_getcc()=='G';  fp->vi_getcc(); fp->vi_getcc();
+        result->id_rgb&=fp->vi_getcc()=='B';  fp->vi_getcc(); fp->vi_getcc();
+      } else { length-=2; fp->vi_getcc(); result->hvs=fp->vi_getcc(); while (length--!=0) fp->vi_getcc(); }
       result->bad=2;
       break;
     case M_SOF1:
@@ -217,6 +225,7 @@ static void jai_handle_jpeg(struct gfxinfo *result, T *fp) {
     case M_SOF13:
     case M_SOF14:
     case M_SOF15:
+      if (!must_be_baseline) goto do_SOF;
       // fprintf(stderr, "SOF%u\n", marker-M_SOF0); assert(0);
       result->bad=3;
       return;
@@ -247,21 +256,21 @@ static void jai_handle_jpeg(struct gfxinfo *result, T *fp) {
     case M_APP0: /* JFIF application-specific marker */
       length=jai_read2(fp);
       if (length==2+4+1+2+1+2+2+1+1) {
-        result->had_jfif=getc_(fp)=='J' && getc_(fp)=='F' && getc_(fp)=='I' &&
-                         getc_(fp)=='F' && getc_(fp)==0;
+        result->had_jfif=fp->vi_getcc()=='J' && fp->vi_getcc()=='F' && fp->vi_getcc()=='I' &&
+                         fp->vi_getcc()=='F' && fp->vi_getcc()==0;
         length-=7;
       } else length-=2;
-      while (length--!=0) getc_(fp);
+      while (length--!=0) fp->vi_getcc();
       break;
     case M_APP14: /* Adobe application-specific marker */
       length=jai_read2(fp);
       if ((length-=2)==5+2+2+2+1) {
-        had_adobe=getc_(fp)=='A' && getc_(fp)=='d' && getc_(fp)=='o' &&
-                  getc_(fp)=='b' && getc_(fp)=='e' && ((unsigned char)getc_(fp))>=1;
-        getc_(fp); getc_(fp); getc_(fp); getc_(fp); getc_(fp);
-        if (had_adobe) result->colortransform=getc_(fp);
-                  else getc_(fp);
-      } else while (length--!=0) getc_(fp);
+        had_adobe=fp->vi_getcc()=='A' && fp->vi_getcc()=='d' && fp->vi_getcc()=='o' &&
+                  fp->vi_getcc()=='b' && fp->vi_getcc()=='e' && ((unsigned char)fp->vi_getcc())>=1;
+        fp->vi_getcc(); fp->vi_getcc(); fp->vi_getcc(); fp->vi_getcc(); fp->vi_getcc();
+        if (had_adobe) result->colortransform=fp->vi_getcc();
+                  else fp->vi_getcc();
+      } else while (length--!=0) fp->vi_getcc();
       break;
     case M_APP1:
     case M_APP2:
@@ -286,7 +295,7 @@ static void jai_handle_jpeg(struct gfxinfo *result, T *fp) {
       #if 0 /**** pts: fseek would disturb later ftell()s and feof()s */
         fseek(fp, (long) length, SEEK_CUR);  /* skip the header */
       #else 
-        while (length--!=0) getc_(fp); /* make feof(fp) correct */
+        while (length--!=0) fp->vi_getcc(); /* make feof(fp) correct */
       #endif
     }
    }
@@ -301,15 +310,18 @@ char *jai_errors[]={
   /*4*/ "more SOF0 markers",
   /*5*/ "bad # components",
   /*6*/ "bad bpc",
+  /*7*/ "?",
   /*8*/ "0xFF expected",
   /*9*/ "invalid JPEG header",
-  /*10*/ "not ending with EOI", /* not output by jai_handle_jpeg! */
+  // /*10*/ "not ending with EOI", /* not output by jai_handle_jpeg! */
 };
 
 static Image::Sampled *in_jai_reader(Image::filep_t file_, SimBuffer::Flat const&) {
   // assert(0);
-  struct gfxinfo gi;
-  jai_handle_jpeg(&gi, (FILE*)file_);
+  struct jai_gfxinfo gi;
+  Filter::FILED filed((FILE*)file_, /*closep:*/false);
+  jai_parse_jpeg(&gi, &filed);
+  // jai_parse_jpeg(&gi, (FILE*)file_);
   // long ftel=ftell((FILE*)file_);
   if (gi.bad!=0) Error::sev(Error::EERROR) << "JAI: " << jai_errors[gi.bad] << (Error*)0;
   // printf("ftell=%lu\n", ftell((FILE*)file_));
@@ -321,27 +333,45 @@ static Image::Sampled *in_jai_reader(Image::filep_t file_, SimBuffer::Flat const
   JAI *ret=new JAI(gi.width,gi.height,gi.bpc,gi.colorspace,flen,gi.SOF_offs,gi.hvs);
   if (fread(ret->getHeadp(), flen, 1, (FILE*)file_)!=1 || ferror((FILE*)file_)) {
     ret->fixEOI();
-    fclose((FILE*)file_);
+    /* fclose((FILE*)file_); */
     Error::sev(Error::EERROR) << "JAI: IO error" << (Error*)0;
   }
-  fclose((FILE*)file_);
+  /* fclose((FILE*)file_); */
   return ret;
 }
 
-static Image::Loader::reader_t in_jai_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const& loadHints) {
-  return (0==memcmp(buf, "\xff\xd8\xff", 3)) && loadHints.findFirst((char const*)",asis,",6)!=loadHints.getLength()
-       ? in_jai_reader : 0;
+static Image::Loader::reader_t in_jai_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const& loadHints, Image::filep_t file_) {
+  if (0!=memcmp(buf, "\xff\xd8\xff", 3)
+   || !(loadHints.findFirst((char const*)",jpeg-asis,",6)!=loadHints.getLength() || loadHints.findFirst((char const*)",asis,",6)!=loadHints.getLength())
+     ) return 0;
+  rewind((FILE*)file_);
+  Filter::FILED filed((FILE*)file_, /*closep:*/false);
+  return jai_is_baseline_jpeg(&filed) ? in_jai_reader : 0;
 }
 
+#if 0 /* Filter::FlatR* used by JPEGSOF0Encode::vi_write() in appliers.cpp */
 static inline int getc_(Filter::FlatR *f) { return f->getcc(); }
 static inline long ftell_(Filter::FlatR *f) { return f->tell(); }
-void jai_parse_jpeg(struct gfxinfo *result, Filter::FlatR *f) {
+void jai_parse_jpeg(struct jai_gfxinfo *result, Filter::FlatR *f) {
   jai_handle_jpeg(result, f);
 }
-void jai_parse_jpeg(struct gfxinfo *result, FILE *f) {
+void jai_parse_jpeg(struct jai_gfxinfo *result, FILE *f) {
   jai_handle_jpeg(result, f);
 }
+#endif
 
+/* by pts@fazekas.hu at Tue Mar 11 20:27:56 CET 2003 */
+int jai_is_baseline_jpeg(char const* filename) {
+  FILE *f=fopen(filename, "rb");
+  if (!f) return -1;
+  Filter::FILED filed(f, /*closep:*/true);
+  return jai_is_baseline_jpeg(&filed);
+}
+int jai_is_baseline_jpeg(DecoderTeller *fp) {
+  struct jai_gfxinfo gi;
+  jai_parse_jpeg(&gi, fp, /*must_be_baseline:*/false);
+  return gi.bad!=0 ? -1 : gi.SOF_type==0;
+}
 #else
 #define in_jai_checker (Image::Loader::checker_t)NULLP
 #endif /* USE_IN_JAI */

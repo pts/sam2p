@@ -76,7 +76,8 @@
 /** Quotes a filename to be displayed in error messages */ 
 /* #define FNQ(str) (str) */
 #define FNQ(filename) SimBuffer::B().appendFnq(SimBuffer::Static(filename))
-#define FNQ2(beg,len) SimBuffer::B().appendFnq(SimBuffer::Static(beg,len))
+#define FNQ2(beg,len) SimBuffer::B().appendFnq(SimBuffer::Static(beg,len),true)
+#define FNQ2STDOK(beg,len) SimBuffer::B().appendFnq(SimBuffer::Static(beg,len),false)
 
 
 #define param_assert assert

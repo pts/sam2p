@@ -12,10 +12,11 @@
 
 #if USE_IN_JAI
 
-#include "in_jai.hpp"
 #include "gensio.hpp"
 
-struct gfxinfo {
+struct jai_gfxinfo {
+  /** 0 for baseline JPEG, 1..15 for other JPEG compression */
+  unsigned char SOF_type;
   unsigned char colorspace;
   unsigned char bad, bpc, cpp, had_jfif, colortransform, id_rgb;
   /** (Horiz<<4+Vert) sampling factor for the first color component. Usually
@@ -30,8 +31,15 @@ struct gfxinfo {
 };
 
 extern char *jai_errors[];
-extern void jai_parse_jpeg(struct gfxinfo *result, Filter::FlatR *f);
-extern void jai_parse_jpeg(struct gfxinfo *result, FILE *f);
+#if 0
+  extern void jai_parse_jpeg(struct gfxinfo *result, Filter::FlatR *f);
+  extern void jai_parse_jpeg(struct gfxinfo *result, FILE *f);
+#else
+  extern void jai_parse_jpeg(struct jai_gfxinfo *result, DecoderTeller *fp, bool must_be_baseline=true);
+  /** Doesn't treat `-' as a special filename. @return 0, 1, or -1 on I/O error */
+  extern int jai_is_baseline_jpeg(char const* filename);
+  extern int jai_is_baseline_jpeg(DecoderTeller *fp);
+#endif
 
 #endif
 

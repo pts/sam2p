@@ -36,7 +36,7 @@ class Encoder: public GenBuffer::Writable { public:
 }; /* class Encoder */
 
 /** Implementors must redefine vi_read(), and they may redefine vi_getcc(). */
-class Decoder: public GenBuffer::Readable {
+class Decoder: public GenBuffer::Readable { public:
   /** Calls vi_read(&ret,1). Note that this is the inverse of
    * GenBuffer::Writable, because there vi_read() calls vi_getcc(). Decoders
    * may be stacked atop of each other.
@@ -48,6 +48,11 @@ class Decoder: public GenBuffer::Readable {
    */
   virtual slen_t vi_read(char *to_buf, slen_t max) =0;
 }; /* class Decoder */
+
+class DecoderTeller: public Decoder { public:
+  /** Equivalent of ftell() */
+  virtual long vi_tell() const=0;
+};
 
 class Filter { public:
   /** Starts a child process (with popen(pipe_tmpl,"wb")), pipes data to it,
@@ -171,13 +176,14 @@ class Filter { public:
     GenBuffer::Readable& in;
   };
 
-  class FILED: public Decoder {
+  class FILED: public DecoderTeller {
    public:
     inline FILED(FILE *f_,bool closep_): f(f_), closep(closep_) {}
     FILED(char const* filename);
     inline virtual int vi_getcc() { return MACRO_GETC(f); }
     virtual slen_t vi_read(char *buf, slen_t len);
     void close();
+    inline virtual long vi_tell() const { return ftell(f); }
    protected:
     FILE *f;
     bool closep;
@@ -201,7 +207,7 @@ class Filter { public:
   /** Reads from a consecutive memory area, which won't be
    * delete()d by (this)
    */
-  class FlatR: public GenBuffer::Readable {
+  class FlatR: public DecoderTeller /*GenBuffer::Readable*/ {
    public:
     FlatR(char const* s_, slen_t slen_);
     FlatR(char const* s_);
@@ -209,6 +215,7 @@ class Filter { public:
     virtual slen_t vi_read(char *to_buf, slen_t max);
     virtual void vi_rewind();
     inline int getcc() { return slen!=0 ? (slen--, *(unsigned char const*)s++) : -1; }
+    inline virtual long vi_tell() const { return s-sbeg; }
     inline long tell() const { return s-sbeg; }
    protected:
     char const *s, *sbeg;
@@ -256,7 +263,9 @@ class Files {
    * @return true if file successfully created
    */
   static FILE *try_dir(SimBuffer::B &dir, SimBuffer::B const&fname, char const*s1, char const*s2, char const*open_mode="wb");
-  /* @param dir `dir' is empty: appends a unique filename for a temporary
+  /* The file will be opened for writing only. It won't be registered for
+   * for automatic removal.
+   * @param dir `dir' is empty: appends a unique filename for a temporary
    *        file. Otherwise: returns a unique filename in the specified directory.
    *        Creates the new file with 0 size.
    * @param extension NULLP or a string specifying the extension of the file

@@ -32,7 +32,7 @@ static Image::Sampled *in_bmp_reader(Image::filep_t file_, SimBuffer::Flat const
   return ret;
 }
 
-static Image::Loader::reader_t in_bmp_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&) {
+static Image::Loader::reader_t in_bmp_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
   return (buf[0]=='B' && buf[1]=='M'
    && buf[6]==0 && buf[7]==0 && buf[8]==0 && buf[9]==0
    && (unsigned char)(buf[14])<=64 && buf[15]==0 && buf[16]==0 && buf[17]==0)

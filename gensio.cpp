@@ -524,12 +524,6 @@ FILE *Files::try_dir(SimBuffer::B &dir, SimBuffer::B const&fname, char const*s1,
 #  define DIR_SEP "/"
 #endif
 
-/* @param dir `dir' is empty: appends a unique filename for a temporary
- *        file. Otherwise: returns a unique filename in the specified directory.
- *        Creates the new file with 0 size.
- * @return FILE* opened for writing for success, NULLP on failure
- * --return true on success, false on failure
- */
 FILE *Files::open_tmpnam(SimBuffer::B &dir, bool binary_p, char const*extension) {
   /* Imp: verify / on Win32... */
   /* Imp: ensure uniqueness on NFS */

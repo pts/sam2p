@@ -26,7 +26,7 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
   }
   virtual void vi_copy(FILE *f) {
     img=Image::load("PNM", (Image::filep_t)f, SimBuffer::B());
-    fclose(f);
+    /* fclose(f); */
   }
   inline Image::Sampled *getImg() const { return img; }
  protected:
@@ -53,7 +53,7 @@ static Image::Sampled *in_tiff_reader(Image::filep_t file_, SimBuffer::Flat cons
   return helper.getImg();
 }
 
-static Image::Loader::reader_t in_tiff_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&) {
+static Image::Loader::reader_t in_tiff_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
   /* MM\x00\x2a: TIFF image data, big-endian
    * II\x2a\x00: TIFF image data, little-endian
    * The second word of TIFF files is the TIFF version number, 42, which has 

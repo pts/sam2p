@@ -1,3 +1,11 @@
+sam2p (0.43-4) unstable; urgency=low
+
+  * Allow to read stdin from a pipe
+  * Recognize SOF2 (progressive) JPEG and other non-baseline types
+  * Fixed SimBuffer::Flat::copyRange
+
+ -- Szabó Péter <pts@math.bme.hu>  Tue, 11 Mar 2003 14:10:37 +0100
+
 sam2p (0.43-3) unstable; urgency=low
 
   * Merged with CVS, created Debian source packages.

@@ -1327,7 +1327,7 @@ class JPEGSOF0Encode: public PSEncoder {
  protected:
   GenBuffer::Writable &out;
   SimBuffer::B buf;
-  struct gfxinfo gi;
+  struct jai_gfxinfo gi;
 };
 
 JPEGSOF0Encode::JPEGSOF0Encode(GenBuffer::Writable &out_): out(out_) {}

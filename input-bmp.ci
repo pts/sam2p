@@ -431,7 +431,7 @@ ReadImage (FILE   *fd,
 	;
   }
 
-  fclose (fd);
+  /* fclose (fd); */
   if (bpp <= 8)
     {
       unsigned char *temp2, *temp3;
@@ -477,4 +477,3 @@ ToS (unsigned char *puffer)
 {
   return ((short)(puffer[0] | puffer[1]<<8));
 }
-

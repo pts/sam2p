@@ -150,12 +150,12 @@ static Image::Sampled *LoadPCX
   /* read the PCX header */
   fread(hdr, (size_t) 128, (size_t) 1, fp);
   if (ferror(fp) || feof(fp)) {
-    fclose(fp);
+    /* fclose(fp); */
     return_pcxError(bname, "EOF reached in PCX header.\n");
   }
 
   if (hdr[PCX_ID] != 0x0a || hdr[PCX_VER] > 5) {
-    fclose(fp);
+    /* fclose(fp); */
     return_pcxError(bname,"unrecognized magic number");
   }
 
@@ -182,12 +182,12 @@ static Image::Sampled *LoadPCX
 #endif
 
   if (colors>256 && !fullcolor) {
-    fclose(fp);
+    /* fclose(fp); */
     return_pcxError(bname,"No more than 256 colors allowed in PCX file.");
   }
 
   if (hdr[PCX_ENC] != 1) {
-    fclose(fp);
+    /* fclose(fp); */
     return_pcxError(bname,"Unsupported PCX encoding format.");
   }
 
@@ -259,15 +259,9 @@ static Image::Sampled *LoadPCX
 #endif
     }
   }
-
-
-  fclose(fp);
-
-
+  /* fclose(fp); */
 
   /* finally, convert into XV internal format */
-
-
 #if 0 /**** pts ****/
   pinfo->type    = fullcolor ? PIC24 : PIC8;
   pinfo->frmType = -1;    /* no default format to save in */
@@ -522,7 +516,7 @@ static Image::Sampled *in_pcx_reader(Image::filep_t file_, SimBuffer::Flat const
   PICINFO pinfo_;
   return LoadPCX((FILE*)file_, &pinfo_);
 }
-static Image::Loader::reader_t in_pcx_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&) {
+static Image::Loader::reader_t in_pcx_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::filep_t) {
   return buf[PCX_ID]==0x0a
       && (unsigned char)buf[PCX_VER]<=5
       && buf[PCX_ENC]==1
