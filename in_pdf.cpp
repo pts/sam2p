@@ -13,25 +13,9 @@
 
 #include "error.hpp"
 #include "gensio.hpp"
+#include "helpere.hpp"
 #include <string.h> /* memchr() */
 #include <stdio.h> /* printf() */
-
-/** Ugly multiple inheritance. !! unify with PNG, TIFF etc. */
-class HelperE: public Filter::NullE, public Filter::PipeE {
- public:
-  HelperE(char const*filter_cmd): Filter::NullE(), Filter::PipeE(*(Filter::NullE*)this, filter_cmd) {
-    // GenBuffer::Writable &out_, char *pipe_tmpl, slendiff_t i=0)
-  }
-  virtual void vi_copy(FILE *f) {
-    // img=Image::load("-", SimBuffer::B(), (Image::filep_t)f, (char const*)"PNM");
-    /* fclose(f); */
-    Filter::UngetFILED ufd((char const*)NULLP, f, Filter::UngetFILED::CM_closep|Filter::UngetFILED::CM_keep_stdinp);
-    img=Image::load((Image::Loader::UFD*)&ufd, SimBuffer::B(), (char const*)"PNM");
-  }
-  inline Image::Sampled *getImg() const { return img; }
- protected:
-  Image::Sampled *img;
-};
 
 #if OS_COTY==COTY_WIN9X || OS_COTY==COTY_WINNT
 #  define GS "gswin32c"

@@ -15,24 +15,9 @@
 
 #include "error.hpp"
 #include "gensio.hpp"
+#include "helpere.hpp"
 #include <string.h> /* memchr() */
 #include <stdio.h> /* printf() */
-
-/** Ugly multiple inheritance. */
-class HelperE: public Filter::NullE, public Filter::PipeE {
- public:
-  HelperE(char const*djpeg_cmd): Filter::NullE(), Filter::PipeE(*(Filter::NullE*)this, djpeg_cmd) {
-    // GenBuffer::Writable &out_, char *pipe_tmpl, slendiff_t i=0)
-  }
-  virtual void vi_copy(FILE *f) {
-    // img=Image::load("PNM", (Image::filep_t)f, SimBuffer::B());
-    img=Image::load("-", SimBuffer::B(), (Image::filep_t)f, (char const*)"PNM");
-    /* fclose(f); */
-  }
-  inline Image::Sampled *getImg() const { return img; }
- protected:
-  Image::Sampled *img;
-};
 
 static Image::Sampled *in_tiff_reader(Image::Loader::UFD *ufd, SimBuffer::Flat const&) {
   // Error::sev(Error::EERROR) << "Cannot load TIFF images yet." << (Error*)0;

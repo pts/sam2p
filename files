@@ -26,6 +26,7 @@ pts_fax.h
 examples/pts2.pbm
 examples/ptsbanner.gif
 ccdep.pl
+helpere.hpp
 encoder.hpp
 error.hpp
 gensi.hpp
