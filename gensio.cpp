@@ -28,7 +28,7 @@ extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list 
 #include "error.hpp"
 #include <string.h> /* strlen() */
 #include <stdarg.h> /* va_list */
-// #include <unistd.h> /* getpid() */ // !!
+#include <unistd.h> /* getpid() */
 #include <sys/stat.h> /* struct stat */
 #include <stdlib.h> /* getenv() */
 #include <errno.h>

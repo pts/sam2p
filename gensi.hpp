@@ -243,7 +243,7 @@ class SimBuffer {
    */
   class Flat: virtual public GenBuffer {
    protected:
-    friend class /*SimBuffer::*/B; /* can read `beg' and `len' */ // !!
+    friend class /*SimBuffer::*/B; /* can read `beg' and `len' */
     const char *beg;
     slen_t len;
    public:
@@ -536,13 +536,13 @@ class SimBuffer {
      * to `n' chars if it would be longer. (Truncation semantics changed at
      * Tue Jun 11 14:27:12 CEST 2002. Old: truncate to no chars if longer)
      */
-    Writable& vformat(slen_t n, char const *fmt, va_list ap);
+    GenBuffer::Writable& vformat(slen_t n, char const *fmt, va_list ap);
     /** appends as many chars as requrested */
-    Writable& vformat(char const *fmt, va_list ap);
+    GenBuffer::Writable& vformat(char const *fmt, va_list ap);
     /** appends; calls vformat(n); mandatorly non-inline because of ... */
-    Writable& format(slen_t n, char const *fmt, ...);
+    GenBuffer::Writable& format(slen_t n, char const *fmt, ...);
     /** appends; calls vformat(); mandatorly non-inline because of ... */
-    Writable& format(char const *fmt, ...);
+    GenBuffer::Writable& format(char const *fmt, ...);
 
     /*
      * Name: NonPathMeta

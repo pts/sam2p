@@ -24,7 +24,7 @@
  * copies.
  */
 
-/*$Id: pts_fax.h,v 1.1 2002-12-09 16:40:18 pts Exp $ */
+/*$Id: pts_fax.h,v 1.2 2002-12-11 14:01:52 pts Exp $ */
 /* CCITTFax filter state definition */
 /* Requires strimpl.h */
 
@@ -36,7 +36,7 @@
 #endif
 
 /* #include "scommon.h" */
-/*$Id: pts_fax.h,v 1.1 2002-12-09 16:40:18 pts Exp $ */
+/*$Id: pts_fax.h,v 1.2 2002-12-11 14:01:52 pts Exp $ */
 /* Definitions common to stream clients and implementors */
 
 /* #ifndef scommon_DEFINED */
@@ -224,7 +224,7 @@ struct stream_state_s {
 
 /**** pts ****/
 /* original strimpl.h coming */
-/*$Id: pts_fax.h,v 1.1 2002-12-09 16:40:18 pts Exp $ */
+/*$Id: pts_fax.h,v 1.2 2002-12-11 14:01:52 pts Exp $ */
 /* Definitions for stream implementors */
 /* Requires stdio.h */
 
