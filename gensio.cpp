@@ -222,7 +222,7 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
       /* ^^^ multiple %escape is now a supported feature */
       if (!*pp && !Files::find_tmpnam(*pp)) Error::sev(Error::ERROR) << "Filter::PipeE" << ": tmpnam() failed" << (Error*)0;
       assert(! !*pp); /* pacify VC6.0 */
-      *pp << ext;
+      // *pp << ext;
       pp->term0();
       if ((unsigned char)(s[-1]-'A')<(unsigned char)('Z'-'A'))
         redir_cmd.appendFnq(*pp); /* Capital letter: quote from the shell */
