@@ -184,6 +184,6 @@
 /* sam2p-specific */
 #define USE_BUILTIN_ZIP 1
 #define USE_BUILTIN_FAXE 1
-/* #undef USE_BUILTIN_LZW */
-/* #undef USE_IN_GIF */
-/* #undef USE_OUT_GIF */
+#define USE_BUILTIN_LZW 1
+#define USE_IN_GIF 1
+#define USE_OUT_GIF 1

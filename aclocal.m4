@@ -8,6 +8,10 @@ dnl Imp: less autoconf warnings
 dnl Dat: m4 SUXX, no normal error message for missing ')'
 dnl Dat: FILE *f=fopen("conftestval", "w"); is autoconf trad
 
+dnl autoconf-2.13 generates bad code for AC_C_CONST in g++-3.2
+dnl autoconf-2.54 is good (verified at Wed Dec 11 15:28:28 CET 2002)
+AC_PREREQ([2.14])
+
 AC_DEFUN([AC_PTS_CHECK_INTEGRALS],[
 dnl Checks for integral sizes.
 AC_REQUIRE([AC_HEADER_STDC])
