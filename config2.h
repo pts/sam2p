@@ -258,6 +258,12 @@ char *alloca ();
 /* #define PTS_dynamic_cast(ptrtype,ptr) dynamic_cast<ptrtype>(ptr) -- would include special G++ symbols into .o */
 #define PTS_dynamic_cast(ptrtype,ptr) ((ptrtype)(ptr))
 
+/** Suppress effect of -Wcast-align warning */
+#define PTS_align_cast(ptrtype,ptr) ((ptrtype)(void*)(ptr))
+/** Suppress effect of -Wcast-align warning */
+#define PTS_calign_cast(ptrtype,ptr) ((ptrtype)(void const*)(ptr))
+
+
 #undef HAVE_LZW
 #if USE_BUILTIN_LZW
 #  define HAVE_LZW 1

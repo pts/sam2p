@@ -337,9 +337,10 @@ typedef struct {
 	hash_t*	enc_hashtab;		/* kept separate for small machines */
 } LZWEncodeState;
 
-#define	LZWState(tif)		((LZWBaseState*) (tif)->tif_data)
-#define	DecoderState(tif)	((LZWDecodeState*) LZWState(tif))
-#define	EncoderState(tif)	((LZWEncodeState*) LZWState(tif))
+#define	LZWState(tif)		((LZWBaseState*)  (void*) (tif)->tif_data)
+#define	DecoderState(tif)	((LZWDecodeState*)(void*) LZWState(tif))
+#define	EncoderState(tif)	((LZWEncodeState*)(void*) LZWState(tif))
+/* ^^^ Dat: (void*) -> suppress gcc warning from -Wcast-align */
 
 static	void cl_hash(LZWEncodeState*);
 

@@ -121,8 +121,9 @@ void Mapping::DoubleHash::getNext (char const*const*& key, slen_t &keylen, char 
   /* vvv Dat: this operation is safe despite of the fact that it increases
    *          signedness off pointer target type ((char*) -> (Ary*)).
    */
-  Ary *p=(Ary*)(   (char*)const_cast<char**>(key)
-                 - ((char*)&((Ary*)0)->keydata-(char*)0) ), *pend=ary+alloced;
+  Ary *p=PTS_align_cast(Ary*,
+   ( (char*)const_cast<char**>(key)
+     - ((char*)&((Ary*)0)->keydata-(char*)0) )), *pend=ary+alloced;
   p++;
   while (p!=pend && p->keylen>=(slen_t)-2) p++;
   if (p==pend) { key=(char const*const*)NULLP; }

@@ -47,16 +47,15 @@ Imp: merge 0.40
 Imp: pts.xpm: unknown color
 Imp: \r\n output file
 Imp: warnings
-Imp: VC++ check for sprintf
 OK:  autoconf
   #define HAVE_STATIC_CONST 1
   class A { static const int i=1; };
-Imp: _open -> fopen()
-Imp: #if !defined(HAVE_SNPRINTF) || !defined(HAVE_C99_VSNPRINTF)
-Imp: xpmc.h ""\
-Imp: bts2.tth
+OK : _open -> fopen()
+Imp: #if !defined(HAVE_SNPRINTF) || !defined(HAVE_C99_VSNPRINTF); VC++ check for sprintf
+OK : xpmc.h ""\
+OK : bts2.tth ""\
 Imp: diff -r ""\
-Imp: chmod +x ./configure
+OK : chmod +x ./configure
 Imp: grep '!!'
 Imp: fopen(...,"rb") OK?
-Imp: autoconf lstat
+OK : autoconf lstat

@@ -14,7 +14,7 @@ extern "C" int lstat(const char *file_name, struct stat *buf);
 /* vvv Imp: not in ANSI C, but we cannot emulate it! */
 extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list ap );
 #else
-#undef __STRICT_ANSI__
+#undef __STRICT_ANSI__ /* __MINGW__ */
 #define _BSD_SOURCE 1 /* vsnprintf(); may be emulated with fixup_vsnprintf() */
 #define _POSIX_SOURCE 1 /* also popen() */
 #define _POSIX_C_SOURCE 2 /* also popen() */
@@ -216,7 +216,7 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
       // if (*pp) Error::sev(Error::ERROR) << "Filter::PipeE" << ": multiple %escape" << (Error*)0;
       /* ^^^ multiple %escape is now a supported feature */
       if (!*pp && !Files::find_tmpnam(*pp)) Error::sev(Error::ERROR) << "Filter::PipeE" << ": tmpnam() failed" << (Error*)0;
-      assert(!!*pp); /* pacify VC6.0 */
+      assert(! !*pp); /* pacify VC6.0 */
       pp->term0();
       if ((unsigned char)(s[-1]-'A')<(unsigned char)('Z'-'A'))
         redir_cmd.appendFnq(*pp); /* Capital letter: quote from the shell */
@@ -483,6 +483,13 @@ slen_t Filter::FlatR::vi_read(char *to_buf, slen_t max) {
 
 /* --- */
 
+
+#if HAVE_lstat_in_sys_stat
+#  define PTS_lstat lstat
+#else
+#  define PTS_lstat stat
+#endif
+
 /** @param fname must start with '/' (dir separator)
  * @return true if file successfully created
  */
@@ -496,8 +503,7 @@ FILE *Files::try_dir(SimBuffer::B &dir, SimBuffer::B const&fname, char const*s1,
   struct stat st;
   FILE *f;
   /* Imp: avoid race conditions with other processes pretending to be us... */
-#define lstat stat /*!! !!*/
-  if (-1!=lstat(full(), &st)
+  if (-1!=PTS_lstat(full(), &st)
    || (0==(f=fopen(full(), "wb")))
    || ferror(f)
      ) return (FILE*)NULLP;
@@ -578,7 +584,7 @@ int Files::removeIf(char const* filename) {
 
 slen_t Files::statSize(char const* filename) {
   struct stat st;
-  if (-1==lstat(filename, &st)) return (slen_t)-1;
+  if (-1==PTS_lstat(filename, &st)) return (slen_t)-1;
   return st.st_size;
 }
 

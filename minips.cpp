@@ -483,14 +483,14 @@ void MiniPS::Dict::getFirst(char const*const*& key, slen_t &keylen, VALUE *&val,
   // key=(char const*const*)NULLP;return;
   ((Mapping::H*)ptr)->getFirst(key, keylen, has);
   if (key==(char const*const*)NULLP) return;
-  val=(VALUE*)has; /* !! Imp: pointer size alignments (should be correct if new[char...] returns aligned ptr) */
+  val=PTS_align_cast(VALUE*,has);
   touched=has[sizeof(VALUE)]!=0;
 }
 void MiniPS::Dict::getNext (char const*const*& key, slen_t &keylen, VALUE *&val, bool &touched) {
   char *has;
   ((Mapping::H*)ptr)->getNext(key, keylen, has);
   if (key==(char const*const*)NULLP) return;
-  val=(VALUE*)has; /* !! Imp: pointer size alignments (should be correct if new[char...] returns aligned ptr) */
+  val=PTS_align_cast(VALUE*,has);
   touched=has[sizeof(VALUE)]!=0;
 }
 void MiniPS::Dict::dump(GenBuffer::Writable &out_, unsigned indent, bool dump_delimiters) {
@@ -688,7 +688,7 @@ MiniPS::Parser::Parser(char const *filename_) {
 }
 MiniPS::Parser::Parser(FILEP f_) {
   f=f_;
-  rd=new Files::FILER((FILE*)f_);
+  rd=new Files::FILER(PTS_align_cast(FILE*,f_));
   tok=new Tokenizer(*rd);
   master=(Parser*)NULLP;
   free_level=3;
@@ -736,7 +736,7 @@ MiniPS::Parser::~Parser() {
   if (master!=NULLP) delete master; /* recursive ~Parser() call */
   if (free_level>=2) delete tok;
   if (free_level>=3) delete rd;
-  if (free_level>=4) fclose((FILE*)f);
+  if (free_level>=4) fclose(PTS_align_cast(FILE*,f));
   if (specRunsDelete) delete0((VALUE)specRuns);
 }
 void MiniPS::Parser::addSpecRun(char const* filename_, GenBuffer::Readable *rd_) {

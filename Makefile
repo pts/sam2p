@@ -130,7 +130,7 @@ bts2.ttt: bts.ttt $(L1_LIST)
 clean:
 	rm -f *~ a.out DEADJOE core *.o *.tth .rgd *.rgd tmp.pin tmp.i tmp.ps0 tmp.h tmp.pst
 	rm -f $(ALL) $(ALL:=.yes) $(ALL:=.no) $(ALL:=.assert) $(ALL:=.checker)
-	-rmdir -f autom4te.cache
+	-rmdir -- autom4te.cache
 allclean: clean
 	rm -f configure config.h Makehelp config.cache config.log \
 	  config.status test.eps test.pdf
