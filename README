@@ -1814,6 +1814,17 @@ A31. -- library and .h incompatibilities
      -- to avoid forced dependencies
      -- checkergcc wouldn't work
 
+Q32. How do I specify the page size when printing a .ps file (-m and -e
+     command line options)?
+
+A32. You cannot. (Use -m to specify the margins.) The page size is
+     autodetected by your printer when the page is
+     printed. So you can print the same .ps file on different printers, and the
+     margins will be all right on all of them.
+
+     If you really have to specify the page size, edit the .ps file and
+     insert the `a4 ' or `letter ' command after the last %% line.
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
