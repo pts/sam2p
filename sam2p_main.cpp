@@ -521,7 +521,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
         else if (GenBuffer::nocase_strbegins(p, "GIF89a:")
               || GenBuffer::nocase_strbegins(p, "GIF:"))  FileFormat=Rule::Cache::FF_GIF89a;
         /* vvv do_stop_SampleFormat BUGFIX at Thu Nov 21 23:44:20 CET 2002 */
-        else if (GenBuffer::nocase_strbegins(p, "PNM:"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Gray1); APPEND_sf(Image::SF_Gray8); APPEND_sf(Image::SF_Rgb8); do_stop_SampleFormat=true; }
+        else if (GenBuffer::nocase_strbegins(p, "PNM:"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Gray1); APPEND_sf(Image::SF_Gray8); APPEND_sf(Image::SF_Rgb8); APPEND_sf(Image::SF_Transparent8); do_stop_SampleFormat=true; }
         else if (GenBuffer::nocase_strbegins(p, "PBM:"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Gray1); do_stop_SampleFormat=true; }
         else if (GenBuffer::nocase_strbegins(p, "PGM:"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Gray8); do_stop_SampleFormat=true; }
         else if (GenBuffer::nocase_strbegins(p, "PPM:"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Rgb8);  do_stop_SampleFormat=true; }
@@ -573,7 +573,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
             else if (0==GenBuffer::nocase_strcmp(pend, "ps"))   { FileFormat=Rule::Cache::FF_eps; if (Scale==Rule::CacheHints::SC_default) Scale=Rule::CacheHints::SC_RotateOK; }
             else if (0==GenBuffer::nocase_strcmp(pend, "pdf"))  FileFormat=Rule::Cache::FF_pdf;
             else if (0==GenBuffer::nocase_strcmp(pend, "gif"))  FileFormat=Rule::Cache::FF_GIF89a;
-            else if (0==GenBuffer::nocase_strcmp(pend, "pnm"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Gray1); APPEND_sf(Image::SF_Gray8); APPEND_sf(Image::SF_Rgb8); do_stop_SampleFormat=true; }
+            else if (0==GenBuffer::nocase_strcmp(pend, "pnm"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Gray1); APPEND_sf(Image::SF_Gray8); APPEND_sf(Image::SF_Rgb8); APPEND_sf(Image::SF_Transparent8); do_stop_SampleFormat=true; }
             else if (0==GenBuffer::nocase_strcmp(pend, "pbm"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Gray1); do_stop_SampleFormat=true; }
             else if (0==GenBuffer::nocase_strcmp(pend, "pgm"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Gray8); do_stop_SampleFormat=true; }
             else if (0==GenBuffer::nocase_strcmp(pend, "ppm"))  { FileFormat=Rule::Cache::FF_PNM; APPEND_sf(Image::SF_Rgb8);  do_stop_SampleFormat=true; }
