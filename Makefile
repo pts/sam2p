@@ -4,6 +4,8 @@
 # Sat Apr 20 19:14:11 CEST 2002
 # ccdep.pl at Sat Jun  1 15:51:36 CEST 2002
 #
+# To create a .tar.gz, run: make MAKE_DIST=0 dist-noautoconf
+#
 
 ifndef MAKE_DIST
 include Makehelp
