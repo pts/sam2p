@@ -961,7 +961,7 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
   // assert(0);
 
   bool overwrite=false;
-  if (0==strcmp(InputFile->begin_(), OutputFile->begin_())) {
+  if (0==strcmp(InputFile->begin_(), OutputFile->begin_()) && 0!=strcmp("-", InputFile->begin_())) {
     // Error::sev(Error::WARNING) << "job: InputFile == OutputFile" << (Error*)0;
     OutputFile->replace(OutputFile->begin_(), OutputFile->getLength(), ".s2new", 6);
     overwrite=true;

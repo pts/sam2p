@@ -1230,6 +1230,7 @@ static int DGifDecompressLine(CGIFFF GifFileType *GifFile, CGIFFF GifPixelType *
 	if (DGifDecompressInput(Private, &CrntCode) == GIF_ERROR)
     	    return GIF_ERROR;
 
+        /*fprintf(stderr,"CrntCode=0x%x\n",CrntCode);*/
 	if (CrntCode == EOFCode) {
 	    /* Note however that usually we will not be here as we will stop */
 	    /* decoding as soon as we got all the pixel, or EOF code will    */

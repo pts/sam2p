@@ -37,7 +37,8 @@ static Image::Sampled *in_gif_reader(Image::Loader::UFD *ufd, SimBuffer::Flat co
   CGIFFF SavedImage *sp;
   CGIFFF ColorMapObject *cm;
   char const *err;
-  
+
+  /* Dat: (CGIFFF GetGifError() || "unknown error") doesn't work like in Perl or Ruby */
   if (0==(giff=CGIFFF DGifOpenFILE(((Filter::UngetFILED*)ufd)->getFILE(/*seekable:*/false))) || GIF_ERROR==CGIFFF DGifSlurp(giff))
     Error::sev(Error::EERROR) << "GIF: " << ((err=CGIFFF GetGifError()) ? err : "unknown error") << (Error*)0;
   if (giff->ImageCount<1)
