@@ -29,7 +29,7 @@ if [ "$1" ]; then
   for F in "$@"; do EXTRA_FILES="$EXTRA_FILES$F
 "; done
 else
-  TAR_BASENAME="$MY_DIR"
+  TAR_BASENAME="$MYDIR"
   EXTRA_FILES=""
 fi
 

@@ -801,7 +801,7 @@ int main(int, char const*const* argv) {
   char const *long_argv0=argv[0]==(char const*)NULLP ? "sam2p" : argv[0];
   Error::argv0=Files::only_fext(long_argv0);
   Error::tmpargv0="_sam2p_";
-  Error::banner0="sam2p v0.39";
+  Error::banner0="sam2p v0.40";
 
   if (versionp) {
     sout << "This is " << Error::banner0 << ".\n";
