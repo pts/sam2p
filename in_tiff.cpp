@@ -39,7 +39,11 @@ static Image::Sampled *in_tiff_reader(Image::filep_t file_, SimBuffer::Flat cons
   // HelperE helper("tif22pnm -rgba %S"); /* tif22pnm <= 0.07 */
   char const *cmd=
   #if OS_COTY==COTY_WIN9X || OS_COTY==COTY_WINNT
-    "tifftonm <%S >%D\ntif22pnm -rgba %S pnm: %D"; /* slow but safe */
+#if 0 /* unsafe if both tifftopnm and png22pnm exist */
+    "tifftopnm <%S >%D\ntif22pnm -rgba %S pnm: %D"; /* slow but safe */
+#else
+    "tif22pnm -rgba %S pnm:";
+#endif
   #else
     #if OS_COTY==COTY_UNIX
       "(tif22pnm -rgba %S pnm: || tifftopnm %S)";
