@@ -77,14 +77,14 @@ bool GenBuffer::toInteger(unsigned long &dst) {
   /* Imp: several bases (2, 8, 10 and 16), ignore _too_long_ */
   /* Imp: check for overflow! */
   slen_t len=copyRange(numtmp, 0, sizeof(numtmp));
-  fprintf(stderr,"len=%d\n", len);
+  // fprintf(stderr,"len=%d\n", len);
   if (len>=sizeof(numtmp)) return true; /* too long */
   /* ASSERT(numtmp null-terminated) */
   char *p=numtmp;
   if (*p=='+') p++;
   unsigned long i=0;
   while (1) {
-    fprintf(stderr,"toInteger'%c'\n", *p);
+    // fprintf(stderr,"toInteger'%c'\n", *p);
     if (*p<'0' || *p>'9') break;
     i=10*i+(*p-'0');
     p++;
