@@ -1,0 +1,57 @@
+??: Project/Settings/(C/C++)/Precompiled Headers/Automatic use of precompiled headers/config2.h
+
+#if _MSC_VER > 1000
+# undef  __PROTOTYPES__
+# define __PROTOTYPES__ 1
+# undef  __VA_START_STDC__
+# define __VA_START_STDC__ 1
+# pragma warning(disable: 4127) /* conditional expression is constant */
+# pragma warning(disable: 4244) /* =' : conversion from 'int ' to 'unsigned char ', possible loss of data */
+# pragma warning(disable: 4250) /* 'SimBuffer::B' : inherits 'SimBuffer::Flat::getLength' via dominance */
+# pragma warning(disable: 4514) /* 'each_char' : unreferenced inline function has been removed */
+#endif
+#ifdef __STDC__
+# undef  __VA_START_STDC__
+# define __VA_START_STDC__ 1
+#endif
+
+cannot override:
+  GenBuffer::Writable& SimBuffer::B::vformat(slen_t n, char const *fmt, va_list ap) {
+  SimBuffer::B& SimBuffer::B::vformat(slen_t n, char const *fmt, va_list ap) {
+pipe_tmpl!=NULLP error C2446: '!=' : no conversion from 'void *' to 'const char *'
+
+The compiler does not support in-place initialization of static const integral member data as specified in the C++ standard
+-> enum; also p->curlev=(Error::level_t)-9999;
+
+cannot compile:
+    unsigned char (*QuantTables)[64]=(unsigned char (*)[64])NULLP, /*NULLP OK*/
+
+virtual /*Image::*/Indexed* toIndexed(); use of  undefined type 'Image'
+
+VC6.0 bug?: A::B::f(...) -> B::f(...)
+
+VC6.0 editora 2048 karaktert bir soronkent, tobbit wrap
+
+FileView popup menuben nincs delete menupont (Delete gomb OK)
+
+meglepoen gyorsan fordit (kimerni!)
+
+VC6.0 warning fogott egy bugot: assignment within conditional expression
+
+bts2.tth tul hosszu... fatal error C1076: compiler limit : internal heap limit reached; use /Zm to specify a higher limit
+/Zm999 max ennyit eszik meg, de meg ez is keves ::-)
+
+:-)) bts2.tth SUXX: error C2026: string too big, trailing characters truncated
+
+Imp: pts.xpm: unknown color
+Imp: \r\n
+Imp: warnings
+Imp: sprintf
+Imp:
+  #define HAVE_STATIC_CONST 1
+  class A { static const int i=1; };
+Imp: _open -> fopen()
+Imp: #if !defined(HAVE_SNPRINTF) || !defined(HAVE_C99_VSNPRINTF)
+Imp: xpmc.h ""\
+Imp: bts2.tth
+Imp: diff -r ""\
