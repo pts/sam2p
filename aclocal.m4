@@ -30,14 +30,14 @@ AC_TRY_RUN([
 #undef volatile
 #undef inline
 #include <stdio.h>
-main(){FILE *f=fopen("conftestval", "w");
-  if (!f) exit(1);
+int main(){FILE *f=fopen("conftestval", "w");
+  if (!f) return 1;
   fprintf(f, "ac_cv_sizeof_char=%d\n", sizeof(char));
   fprintf(f, "ac_cv_sizeof_char_p=%d\n", sizeof(char*));
   fprintf(f, "ac_cv_sizeof_short=%d\n", sizeof(short));
   fprintf(f, "ac_cv_sizeof_int=%d\n", sizeof(int));
   fprintf(f, "ac_cv_sizeof_long=%d\n", sizeof(long));
-  exit(0);
+  return 0; /* exit(0); -- return is more portable */
 }], eval "`cat conftestval`", , ac_cv_sizeof_char=-1)])
 AC_MSG_RESULT($ac_cv_sizeof_char)
 AC_DEFINE_UNQUOTED(SIZEOF_CHAR, $ac_cv_sizeof_char)
@@ -129,12 +129,11 @@ AC_MSG_CHECKING(size of $1)
 AC_CACHE_VAL(AC_CV_NAME,
 [AC_TRY_RUN([#include <stdio.h>
 #include <sys/types.h>
-main()
-{
+int main() {
   FILE *f=fopen("conftestval", "w");
-  if (!f) exit(1);
+  if (!f) return 1;
   fprintf(f, "%d\n", sizeof($1));
-  exit(0);
+  return 0;
 }], AC_CV_NAME=`cat conftestval`, AC_CV_NAME=0, ifelse([$2], , , AC_CV_NAME=$2))])dnl
 AC_MSG_RESULT($AC_CV_NAME)
 AC_DEFINE_UNQUOTED(AC_TYPE_NAME, $AC_CV_NAME)
@@ -319,14 +318,20 @@ dnl implies check for AC_PTS_HAVE_PROTOTYPES, AC_HEADER_STDC
   AC_REQUIRE([AC_HEADER_STDC])
   AC_REQUIRE([AC_PTS_HAVE_PROTOTYPES])
   AC_CACHE_CHECK(whether cc compiles standard C, ac_cv_pts_have_stdc, [
-    AC_EGREP_CPP(no, [
+    AC_EGREP_CPP(nope, [
 #if defined(__STDC__) && __STDC__
   /* note: the starting spaces are deliberate in the next line */
   #if 0
-   no
+    nope
   #endif
 #else
-  no
+#if defined(__cplusplus) && __cplusplus
+  #if 0
+    nope
+  #endif
+#else
+  nope
+#endif
 #endif
     ], ac_cv_pts_have_stdc=no, [
       if test x"$ac_cv_pts_have_prototypes" = xyes; then
@@ -651,6 +656,13 @@ dnl on kempelen: ac_cv_pts_vsnprintf=bad
 AC_DEFUN([AC_PTS_HAVE_VSNPRINTF], [
   AC_CACHE_CHECK(for working vsnprintf, ac_cv_pts_vsnprintf, [
     AC_TRY_RUN([
+#if 0 /* autoconf-2.54 */
+  extern "C" void std::exit (int) throw (); using std::exit;
+  extern "C" void std::exit (int); using std::exit;
+  extern "C" void exit (int) throw ();
+  extern "C" void exit (int);
+  void exit (int);
+#endif
 #ifdef __cplusplus
 extern "C" void exit(int);
 #endif                     
@@ -1009,8 +1021,8 @@ AC_TRY_RUN(
 #if !defined(__STDC__) || __STDC__ != 1
 #define volatile
 #endif
-main() {
-  volatile char c = 255; exit(c < 0);
+int main() {
+  volatile char c = 255; return(c < 0);
 }], ac_cv_c_char_unsigned=yes, ac_cv_c_char_unsigned=no,
   [AC_MSG_ERROR(cross compiling not supported by .._PTS_C_CHAR_UNSIGNED)])
 fi])
