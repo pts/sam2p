@@ -1,3 +1,15 @@
+config-vc6.h
+sam2p16.ico
+sam2p32.ico
+vcsam2p.ico
+vcsam2p.cpp
+vcsam2p.dsp
+vcsam2p.h
+vcsam2p.ico
+vcsam2p.rc
+resource.h
+StdAfx.cpp
+StdAfx.h
 hq.pl
 c_lgcc.cpp
 c_lgcc3.cpp

@@ -572,7 +572,7 @@ int main
 { 
   (void)argc;
   (void)argv;
-  if (0!=system("echo \"let  it\" be  e >conftestval")) {
+  if (0!=system("echo t >conftestval && echo \"let  it\" be  e >conftestval")) {
     FILE *f=fopen("conftestval","w");
     if (f) {
       fprintf(f,"runtime-error\n");
@@ -586,9 +586,12 @@ int main
       [AC_MSG_ERROR(cross compiling not supported by .._PTS_HAVE_VSNPRINTF)]
     )
     # echo "($ac_cv_pts_systemf)"
-    if test x"$ac_cv_pts_systemf" = x'"let  it" be  e '; then
+    # if test x"$ac_cv_pts_systemf" = x'"let  it" be  e '; then
+    if test x"$ac_cv_pts_systemf" = x't  && echo "let  it" be  e '; then
+      # Win32 COMMAND.COM
       ac_cv_pts_systemf=win32
     elif test x"$ac_cv_pts_systemf" = x"let  it be e"; then
+      # UNIX /bin/sh
       ac_cv_pts_systemf=unix
     fi
   ])

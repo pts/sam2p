@@ -140,7 +140,6 @@ dist: distclean dist-noautoconf
 dist-noautoconf:
 	chmod 755 configure
 	$(BASH) mkdist.sh
-	$(BASH) -c 'NEED=encoder.cpp; source ./mkdist.sh'
 # vvv Create a distribution with more files to aid compilation
 dist-more: bts2.tth
 	$(BASH) mkdist.sh sam2p-more bts2.tth

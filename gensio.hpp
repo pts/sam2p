@@ -255,14 +255,16 @@ class Files {
   /** @param fname must start with '/' (dir separator)
    * @return true if file successfully created
    */
-  static FILE *try_dir(SimBuffer::B &dir, SimBuffer::B const&fname, char const*s1, char const*s2);
+  static FILE *try_dir(SimBuffer::B &dir, SimBuffer::B const&fname, char const*s1, char const*s2, char const*open_mode="wb");
   /* @param dir `dir' is empty: appends a unique filename for a temporary
    *        file. Otherwise: returns a unique filename in the specified directory.
    *        Creates the new file with 0 size.
+   * @param extension NULLP or a string specifying the extension of the file
+   *        to create (should beginn with ".")
    * @return FILE* opened for writing for success, NULLP on failure
    * --return true on success, false on failure
    */
-  static FILE *open_tmpnam(SimBuffer::B &dir);
+  static FILE *open_tmpnam(SimBuffer::B &dir, bool binary_p=true, char const*extension=(char const*)NULLP);
   static bool find_tmpnam(SimBuffer::B &dir);
   /** Calls lstat().
    * @return (slen_t)-1 on error, the size otherwise
@@ -298,6 +300,12 @@ class Files {
   #else
     static inline void set_binary_mode(int,bool) {}
   #endif
+
+  /** Like the system(3) call, but it is able to run a string containing
+   * multiple lines of commands. On Win32, it creates a batch file if
+   * necessary.
+   */
+  static int system3(char const *commands);
 };
 
 #endif

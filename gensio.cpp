@@ -9,9 +9,9 @@
 
 #if 0
 extern "C" int errno;
-/* Imp: autodetect with autoconf */
-extern "C" int lstat(const char *file_name, struct stat *buf);
-/* vvv Imp: not in ANSI C, but we cannot emulate it! */
+/* OK: autodetect with autoconf */
+extern "C" int _l_stat(const char *file_name, struct stat *buf);
+/* OK: Imp: not in ANSI C, but we cannot emulate it! */
 extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list ap );
 #else
 #undef __STRICT_ANSI__ /* for __MINGW32__ */
@@ -283,7 +283,7 @@ void Filter::PipeE::vi_write(char const*buf, slen_t len) {
     if (tmpsname) {
      #if HAVE_system_in_stdlib
       fclose(p);
-      if (0!=(system(redir_cmd()))) Error::sev(Error::ERROR) << "Filter::PipeE" << ": system() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
+      if (0!=(Files::system3(redir_cmd()))) Error::sev(Error::ERROR) << "Filter::PipeE" << ": system() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
       remove(tmpsname());
      #endif /* Dat: else is not required; would be unreachable code. */
     } else {
@@ -397,7 +397,7 @@ slen_t Filter::PipeD::vi_read(char *tobuf, slen_t tolen) {
       vi_precopy();
       in.vi_read(0,0);
       fclose(p);
-      if (0!=(system(redir_cmd()))) Error::sev(Error::ERROR) << "Filter::PipeD" << ": system() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
+      if (0!=(Files::system3(redir_cmd()))) Error::sev(Error::ERROR) << "Filter::PipeD" << ": system() failed: " << (SimBuffer::B().appendDumpC(redir_cmd)) << (Error*)0;
       remove(tmpsname());
      #endif
     }
@@ -499,7 +499,7 @@ slen_t Filter::FlatR::vi_read(char *to_buf, slen_t max) {
 /** @param fname must start with '/' (dir separator)
  * @return true if file successfully created
  */
-FILE *Files::try_dir(SimBuffer::B &dir, SimBuffer::B const&fname, char const*s1, char const*s2) {
+FILE *Files::try_dir(SimBuffer::B &dir, SimBuffer::B const&fname, char const*s1, char const*s2, char const*open_mode) {
   if (dir.isEmpty() && s1==(char const*)NULLP) return (FILE*)NULLP;
   SimBuffer::B full(s1!=(char const*)NULLP?s1:dir(),
                     s1!=(char const*)NULLP?strlen(s1):dir.getLength(),
@@ -510,12 +510,18 @@ FILE *Files::try_dir(SimBuffer::B &dir, SimBuffer::B const&fname, char const*s1,
   FILE *f;
   /* Imp: avoid race conditions with other processes pretending to be us... */
   if (-1!=PTS_lstat(full(), &st)
-   || (0==(f=fopen(full(), "wb")))
+   || (0==(f=fopen(full(), open_mode)))
    || ferror(f)
      ) return (FILE*)NULLP;
   dir=full;
   return f;
 }
+
+#if OS_COTY==COTY_WIN9X || OS_COTY==COTY_WINNT
+#  define DIR_SEP "\\"
+#else
+#  define DIR_SEP "/"
+#endif
 
 /* @param dir `dir' is empty: appends a unique filename for a temporary
  *        file. Otherwise: returns a unique filename in the specified directory.
@@ -523,31 +529,36 @@ FILE *Files::try_dir(SimBuffer::B &dir, SimBuffer::B const&fname, char const*s1,
  * @return FILE* opened for writing for success, NULLP on failure
  * --return true on success, false on failure
  */
-FILE *Files::open_tmpnam(SimBuffer::B &dir) {
+FILE *Files::open_tmpnam(SimBuffer::B &dir, bool binary_p, char const*extension) {
   /* Imp: verify / on Win32... */
   /* Imp: ensure uniqueness on NFS */
   /* Imp: short file names */
   static unsigned PTS_INT32_T counter=0;
   assert(Error::tmpargv0!=(char const*)NULLP);
-  SimBuffer::B fname("/tmp_", 5, Error::tmpargv0,strlen(Error::tmpargv0));
+  SimBuffer::B fname(DIR_SEP "tmp_", 5, Error::tmpargv0,strlen(Error::tmpargv0));
+  /* ^^^ Dat: we need DIR_SEP here, because the name of the tmp file may be
+   * passed to Win32 COMMAND.COM, which interprets "/" as a switch
+   */
   fname << '_' << getpid() << '_' << counter++;
+  if (extension) fname << extension;
   fname.term0();
   FILE *f=(FILE*)NULLP;
-  (void)( ((FILE*)NULLP!=(f=try_dir(dir, fname, 0, 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, PTS_CFG_P_TMPDIR, 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("TMPDIR"), 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("TMP"), 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("TEMP"), 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, "/tmp", 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("WINBOOTDIR"), "//temp"))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("WINDIR"), "//temp"))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, "c:/temp", 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, "c:/windows/temp", 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, "c:/winnt/temp", 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, "c:/tmp", 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, ".", 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, "..", 0))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, "../..", 0)) ));
+  char const* open_mode=binary_p ? "wb" : "w"; /* Dat: "bw" is bad */
+  (void)( ((FILE*)NULLP!=(f=try_dir(dir, fname, 0, 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, PTS_CFG_P_TMPDIR, 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("TMPDIR"), 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("TMP"), 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("TEMP"), 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, "/tmp", 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("WINBOOTDIR"), "//temp", open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("WINDIR"), "//temp", open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, "c:/temp", 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, "c:/windows/temp", 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, "c:/winnt/temp", 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, "c:/tmp", 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, ".", 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, "..", 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, "../..", 0, open_mode))) );
   return f;
 };
 
@@ -619,5 +630,27 @@ void Files::set_binary_mode(int fd, bool binary) {
   setmode(fd, binary ? O_BINARY : O_TEXT);
 }
 #endif
+
+int Files::system3(char const *commands) {
+  #if OS_COTY==COTY_WIN9X || OS_COTY==COTY_WINNT
+    char const *p;
+    p=commands; while (*p!='\0' && *p!='\n') p++;
+    if (*p=='\0') return system(commands); /* no newline -- simple run */
+    SimBuffer::B tmpnam;
+    FILE *f=Files::open_tmpnam(tmpnam, /*binary_p:*/false, ".bat");
+    tmpnam.term0();
+    Files::tmpRemoveCleanup(tmpnam());
+    fprintf(f, "@echo off\n%s\n", commands);
+    if (ferror(f)) Error::sev(Error::ERROR) << "system3: write to tmp .bat file: " << tmpnam << (Error*)NULLP;
+    fclose(f);
+    // printf("(%s)\n", tmpnam()); system("bash");
+    // int ret=system(("sh "+tmpnam)());
+    int ret=system(tmpnam());
+    remove(tmpnam());
+    return ret;
+  #else
+    return system(commands);
+  #endif
+}
 
 /* __END__ */

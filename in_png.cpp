@@ -33,7 +33,17 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
 
 static Image::Sampled *in_png_reader(Image::filep_t file_, SimBuffer::Flat const&) {
   // Error::sev(Error::ERROR) << "Cannot load PNG images yet." << (Error*)0;
-  HelperE helper("(pngtopnm <%S && pngtopnm -alpha <%S) >%D"); /* Run external process `djpeg' to convert JPEG -> PNM */
+  char const* cmd=
+  #if OS_COTY==COTY_WIN9X || OS_COTY==COTY_WINNT
+    "pngtopnm %S >%D\npngtopnm -alpha %S >>%D";
+  #else
+    #if OS_COTY==COTY_UNIX
+      "(pngtopnm <%S && pngtopnm -alpha <%S) >%D";
+    #else
+      "pngtopnm %S >%D\npngtopnm -alpha %S >>%D";
+    #endif
+  #endif
+  HelperE helper(cmd); /* Run external process pngtopnm */
   Encoder::writeFrom(*(Filter::PipeE*)&helper, (FILE*)file_);
   ((Filter::PipeE*)&helper)->vi_write(0,0); /* Signal EOF */
   return helper.getImg();

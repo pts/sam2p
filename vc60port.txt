@@ -43,6 +43,10 @@ bts2.tth tul hosszu... fatal error C1076: compiler limit : internal heap limit r
 
 :-)) bts2.tth SUXX: error C2026: string too big, trailing characters truncated
 
+igloo, wincvs nem tudnak SSH-s cvs-t. WinCVS azt mondja magáról, hogy tud;
+  de nincs értelmes hibaüzenet, és nincs olyan ablak, amirõl a
+  dokumentáció írja, hogy ott kell beállítani
+
 Imp: merge 0.40, diff -r ""
 Imp: pts.xpm: unknown color
 Imp: test vc++

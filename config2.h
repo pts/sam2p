@@ -10,7 +10,11 @@
 #  define ASSERT_SIDE2(x,y) assert(x y)
 #endif
 
-#include "config.h"
+#if _MSC_VER > 1000
+#  include "config-vc6.h"
+#else
+#  include "config.h"
+#endif
 
 #if 0
 /* vvv i386 Debian slink gcc */

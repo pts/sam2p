@@ -4986,7 +4986,7 @@ int main
 {
   (void)argc;
   (void)argv;
-  if (0!=system("echo \"let  it\" be  e >conftestval")) {
+  if (0!=system("echo t >conftestval && echo \"let  it\" be  e >conftestval")) {
     FILE *f=fopen("conftestval","w");
     if (f) {
       fprintf(f,"runtime-error\n");
@@ -5019,9 +5019,12 @@ fi
 rm -f core core.* *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
 fi
     # echo "($ac_cv_pts_systemf)"
-    if test x"$ac_cv_pts_systemf" = x'"let  it" be  e '; then
+    # if test x"$ac_cv_pts_systemf" = x'"let  it" be  e '; then
+    if test x"$ac_cv_pts_systemf" = x't  && echo "let  it" be  e '; then
+      # Win32 COMMAND.COM
       ac_cv_pts_systemf=win32
     elif test x"$ac_cv_pts_systemf" = x"let  it be e"; then
+      # UNIX /bin/sh
       ac_cv_pts_systemf=unix
     fi
 
@@ -7010,7 +7013,7 @@ fi
 rm -f Makedep
 ac_n="${ac_n:-$ECHO_N}"
 echo $ac_n "running make Makedep""... $ac_c" 1>&6
-echo "configure:7013: running make Makedep" >&5
+echo "configure:7016: running make Makedep" >&5
 if >&5 2>&5 make Makedep; then :
   echo "$as_me:$LINENO: result: ok" >&5
 echo "${ECHO_T}ok" >&6
@@ -7023,7 +7026,7 @@ echo "$as_me: error: cannot compute depends" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-echo "configure:7026: all OK" >&5
+echo "configure:7029: all OK" >&5
 
 echo "configure done. Now you should run: make; make install"
 
