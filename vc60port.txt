@@ -55,3 +55,5 @@ Imp: #if !defined(HAVE_SNPRINTF) || !defined(HAVE_C99_VSNPRINTF)
 Imp: xpmc.h ""\
 Imp: bts2.tth
 Imp: diff -r ""\
+Imp: chmod +x ./configure
+Imp: grep '!!'

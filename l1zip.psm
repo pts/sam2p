@@ -151,9 +151,9 @@ begin
 #if USE_SHORT_NAMES
 % Free for short names: *?\^_`| BFGIKLMNPQRTUVWYZ efhklmnopqrsvwz
 % Numerical comments denote # calls or # accesses
-%: B: TokSubs
+% : B: TokSubs
 %<D F Bary/> /* F must be overridden with array to avoid early TokSubs */
-%: G
+% : G
 %<D I fxIgnore8/> % ? + 3
 %<D K Sbuf/>
 %<D L fvFree/> % 5

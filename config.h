@@ -129,7 +129,7 @@
 #define HAVE_sprintf_in_stdio 1
 #define HAVE_write_in_unistd 1
 #define HAVE_system_in_stdlib 1
-#define HAVE_PTS_STDC 1
+/* #undef HAVE_PTS_STDC */
 /* #undef HAVE_SWITCH_ENUM_BUG */
 #define HAVE_ASCII_SYSTEM 1
 #define PTS_CFG_P_TMPDIR "/tmp"

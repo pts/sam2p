@@ -170,7 +170,7 @@ dnl AC_DEFINE(PTS_INT128_T, 42) # Dat: includes to conftest.h, config.h
 dnl cat confdefs.h # Dat: contains already AC_DEFINE()d symbols
 
 dnl Checks for typedefs, structures, and compiler characteristics.
-AC_TYPE_SIZE_T
+dnl AC_TYPE_SIZE_T
 AC_PTS_CHECK_INTEGRAL_TYPE(size_t, unsigned)
 dnl AC_PTS_CHECK_INTEGRAL_TYPE(time_t, unsigned)
 dnl AC_PTS_CHECK_INTEGRAL_TYPE(mode_t, int)
