@@ -1,3 +1,9 @@
+sam2p (0.44-3) unstable; urgency=low
+
+  * minor fixes, documentation addons
+
+ -- Szabó Péter <pts@math.bme.hu>  Tue,  1 Jun 2004 18:50:15 +0200
+
 sam2p (0.44-2) unstable; urgency=low
 
   * Added answers to FAQ in README.

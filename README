@@ -2497,6 +2497,7 @@ Further changes moved to debian/changelog.
 
 Missing feature list
 ~~~~~~~~~~~~~~~~~~~~
+!! make mkdist-noautoconf creates .tar.gz w/o leading directory part
 !! cannot read t.pnm "P4 1 1 1" doesn't end with \S
 !! ./sam2p ../pts.ppm t.gif -> sam2p: out_gif.cpp:260: void out_gif_write(GenBuffer::Writable&, Image::Indexed*): Assertion `bits_per_pixel<=8' failed.
 !! why so large PNG? sam2p examples/chessboard_ascii.pnm t.png

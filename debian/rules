@@ -42,7 +42,10 @@ define checkdir
 	test -f debian/rules
 endef
 
-binary: binary-indep binary-arch
+binary:
+	$(checkdir)
+	if test root = "`whoami`"; then $(MAKE) -f debian/rules binary-indep binary-arch; \
+	else                   fakeroot $(MAKE) -f debian/rules binary-indep binary-arch; fi
 
 checkroot:
 	$(checkdir)
@@ -50,6 +53,17 @@ checkroot:
 
 .PHONY: binary binary-arch binary-indep clean checkroot
 
-.PHONY: source  
-source: clean
-	DIR="`pwd`";DIR="$${DIR##*/}"; cd .. && dpkg-source -b "$$DIR"
+.PHONY: source source-here
+source-here:
+	rm -rf debsrc
+	mkdir -p debsrc/debian
+	cp -a $(wildcard $(addprefix debian/,README.debian docs changelog control copyright dirs rules prerm postrm postinst preinst)) debsrc/debian
+	$(MAKEF) install-debsrc
+	DIR="`<debian/changelog perl -ne 'print if s@^(\S+) [(]([^)]+?)(?:-\d+)?[)].*@$$1-$$2@;last'`" && \
+	  test ! -d "$$DIR" && \
+	  mv debsrc "$$DIR" && \
+	  (dpkg-source -b "$$DIR";true) && \
+	  rm -rf "$$DIR"
+
+source: source-here
+	mv $(package)_*-*.tar.gz $(package)_*-*.dsc ..
