@@ -147,7 +147,12 @@ class Rule { public:
     MiniPS::String *Created, *Produced;
     MiniPS::Dict *DCT;
     /** MiniPS::Real* or integer */
-    MiniPS::VALUE TopMargin, BottomMargin, LeftMargin, RightMargin; 
+    MiniPS::VALUE TopMargin, BottomMargin, LeftMargin, RightMargin;
+    /** MiniPS::Real* or integer. Specifies the dimension the image should
+     * be lowered below the baseline for (PostScript or PDF) output with
+     * /Scale/None. Default to 0.
+     */
+    MiniPS::VALUE LowerMargin;
 
     static char const* dumpScale(sc_t Scale);
   };

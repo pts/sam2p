@@ -385,6 +385,7 @@ void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
     "BottomMargin",    MiniPS::S_NUMBER,  MiniPS::Qinteger(0),   &cacheHints.BottomMargin,
     "LeftMargin",      MiniPS::S_NUMBER,  MiniPS::Qinteger(0),   &cacheHints.LeftMargin,
     "RightMargin",     MiniPS::S_NUMBER,  MiniPS::Qinteger(0),   &cacheHints.RightMargin,
+    "LowerMargin",     MiniPS::S_NUMBER,  MiniPS::Qinteger(0),   &cacheHints.LowerMargin,
 
     "Comment",         MiniPS::T_STRING,  MiniPS::Qnull,         &cacheHints.Comment,
     "Title",           MiniPS::T_STRING,  MiniPS::Qnull,         &cacheHints.Title,
@@ -412,6 +413,7 @@ void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
     MiniPS::setDumpPS(cacheHints.BottomMargin, true);
     MiniPS::setDumpPS(cacheHints.LeftMargin, true);
     MiniPS::setDumpPS(cacheHints.RightMargin, true);
+    MiniPS::setDumpPS(cacheHints.LowerMargin, true);
   }
   cacheHints.DCT=MiniPS::RDICT(DCT);
   cacheHints.EncoderColumns=MiniPS::int2ii(EncoderColumns);
@@ -932,38 +934,41 @@ void Rule::writeTTE(
       break;
      case 'X': /* BoundingBox for EPS, MediaBox for PDF */
       if (or_->cache.isPDF()) {
-        out << "0 0 ";
-        MiniPS::dumpAdd3(out, MiniPS::Qinteger(img->getWd()),
-          or_->cacheHints.LeftMargin, or_->cacheHints.RightMargin, 2);
-        out << ' ';
-        MiniPS::dumpAdd3(out, MiniPS::Qinteger(img->getHt()),
-          or_->cacheHints.TopMargin, or_->cacheHints.BottomMargin, 2);
+        // out << "0 0 ";
+        out << "0 ";
+        goto do_bbox;
       } else if (or_->cacheHints.Scale==or_->cacheHints.SC_None) {
         /* It is no point to start the BoundingBox of EPS files at
          * (LeftMargin,BottomMargin). The effect would be the same as
          * specifying no margins at all.  Our choice is better: the
          * BoundingBox contains the image and the margins too.
          */
-        out << "%%BoundingBox: 0 0 ";
+        // out << "%%BoundingBox: 0 0 ";
+        out << "%%BoundingBox: 0 ";
+       do_bbox:
+        // out << MiniPS::RVALUE(or_->cacheHints.LowerMargin) << ';'; /* SUXX: this would put `1 72 mul' */
+        // out << MiniPS::RVALUE(or_->cacheHints.BottomMargin) << ';'; /* SUXX: this would put `1 72 mul' */
+        MiniPS::dumpAdd3(out, MiniPS::Qinteger(0), MiniPS::Qinteger(0), or_->cacheHints.LowerMargin, or_->cacheHints.BottomMargin, 1);
+        out << ' ';
         MiniPS::dumpAdd3(out, MiniPS::Qinteger(img->getWd()),
-          or_->cacheHints.LeftMargin, or_->cacheHints.RightMargin, 2);
+          or_->cacheHints.LeftMargin, or_->cacheHints.RightMargin, MiniPS::Qinteger(0), 2);
         out << ' ';
         MiniPS::dumpAdd3(out, MiniPS::Qinteger(img->getHt()),
-          or_->cacheHints.TopMargin, or_->cacheHints.BottomMargin, 2);
-        out << '\n';
+          or_->cacheHints.TopMargin, or_->cacheHints.LowerMargin, MiniPS::Qinteger(0), 2);
+        if (!or_->cache.isPDF()) out << '\n';
       }
       break;
      case 's': /* scaling to a full PostScript page or translation for PDF and EPS */
-      nzp=!(MiniPS::isZero(or_->cacheHints.BottomMargin)
+      nzp=!(MiniPS::isZero(or_->cacheHints.LowerMargin)
          && MiniPS::isZero(or_->cacheHints.TopMargin));
       if (or_->cache.isPDF()) {
         if (nzp) out << " 1 0 0 1 " << MiniPS::RVALUE(or_->cacheHints.LeftMargin)
-                             << ' ' << MiniPS::RVALUE(or_->cacheHints.BottomMargin)
+                             << ' ' << MiniPS::RVALUE(or_->cacheHints.LowerMargin)
                      << " cm"; /* translate */
       } else switch (or_->cacheHints.Scale) {
        case or_->cacheHints.SC_None:
         if (nzp) out << '\n' << MiniPS::RVALUE(or_->cacheHints.LeftMargin)
-                     << ' '  << MiniPS::RVALUE(or_->cacheHints.BottomMargin)
+                     << ' '  << MiniPS::RVALUE(or_->cacheHints.LowerMargin)
                      << " translate";
         break;
        case or_->cacheHints.SC_OK:

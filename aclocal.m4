@@ -13,7 +13,7 @@ dnl autoconf-2.54 is good (verified at Wed Dec 11 15:28:28 CET 2002)
 AC_PREREQ([2.14])
 
 dnl stupid autoconf-2.54 does #include <stdlib.h>
-m4_define([_AC_PROG_CXX_EXIT_DECLARATION],[])
+m4_define([_AC_PROG_CXX_EXIT_DECLARATION],[:])
 
 AC_DEFUN([AC_PTS_CHECK_INTEGRALS],[
 dnl Checks for integral sizes.

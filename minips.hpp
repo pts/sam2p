@@ -151,6 +151,7 @@ class MiniPS {
     double d;
     /* vvv metric added at Sat Sep  7 12:26:08 CEST 2002 */
     metric_t metric;
+    /** Allow PostScript operators such as `div' to appear in the dump */
     bool dumpPS;
     /** Factor to convert to bp */
     static const double me_factor[ME_COUNT];
@@ -289,15 +290,16 @@ class MiniPS {
   static void setDumpPS(VALUE v, bool g);
   /** @param v must be T_REAL or T_INTEGER */
   static bool isZero(VALUE v);
-  /** Dumps the human-readable real or integer value of the sum a+b+c
+  /** Dumps the human-readable real or integer value of the sum a+b+c-sub
    * to `out'.
    * @param rounding 0: nothing. 1: round the sum _up_ to integers. 2:
    *        round the sum _up_ to non-negative integers
    * @param a must be T_REAL or T_INTEGER
    * @param b must be T_REAL or T_INTEGER
    * @param c must be T_REAL or T_INTEGER
+   * @param sub must be T_REAL or T_INTEGER
    */
-  static void dumpAdd3(GenBuffer::Writable &out, VALUE a, VALUE b, VALUE c, unsigned rounding=0);
+  static void dumpAdd3(GenBuffer::Writable &out, VALUE a, VALUE b, VALUE c, VALUE sub, unsigned rounding=0);
 };
 
 /* Fri Aug 16 17:07:14 CEST 2002 */

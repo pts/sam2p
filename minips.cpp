@@ -966,7 +966,7 @@ bool MiniPS::isZero(MiniPS::VALUE v) {
   return false; /* NOTREACHED */
 }
 
-void MiniPS::dumpAdd3(GenBuffer::Writable &out, MiniPS::VALUE a, MiniPS::VALUE b, MiniPS::VALUE c, unsigned rounding) {
+void MiniPS::dumpAdd3(GenBuffer::Writable &out, MiniPS::VALUE a, MiniPS::VALUE b, MiniPS::VALUE c, MiniPS::VALUE sub, unsigned rounding) {
   long ll;
   #if 1
     /* Sat Sep  7 15:30:28 CEST 2002 */
@@ -974,15 +974,21 @@ void MiniPS::dumpAdd3(GenBuffer::Writable &out, MiniPS::VALUE a, MiniPS::VALUE b
     double d=0, dd;
     long l=0;
     MiniPS::VALUE t[3], *tt=t+3;  t[0]=a; t[1]=b; t[2]=c;
+    unsigned subt=getType(sub);
     while (tt--!=t) switch (getType(*tt)) {
      case T_REAL: if ((dd=RREAL(*tt)->getBp())!=0) { d+=dd; no_real_real=false; } break;
      case T_INTEGER: if ((ll=int2ii(*tt))!=0) { d+=ll; l+=ll; }  break;
-     default: Error::sev(Error::ERROR) << "dumpAdd3: numbers expected" << (Error*)0;
+     default: err: Error::sev(Error::ERROR) << "dumpAdd3: numbers expected" << (Error*)0;
+    }
+    switch (subt) {
+     case T_REAL:    d-=RREAL(sub)->getBp(); no_real_real=false; break;
+     case T_INTEGER: d-=int2ii(sub); l-=int2ii(sub); break;
+     default: goto err;
     }
     if (no_real_real) { out << l; return; }
   #else
     /* Sat Sep  7 15:16:12 CEST 2002 */
-    unsigned at=getType(a), bt=getType(b), ct=getType(c);
+    unsigned at=getType(a), bt=getType(b), ct=getType(c), subt=getType(sub);
     if (at==T_INTEGER && bt==T_INTEGER && ct==T_INTEGER) {
       out << int2ii(a)+int2ii(b)+int2ii(c);
       return;
@@ -1002,6 +1008,11 @@ void MiniPS::dumpAdd3(GenBuffer::Writable &out, MiniPS::VALUE a, MiniPS::VALUE b
     switch (ct) {
      case T_REAL:    d+=RREAL(c)->getBp(); break;
      case T_INTEGER: d+=int2ii(c); break;
+     default: goto err;
+    }
+    switch (subt) {
+     case T_REAL:    d-=RREAL(sub)->getBp(); break;
+     case T_INTEGER: d-=int2ii(sub); break;
      default: err: Error::sev(Error::ERROR) << "dumpAdd3: numbers expected" << (Error*)0;
     }
   #endif
@@ -1011,7 +1022,7 @@ void MiniPS::dumpAdd3(GenBuffer::Writable &out, MiniPS::VALUE a, MiniPS::VALUE b
     assert((double)ll>=d); /* Imp: verify possible rounding errors */
     out << (rounding>=2 && ll<0 ? 0 : ll);
   } else {
-    char buf[64]; /* Imp: should be enough?? */
+    char buf[64]; /* Imp: should be enough?? */ /* Imp: precision > %.6g */
     sprintf(buf, "%g", d);
     out << buf;
   }
