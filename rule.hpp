@@ -46,6 +46,11 @@ class Rule { public:
     END_STATIC_ENUM()
     ff_t FileFormat;
     Image::sf_t SampleFormat;
+    /** Used only in appliers.cpp when _check_rule() changes SampleFormat so
+     * setSampleFormat() called before _work() would set that dummy
+     * SampleFormat.
+     */
+    Image::sf_t origSampleFormat;
     BEGIN_STATIC_ENUM(unsigned char,te_t)
       TE_default=0, /* only for one-liner */
       TE_Binary=1,

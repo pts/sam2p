@@ -14,7 +14,7 @@ extern "C" int lstat(const char *file_name, struct stat *buf);
 /* vvv Imp: not in ANSI C, but we cannot emulate it! */
 extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list ap );
 #else
-#undef __STRICT_ANSI__ /* __MINGW__ */
+#undef __STRICT_ANSI__ /* for __MINGW32__ */
 #define _BSD_SOURCE 1 /* vsnprintf(); may be emulated with fixup_vsnprintf() */
 #define _POSIX_SOURCE 1 /* also popen() */
 #define _POSIX_C_SOURCE 2 /* also popen() */
@@ -222,6 +222,7 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
       /* ^^^ multiple %escape is now a supported feature */
       if (!*pp && !Files::find_tmpnam(*pp)) Error::sev(Error::ERROR) << "Filter::PipeE" << ": tmpnam() failed" << (Error*)0;
       assert(! !*pp); /* pacify VC6.0 */
+      *pp << ext;
       pp->term0();
       if ((unsigned char)(s[-1]-'A')<(unsigned char)('Z'-'A'))
         redir_cmd.appendFnq(*pp); /* Capital letter: quote from the shell */

@@ -740,7 +740,8 @@ Image::Indexed *Image::Indexed::calcAlpha() {
     while (to!=toend) {
       #if 1 /* add ->pal[0] funcitonality at Sat Jun 15 14:24:25 CEST 2002 */
         i=0; i8=256;
-        while ((i8>>=1)!=0) if (*p++==transpx) { p[-1]=1; i|=i8; }
+        /* vvv p[-1]=0 BUGFIX at Sun Dec  8 23:21:47 CET 2002 */
+        while ((i8>>=1)!=0) if (*p++==transpx) { p[-1]=0; i|=i8; }
       #else
         i =(*p++==transpx)<<7; i|=(*p++==transpx)<<6;
         i|=(*p++==transpx)<<5; i|=(*p++==transpx)<<4;
@@ -752,7 +753,8 @@ Image::Indexed *Image::Indexed::calcAlpha() {
     #if 1 /* This works even when p gets modified; this puts fixed 0 pads at EOLs */
       if ((wdcpp&7)!=0) {
         i7=1<<(7-(wdcpp&7)); i8=256; i=0;
-        while ((i8>>=1)!=i7) if (*p++==transpx) i|=i8;
+        /* vvv p[-1]=0 BUGFIX at Sun Dec  8 23:21:47 CET 2002 */
+        while ((i8>>=1)!=i7) if (*p++==transpx) { p[-1]=0; i|=i8; }
         *to++=i;
       }
     #else

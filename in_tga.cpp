@@ -37,7 +37,8 @@ static Image::Loader::reader_t in_tga_checker(char buf[Image::Loader::MAGIC_LEN]
   (void)bufend;
   /* vvv Unfortunately not all targa images have that footer */
   /* return 0==memcmp(bufend+Image::Loader::MAGIC_LEN-18, "TRUEVISION-XFILE", 16) */
-  return (unsigned char)buf[0]>=30 && (unsigned char)buf[0]<=50 && 
+  /* vvv 30..127: Aladdin Ghostscript adds 58 bytes of header */
+  return (unsigned char)buf[0]>=30 && (unsigned char)buf[0]<=63 && 
     (unsigned char)buf[1]<=11 &&
     ((unsigned char)buf[16]<=8 || (unsigned char)buf[16]==24)
    ? in_tga_reader : 0;

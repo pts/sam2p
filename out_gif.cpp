@@ -17,7 +17,7 @@
 #  define AALLOC(var,len,itemtype) var=(itemtype*)malloc(len*sizeof(itemtype));
 #  define AFREE(expr) free((expr))
 #endif
-#define HasLZW 1
+#define HasLZW HAVE_LZW /* Imp: or USE_BUILTIN_LZW? */
 #define True true
 #define False false
 
@@ -129,7 +129,7 @@ static unsigned int GIFEncodeImage(GenBuffer::Writable& out, char const*ppbeg, r
   */
   /**** pts ****/
   pp=ppbeg;
-  waiting_code=*pp++;
+  waiting_code=*(unsigned char const*)pp++; /* unsigned char BUGFIX at Sun Dec  8 13:17:00 CET 2002 */
 
   while (pp!=ppend) {
       /*
@@ -171,6 +171,7 @@ static unsigned int GIFEncodeImage(GenBuffer::Writable& out, char const*ppbeg, r
         }
 #endif
       GIFOutputCode(waiting_code);
+      // printf("wc=%u\n", waiting_code);
       if (free_code < MaxGIFTable)
         {
           hash_code[k]=free_code++;
@@ -247,11 +248,11 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
   
   assert(img->getBpc()==8); /* 1 palette entry == 8 bits */
   
-  memcpy(hd, "GIF89a", 6);
+  transp=img->getTransp();
+  memcpy(hd, transp!=-1 ? "GIF89a" : "GIF87a", 6);
   i=img->getWd(); hd[6]=i; hd[7]=i>>8;
   i=img->getHt(); hd[8]=i; hd[9]=i>>8;
   
-  transp=img->getTransp();
   // transp=-1; /* With this, transparency will be ignored */
   c=img->getNcols();
   // fprintf(stderr, "GIF89 write transp=%d ncols=%d\n", transp, c);
@@ -277,12 +278,15 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
     delete [] padding;
   }
 
-  /* Write Graphics Control extension. Only GIF89a */
-  hd[0]=0x21; hd[1]=(char)0xf9; hd[2]=0x04;
-  hd[3]=transp!=-1; /* dispose==0 */
-  hd[4]=hd[5]=0; /* delay==0 */
-  hd[6]=transp; /* transparent color index -- or 255 */
-  hd[7]=0;
+  if (transp!=-1) {
+    /* Write Graphics Control extension. Only GIF89a */
+    hd[0]=0x21; hd[1]=(char)0xf9; hd[2]=0x04;
+    hd[3]=transp!=-1; /* dispose==0 */
+    hd[4]=hd[5]=0; /* delay==0 */
+    hd[6]=transp; /* transparent color index -- or 255 */
+    hd[7]=0;
+    out.vi_write(hd, 8);
+  }
   
   /* Write image header */
   hd[8]=',';
@@ -294,9 +298,31 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
   
   if ((c=bits_per_pixel)<2) c=4;
   hd[18]=c; /* compression bits_per_pixel */
-  out.vi_write(hd, 19);
+  out.vi_write(hd+8, 11);
 
+#if 0
+  printf("GIFEncodeImage out r r+%u %u; off=%u\n", img->getRlen()*img->getHt(), c+1, img->getRowbeg()-img->getHeadp());
+  FILE *f=fopen("tjo.dat","wb");
+  fprintf(f, "P6 %u %u 255\n", img->getWd(), img->getHt());
+  // fwrite(img->getRowbeg(), 1, img->getRlen()*img->getHt(), f);
+  for (unsigned u=0; u<img->getRlen()*img->getHt(); u++) {
+    char *p=img->getHeadp()+3* *(unsigned char*)(img->getRowbeg()+u);
+    putc(p[0],f);
+    putc(p[1],f);
+    putc(p[2],f);
+  }
+#endif
+  
   i=GIFEncodeImage(out, img->getRowbeg(), img->getRowbeg()+img->getRlen()*img->getHt(), c+1);
+#if 0
+  { char buf[500000];
+    FILE *f=fopen("tjo.dat","rb");
+    int got=fread(buf, 1, sizeof(buf), f);
+    assert(got==486109);
+    assert(got==img->getRlen()*img->getHt());
+    i=GIFEncodeImage(out, buf, buf+img->getRlen()*img->getHt(), c+1);
+  }
+#endif
   assert(i!=0);
   
   /* Write trailer */

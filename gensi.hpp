@@ -229,9 +229,6 @@ class GenBuffer {
 //     declared inside class { ... };
 ///GenBuffer::Writable &operator <<(GenBuffer::Writable a, GenBuffer b);
 
-// class SimBuffer;
-// class SimBuffer::B;
-
 /** Collection of some simplistic GenBuffer implementations. */
 class SimBuffer {
  public:

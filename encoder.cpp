@@ -217,7 +217,7 @@ class CjpegEncode: public PSEncoder {
   class P: public Filter::PipeE { public:
     // protected: virtual void vi_check();
     P(GenBuffer::Writable &out_, slen_t Columns, slen_t Rows, bool rgbp_, unsigned char quality);
-   protected: /* protected -> public: pacify VC6.0 */
+   protected: /* Not needed: protected -> public: pacify VC6.0 */
     virtual void vi_copy(FILE *f);
     bool rgbp;
   };

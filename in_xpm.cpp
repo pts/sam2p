@@ -29,6 +29,7 @@
 
 #define USGE(a,b) ((unsigned char)(a))>=((unsigned char)(b))
 
+#if 0
 /** @return true iff params are different strings (not respecting case) */
 static int my_strcase_neq(char *s1, char *s2) {
   while ((USGE(*s1,'A') && USGE('Z',*s1) ? *s1+'a'-'A' : *s1) ==
@@ -38,57 +39,47 @@ static int my_strcase_neq(char *s1, char *s2) {
   }
   return 1;
 }
+#endif
+
+#define my_strcase_neq(s1,s2) GenBuffer::nocase_strcmp(s1,s2)
 
 /** @ return RGB long */
-static Image::Sampled::rgb_t parse_rgb(char *s) {
+static Image::Sampled::rgb_t parse_rgb(char const*s) {
   unsigned v=0, len;
   Image::Sampled::rgb_t ret;
-  char *p;
   if (!s || !*s) return 0x2000000; /* not found */
   // fprintf(stderr, "'%s'\n", s);
-  if (*s=='#') { /* an #RRGGBB web-style color spec */
-    register char c;
-    c=*++s;
-    if (USGE(c,'a') && USGE('f',c)) ret=((Image::Sampled::rgb_t)(unsigned char)(c-'a'+10))<<20;
-    else if (USGE(c,'A') && USGE('F',c)) ret=((Image::Sampled::rgb_t)(unsigned char)(c-'A'+10))<<20;
-    else if (USGE(c,'0') && USGE('9',c)) ret=((Image::Sampled::rgb_t)(unsigned char)(c-'0'))<<20;
-    else return 0x2000000; /* not found, error in spec */
-    c=*++s;
-    if (USGE(c,'a') && USGE('f',c)) ret+=((Image::Sampled::rgb_t)(unsigned char)(c-'a'+10))<<16;
-    else if (USGE(c,'A') && USGE('F',c)) ret+=((Image::Sampled::rgb_t)(unsigned char)(c-'A'+10))<<16;
-    else if (USGE(c,'0') && USGE('9',c)) ret+=((Image::Sampled::rgb_t)(unsigned char)(c-'0'))<<16;
-    else return 0x2000000; /* not found, error in spec */
-    c=*++s;
-    if (USGE(c,'a') && USGE('f',c)) ret+=((unsigned char)(c-'a'+10))<<12;
-    else if (USGE(c,'A') && USGE('F',c)) ret+=((unsigned char)(c-'A'+10))<<12;
-    else if (USGE(c,'0') && USGE('9',c)) ret+=((unsigned char)(c-'0'))<<12;
-    else return 0x2000000; /* not found, error in spec */
-    c=*++s;
-    if (USGE(c,'a') && USGE('f',c)) ret+=((unsigned char)(c-'a'+10))<<8;
-    else if (USGE(c,'A') && USGE('F',c)) ret+=((unsigned char)(c-'A'+10))<<8;
-    else if (USGE(c,'0') && USGE('9',c)) ret+=((unsigned char)(c-'0'))<<8;
-    else return 0x2000000; /* not found, error in spec */
-    c=*++s;
-    if (USGE(c,'a') && USGE('f',c)) ret+=((unsigned char)(c-'a'+10))<<4;
-    else if (USGE(c,'A') && USGE('F',c)) ret+=((unsigned char)(c-'A'+10))<<4;
-    else if (USGE(c,'0') && USGE('9',c)) ret+=((unsigned char)(c-'0'))<<4;
-    else return 0x2000000; /* not found, error in spec */
-    c=*++s;
-    if (USGE(c,'a') && USGE('f',c)) ret+=((unsigned char)(c-'a'+10));
-    else if (USGE(c,'A') && USGE('F',c)) ret+=((unsigned char)(c-'A'+10));
-    else if (USGE(c,'0') && USGE('9',c)) ret+=((unsigned char)(c-'0'));
-    else return 0x2000000; /* not found, error in spec */
-    if (*++s!='\0') return 0x2000000; /* not found, spec too long */
+  if (*s=='#') { /* an #RRGGBB web-style color spec; or #RRRRGGGGBBBB */
+    unsigned dif=0;
+    ++s;
+    while (dif<13 && (USGE(5,(s[dif]|32)-'a') || USGE(9,s[dif]-'0'))) dif++; /* find at most 13 hex digits */
+    if (s[dif]!='\0' || (dif!=12 && dif!=6)) return 0x2000000; /* not found, spec length error */
+    dif=(dif==12) ? 3 : 1;
+    // shr=24; while (shr!=0) {
+    ret= (Image::Sampled::rgb_t)( USGE(9,*s-'0') ? *s-'0' : 10+(*s|32)-'a' )<<20;
+    s++;
+    ret|=(Image::Sampled::rgb_t)( USGE(9,*s-'0') ? *s-'0' : 10+(*s|32)-'a' )<<16;
+    s+=dif; /* ignore lower two hex digits of 16-bit sample value */
+    ret|=(Image::Sampled::rgb_t)( USGE(9,*s-'0') ? *s-'0' : 10+(*s|32)-'a' )<<12;
+    s++;
+    ret|=(Image::Sampled::rgb_t)( USGE(9,*s-'0') ? *s-'0' : 10+(*s|32)-'a' )<<8;
+    s+=dif; /* ignore lower two hex digits of 16-bit sample value */
+    ret|=(Image::Sampled::rgb_t)( USGE(9,*s-'0') ? *s-'0' : 10+(*s|32)-'a' )<<4;
+    s++;
+    ret|=(Image::Sampled::rgb_t)( USGE(9,*s-'0') ? *s-'0' : 10+(*s|32)-'a' );
     return ret;
   }
   /* vvv 223==255-32: ignore case when hashing */
-  p=s; while (*p!='\0') v=xpmColors_mul*v+(223&*(unsigned char*)p++);
+  char const *p=s;
+  while (*p!='\0') v=xpmColors_mul*v+(223&*(unsigned char const*)p++);
   p=xpmColors_dat+xpmColors_ofs[(v&65535)%xpmColors_mod];
   while (*p!='\0') {
     len=strlen(p);
     if (0==my_strcase_neq(p,s)) {
       p+=len;
-      ret=(((Image::Sampled::rgb_t)((unsigned char*)p)[1])<<16)+(((Image::Sampled::rgb_t)((unsigned char*)p)[2])<<8)+(((Image::Sampled::rgb_t)((unsigned char*)p)[3]));
+      ret=(((Image::Sampled::rgb_t)((unsigned char const*)p)[1])<<16)+
+          (((Image::Sampled::rgb_t)((unsigned char const*)p)[2])<<8)+
+          (((Image::Sampled::rgb_t)((unsigned char const*)p)[3]));
       return (ret==0x30201) ? 0x1000000 : ret; /* transparent color */
     }
     p+=len+4;
@@ -169,7 +160,7 @@ Image::Sampled::dimen_t XPMTok::getDimen() {
   return 0; /*notreached*/
 }
 void XPMTok::getComma() {
-  if (getcc()!=T_COMMA) Error::sev(Error::ERROR) << "XPM: comma expected" << (Error*)0;
+  if (getcc()!=T_COMMA) Error::sev(Error::ERROR) << "XPM: comma expected at " << ftell(f) << (Error*)0;
 }
 void XPMTok::read(char *buf, unsigned len) {
   int i;
@@ -219,7 +210,7 @@ Image::Sampled::rgb_t XPMTok::getColor() {
     }
     if (i!=T_COMMA) goto cexp;
     Image::Sampled::rgb_t ret=parse_rgb(tmp);
-    if (ret==0x2000000) Error::sev(Error::ERROR) << "XPM: unknown color" << (Error*)0;
+    if (ret==0x2000000) Error::sev(Error::ERROR) << "XPM: unknown color: " << tmp << (Error*)0;
     return ret;
   } else { cexp: Error::sev(Error::ERROR) << "XPM: color expected" << (Error*)0; }
   return 0; /*notreached*/
@@ -232,7 +223,12 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
   Image::Sampled::dimen_t ht=tok.getDimen();
   Image::Sampled::dimen_t colors=tok.getDimen();
   Image::Sampled::dimen_t cpp=tok.getDimen(); /* chars per pixel */
-  tok.getComma();
+
+  /* width height ncolors cpp [x_hot y_hot] */
+  int i; /* multiple purpose */
+  while ((i=tok.getcc())==' ' || i=='\t' || USGE(9,i-'0')) ;
+  tok.ungetcc(i); tok.getComma();
+  
   // Error::sev(Error::DEBUG) << "wd="<<wd<<" ht="<<ht<<" colors="<<colors<<" cpp="<<cpp << (Error*)0;
   if (1UL*cpp*colors>65535) Error::sev(Error::ERROR) << "XPM: too many colors" << (Error*)0;
   // if (cpp==1) {
@@ -257,7 +253,6 @@ static Image::Sampled *in_xpm_reader(Image::filep_t file_, SimBuffer::Flat const
   Image::Indexed *iimg=(Image::Indexed*)NULLP;
   tok.ungetcc(tok.T_COMMA);
 
-  int i; /* multiple purpose */
   if (colors<=256) {
     ret=iimg=new Image::Indexed(wd,ht,colors,8);
     if (transp!=colors) iimg->setTransp(transp);

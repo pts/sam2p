@@ -1,15 +1,19 @@
-#!/bin/sh --
-eval '(exit $?0)' && eval 'PERL_BADLANG=x; export PERL_BADLANG; exec perl -w -x -S $0 ${1+"$@"}' &&
-eval 'setenv PERL_BADLANG x; exec perl -w -x -S $0 $argv:q'
-if 0; # the 1st 4 lines make compatible with kernel/perl/bash/ash/sh/csh
-#!/usr/local/bin/perl -w
+#! /bin/sh --
+eval '(exit $?0)' && eval 'PERL_BADLANG=x;export PERL_BADLANG;: \
+;exec perl -x -S -- "$0" ${1+"$@"};#'if 0;
+eval 'setenv PERL_BADLANG x;exec perl -x -S -- "$0" $argv:q;#'.q
+#!perl -w
++($0=~/(.*)/s);do$1;die$@if$@;__END__+if 0;
+# Don't touch/remove lines 1--7: http://www.inf.bme.hu/~pts/Magic.Perl.Header
+
 #
 # cols2.pl -- create a read-only C hash table from hash function
 # by pts@fazekas.hu at Fri Mar  1 09:24:46 CET 2002
+# minor VC6.0 updates at Thu Dec 12 19:01:06 CET 2002
 #
 BEGIN{$^W=1}
-use integer;
-use strict;
+BEGIN { eval { require integer; import integer } }
+BEGIN { eval { require strict ; import strict  } }
 
 my @L=( # imagemagick's ColorList.h
     [ "None", 3, 2, 1 ],
@@ -255,6 +259,7 @@ sub cq($) {
   my $S=$_[0];
   $S=~s@([\\"])@\\$1@g;
   $S=~s@([^!-~])@sprintf"\\%03o",ord$1@ge;
+  $S=~s@\\([0-7][0-7][0-7])(?=[0-9])@$1""@g; # pacify VC6.0 warning
   $S
 }
 

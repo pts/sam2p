@@ -248,7 +248,8 @@ Output file extension gives a hint for /FileFormat:
 Options (case insensitive):
 
 -- -j -j:job : display in-memory .job file
--- -j:warn : display warnings about impossible combinations in the .job file
+-- -j:warn : be verbose and display warnings about impossible combinations in
+   the .job file
 -- -s:Indexed1:Indexed4:Indexed8: Try /SampleFormats in this order, and try
    all others after these. Can be
    specified separately (e.g `-s Indexed1 -s Indexed2:Indexed8')
@@ -2067,6 +2068,7 @@ Are the problems I'm dealing about already solved?
 
    -- Is there a utility for creating a (semi-)transparent EPS or PDF files
       from pixel images?
+
 History
 ~~~~~~~
 0.29 Apr 4 2002
@@ -2097,7 +2099,13 @@ History
      -m, scaling PS output command line, PSL1 Gray ZIP&LZW in all
      TransferEncodings
 
-     avoid 3 warnings in: ./sam2p examples/pts2.pbm t.ppm
+0.40 Wed Dec 11 19:24:31 CET 2002
+     builds out-of-the box (./configure ...; make -> sam2p.exe) on Win32 with MinGW32 + Perl
+
+0.41 GIF and XPM load bugfixes
+     synchronized to GIMP tif22pnm
+     transparent(+?) TIFF output, really
+
      (expected) !!
      transparent(+?) TIFF output,
      complete turbo tutorial,
@@ -2109,12 +2117,11 @@ History
      PS and PDF input,
      GIMP tif22pnm
      /Background option (-bg) to change transparent pixels -> bg color
-
-0.40 Wed Dec 11 19:24:31 CET 2002
-     builds out-of-the box (./configure ...; make -> sam2p.exe) on Win32 with MinGW32 + Perl
+     LZW and ZIP compressed for indexed etc.
 
 Missing feature list
 ~~~~~~~~~~~~~~~~~~~~
+/* Imp: avoid 3 warnings in: ./sam2p examples/pts2.pbm t.ppm */
 /* OK : margins for all PS, EPS and PDF (Sat Sep  7 16:17:58 CEST 2002 */
 /* Imp: howto in pts_defl.h */
 /* Imp: check for fixed bugs new zlib */
@@ -2228,7 +2235,7 @@ Fixed bugs
 
 ./sam2p -c fax csanyi_torok_old.png csanyi_torok.eps
 ./sam2p -c fax examples/ptsbanner.gif csanyi_torok.eps
-  error:   Impossible combination
+  error: Impossible combination
   OK, the user should specify `-s Indexed8' for unexpected use of  `-c fax'
 
 __END__

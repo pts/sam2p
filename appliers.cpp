@@ -69,7 +69,7 @@ Rule::Applier::cons_t out_l1fa85g_check_rule(Rule::OutputRule* or_) {
 }
 Rule::Applier::cons_t out_l1fa85g_work(GenBuffer::Writable& out, Rule::OutputRule*or_, Image::SampledInfo *sf) {
   /* by pts@fazekas.hu at Sun Mar 17 15:52:48 CET 2002 */
-  // Imp: two other TransferEncodings !!
+  // Imp: two other TransferEncodings [no more, since #if 0]
   if (out_l1fa85g_check_rule(or_)!=Rule::Applier::OK) return Rule::Applier::DONT_KNOW;
   if (!or_->cache.isPSL3()) 
     Error::sev(Error::WARNING_DEFER) << "l1fa85g: /ZIP without /PSL3 will be slow" << (Error*)0;
@@ -126,10 +126,8 @@ Rule::Applier::cons_t out_l2jbin_work(GenBuffer::Writable& out, Rule::OutputRule
   Rule::Cache *cache=&or_->cache;
   Filter::VerbatimE outve(out); /* required since template /p0jbin is TTM */
   GenBuffer::Writable *op=cache->isPDF() ? &outve : &out, *tp=op;
-
   strings[0]=const_cast<char*>(cache->isPDF() ? (char const*)"0" : (char const*)"2");
-   
-    if (cache->TransferEncoding==cache->TE_A85) tp=PSEncoder::newASCII85Encode (*op, or_->cacheHints.TransferCPL);
+       if (cache->TransferEncoding==cache->TE_A85) tp=PSEncoder::newASCII85Encode (*op, or_->cacheHints.TransferCPL);
   else if (cache->TransferEncoding==cache->TE_Hex) tp=PSEncoder::newASCIIHexEncode(*op, or_->cacheHints.TransferCPL);
   // else strings[2]=" F closefile";
   Rule::writeTTT(*op, *tp, *tp, !cache->isPDF()?"l2jbin":cache->isPDFB()?"p0jbb":"p0jbin", or_, sf, Rule::writePalData, strings);
@@ -1393,48 +1391,41 @@ Rule::Applier::cons_t out_tiff_check_rule(Rule::OutputRule* or_) {
     Error::sev(Error::WARNING_DEFER) << "check_rule: /DCTEncode requires /Rgb8 or /Gray8 (or /Indexed8)" << (Error*)0;
     badp=true;
   }
-  if (!badp && cache->isTransparentM()) cache->SampleFormat=Image::SF_Transparent8;
+  if (!badp && cache->isTransparentM()) {
+    cache->origSampleFormat=cache->SampleFormat;
+    cache->SampleFormat=Image::SF_Transparent8;
+  }
   return (Rule::Applier::cons_t)(badp ? 0+Rule::Applier::BAD : 0+Rule::Applier::OK);
   /* ^^^ Dat: 0+: pacify g++-3.1 */
 }
 
 Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*or_, Image::SampledInfo *sf) {
-  if (out_tiff_check_rule(or_)!=Rule::Applier::OK) return Rule::Applier::DONT_KNOW;
   Rule::Cache *cache=&or_->cache;
+  Image::sf_t origSampleFormat=cache->origSampleFormat;
+  if (out_tiff_check_rule(or_)!=Rule::Applier::OK) return Rule::Applier::DONT_KNOW;
 
   assert(!sf->hasTranspp() || cache->isTransparentM());
   /** Alpha channel or null. */
   Image::Indexed *alpha=(Image::Indexed*)NULLP;
   if (cache->isTransparentM()) {
+    // fprintf(stderr,"sf=%u osf=%u\n", cache->SampleFormat, origSampleFormat);
     alpha=PTS_dynamic_cast(Image::Indexed*,sf->getImg())->calcAlpha();
     PTS_dynamic_cast(Image::Indexed*,sf->getImg())->getClearTransp();
     assert((alpha!=NULLP) == (sf->hasTranspp()==true));
     sf->clearTransp();
-    Image::sf_t saf=Image::SF_max;
-    // assert(alpha!=NULLP);
-    if (alpha!=NULLP) switch (sf->minGrayBpcc()) {
-     case 8: saf=Image::SF_Gray8; break;
-     case 4: saf=Image::SF_Gray4; break;
-     case 2: saf=Image::SF_Gray2; break;
-     case 1: saf=Image::SF_Gray1; break;
-     case 0: switch (sf->minRGBBpcc()) {
-      case 8: saf=Image::SF_Rgb8; break;
-      case 4: saf=Image::SF_Rgb4; break;
-      case 2: saf=Image::SF_Rgb2; break;
-      case 1: saf=Image::SF_Rgb1; break;
-     } break;
-     /*NOTREACHED*/
-     // cacheHints.EncoderBPL=(slen_t)img->getWd()*img->getCpp()*img->getBpc();
-     /* ^^^ Dat: doSampleFormat will do it correctly */
-    } else switch (cache->SampleFormat) {
-     case Image::SF_Transparent8: saf=Image::SF_Indexed8; break;
-     case Image::SF_Transparent4: saf=Image::SF_Indexed4; break;
-     case Image::SF_Transparent2: saf=Image::SF_Indexed2; break;
-     case Image::SF_Mask        : saf=Image::SF_Indexed1; break;
-    }
-    // fprintf(stderr,"%u\n",saf);
-    assert(saf!=Image::SF_max);
-    cache->SampleFormat=saf;
+    static Image::sf_t const graytab[9]={0,Image::SF_Gray1,Image::SF_Gray2,0,Image::SF_Gray4,0,0,0,Image::SF_Gray8};
+    static Image::sf_t const rgbtab[9]={0,Image::SF_Rgb1,Image::SF_Rgb2,0,Image::SF_Rgb4,0,0,0,Image::SF_Rgb8};
+    static Image::sf_t const indexedtab[9]={0,Image::SF_Indexed1,Image::SF_Indexed2,0,Image::SF_Indexed4,0,0,0,Image::SF_Indexed8};
+    unsigned char minbpc=sf->minRGBBpcc();
+    // fprintf(stderr,"minbpc=%u\n",minbpc);
+         if (minbpc<8 && origSampleFormat==Image::SF_Transparent8) minbpc=8;
+    else if (minbpc<4 && origSampleFormat==Image::SF_Transparent4) minbpc=4;
+    else if (minbpc<2 && origSampleFormat==Image::SF_Transparent2) minbpc=2;
+    // fprintf(stderr,"minbpc=%u\n",minbpc);
+    // cacheHints.EncoderBPL=(slen_t)img->getWd()*img->getCpp()*img->getBpc();
+    /* ^^^ Dat: doSampleFormat will do it correctly */
+    // assert(saf!=Image::SF_max);
+    cache->SampleFormat=(alpha==NULLP ? indexedtab : sf->minGrayBpcc()==0 ? rgbtab : graytab)[minbpc];
   }
 
   or_->doSampleFormat(sf); /* No separations */
@@ -1497,7 +1488,8 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
      * compressible TIFF file.
      */
 
-    if (alpha!=NULLP) { 
+    if (alpha!=NULLP) {
+      unsigned char bpc=img->getBpc();
       slen_t rlen=img->getRlen();
       slen_t writelen;
       char *buf=(char*)NULLP;
@@ -1507,62 +1499,112 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
       register unsigned u;
       Image::Sampled::dimen_t rlena=(wd+7)>>3;
       assert(rlena==alpha->getRlen());
-      switch (cache->SampleFormat) {
-       case Image::SF_Gray8:
-        /* Dat: works at Tue Sep 10 22:45:52 CEST 2002 */
-        buf=new char[(writelen=wd*2)+7];
+      // printf("SF=%u\n", cache->SampleFormat);
+      if (cache->isGray()) {
+        /* works at Mon Dec  9 01:25:59 CET 2002 */
+        static unsigned char const szor1[16]={2*0,2*1,2*4,2*5,2*16,2*17,2*20,2*21,2*64,2*65,2*68,2*69,2*80,2*81,2*84,2*85};
+        static unsigned char const szor2[16]={85,84,81,80,69,68,65,64,21,20,17,16,5,4,1,0};
+        // static unsigned char const szor2[8]={0,1,16,17,64,65,80,81};
+        buf=new char[(writelen=((slen_t)wd*bpc+3)>>2)+24];
         assert(rlena*8>=rlen);
         while (psave!=ppend) {
           t=buf;
           rend=r+rlena;
-          p=psave;
-          while (r!=rend) {
-            u=*(unsigned char const*)r++;
-            *t++=*p++; *t++=-(0==(u&128));
-            *t++=*p++; *t++=-(0==(u& 64));
-            *t++=*p++; *t++=-(0==(u& 32));
-            *t++=*p++; *t++=-(0==(u& 16));
-            *t++=*p++; *t++=-(0==(u&  8));
-            *t++=*p++; *t++=-(0==(u&  4));
-            *t++=*p++; *t++=-(0==(u&  2));
-            *t++=*p++; *t++=-(0==(u&  1));
-          }
-          assert(p-psave+0U==rlena*8U);
-          psave+=rlen;
+          p=psave; psave+=rlen;
+          assert(psave<=ppend);
+          u=(1<<16);
+          switch (bpc) {
+           case 8:
+            while (p!=psave) {
+              /* Dat: works at Tue Sep 10 22:45:52 CEST 2002 */
+              if (0!=(u&(1<<16))) u=*(unsigned char const*)r++|(1<<8);
+              *t++=*p++; *t++=-(0==(u&128));
+              u<<=1;
+            } break;
+           case 4:
+            while (p!=psave) {
+              if (0!=(u&(1<<16))) u=*(unsigned char const*)r++|(1<<8);
+              *t++=(p[0]&0xF0)|(0==(u&128)?15:0);
+              *t++=((p[0]&0xF)<<4)|(0==(u&64)?15:0);
+              p++; u<<=2;
+            } break;
+           case 2:
+            while (p!=psave) {
+              if (0!=(u&(1<<16))) u=*(unsigned char const*)r++|(1<<8);
+              *t++=(p[0]&0xC0    )|((u&128)!=0?0:48)|((p[0]&0x30)>>2)|((u&64)!=0?0:3);
+              *t++=((p[0]&0xC)<<4)|((u& 32)!=0?0:48)|((p[0]&0x3 )<<2)|((u&16)!=0?0:3);
+              p++; u<<=4;
+            } break;
+           case 1:
+            while (p!=psave) {
+              u=*(unsigned char const*)r++;
+              *t++=szor1[*(unsigned char const*)p>>4]|szor2[u>>4];
+              *t++=szor1[*(unsigned char const*)p&15]|szor2[u&15];
+              p++;
+            } break;
+          } /* SWITCH Gray bpc */
+          // assert(p-psave+0U==rlena*8U);
           assert(p>=psave);
           pp->vi_write(buf, writelen);
-          assert(psave<=ppend);
         }
-        break;
-       /* !! */
-       case Image::SF_Gray4: assert(0000000); break;
-       case Image::SF_Gray2: assert(000000); break;
-       case Image::SF_Gray1: assert(00000); break;
-       case Image::SF_Rgb8: assert(0000); break;
-       case Image::SF_Rgb4:
-        buf=new char[(writelen=wd*2)+24];
+      } else {
+        /* works at Sun Dec  8 23:30:17 CET 2002 */
+        assert(cache->isRGB());
+        buf=new char[(writelen=((slen_t)wd*bpc+1)>>1)+24];
         while (psave!=ppend) {
           t=buf;
           p=psave; psave+=rlen;
-          u=(1<<14);
-          rend=r+rlena;
-          while (p<psave) {
-            if (0!=(u&(1<<14))) u=*(unsigned char const*)r++|(1<<8);
-            *t++=p[0]; /* R0 and G0 */
-            *t++=(p[1]&0xF0)|((u&128)!=0?0:15); /* B0 and A0 */
-            *t++=(p[1]<<4)|(p[2]>>4&15); /* R1 and G1 */
-            *t++=(p[2]<<4)|((u&64)!=0?0:15); /* B1 and A1 */
-            p+=3;
-          }
-          r=rend;
-          pp->vi_write(buf, writelen);
           assert(psave<=ppend);
+          u=(1<<16);
+          rend=r+rlena; /* superfluous */
+          switch (bpc) {
+           case 8:
+            while (p<psave) {
+              if (0!=(u&(1<<16))) u=*(unsigned char const*)r++|(1<<8);
+              *t++=*p++;
+              *t++=*p++;
+              *t++=*p++;
+              *t++=-(0==(u&128));
+              u<<=1;
+            } break;
+           case 4:
+            while (p<psave) {
+              if (0!=(u&(1<<16))) u=*(unsigned char const*)r++|(1<<8);
+              *t++=p[0]; /* R0 and G0 */
+              *t++=(p[1]&0xF0)|((u&128)!=0?0:15); /* B0 and A0 */
+              *t++=(p[1]<<4)|((p[2]>>4)&15); /* R1 and G1 */
+              *t++=(p[2]<<4)|((u&64)!=0?0:15); /* B1 and A1 */
+              p+=3; u<<=2;
+            } break;
+           case 2:
+            while (p<psave) {
+              if (0!=(u&(1<<16))) u=*(unsigned char const*)r++|(1<<8);
+              /* Dat: p[0]==R0G0B0R1  p[1]==G1B1R2G2  p[2]==B2R3G3B3 */
+              *t++=(p[0]&0xFC)|((u&128)!=0?0:3); /* R0G0B0 and A0 */
+              *t++=(p[0]<<6)|((p[1]>>2)&0x3C)|((u&64)!=0?0:3); /* R1 G1B1 A1 */
+              *t++=(p[1]<<4)|((p[2]>>4)&0x0C)|((u&32)!=0?0:3); /* R2G1 B1 A2 */
+              *t++=(p[2]<<2)|((u&16)!=0?0:3); /* R3G3B3 and A3 */
+              p+=3; u<<=4;
+            } break;
+           default: // case 1:
+            while (p<psave) {
+              u=*(unsigned char const*)r++;
+              /* Dat: p[0]==RGBRGBRG p[1]==BRGBRGBR  p[2]==GBRGBRGB */
+              *t++=(p[0]&0xE0)|((u&128)!=0?0:16)
+                  |((p[0]>>1)&0xE)|((u&64)!=0?0:1);
+              *t++=(p[0]<<6)|((p[1]>>2)&0x80)|((u&32)!=0?0:16)
+                  |((p[1]>>3)&0xE)|((u&16)!=0?0:1);
+              *t++=((p[1]<<4)&0xE0)|((u&8)!=0?0:16)
+                  |((p[1]<<3)&0x7)|((p[2]>>5)&0x06)|((u&4)!=0?0:1);
+              *t++=((p[2]<<2)&0xE0)|((u&2)!=0?0:16)
+                  |((p[2]<<1)&0x0E)|((u&1)!=0?0:1);
+              p+=3;
+            }
+           break;
+          } /* SWITCH RGB bpc */
+          assert(r==rend); // r=rend;
+          pp->vi_write(buf, writelen);
         }
-        break;
-       case Image::SF_Rgb2: assert(00); break;
-       case Image::SF_Rgb1: assert(0); break;
-       default:
-        assert(0);
       }
       delete [] buf;
     } else pp->vi_write(img->getRowbeg(), rlenht);

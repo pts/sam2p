@@ -47,6 +47,12 @@ Imp: merge 0.40, diff -r ""
 Imp: pts.xpm: unknown color
 Imp: test vc++
 Imp: add tif22pnm, png22pnm
+Imp: sam2p doktar.jpg t.bmp
+Imp: eliminate from config2.h: #define OS_COTY COTY_UNIX
+Imp: gensi.cpp appendFnq()
+Imp: integrate tif22pnm
+Imp: integrate png22pnm
+Imp: verify all system() calls
 OK : #undef HAVE_PTS_VSNPRINTF, because msvcrt.dll has a completely buggy vsnprintf()
 OK : verify no "\r\n" output file
 OK : Win32 (VC++, mingw): either fopen(...,"rb") or setmode(..., O_BINARY) OK
