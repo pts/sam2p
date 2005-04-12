@@ -19,7 +19,9 @@ extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list 
 #define _POSIX_SOURCE 1 /* also popen() */
 #define _POSIX_C_SOURCE 2 /* also popen() */
 #define _XOPEN_SOURCE_EXTENDED 1 /* Digital UNIX lstat */
+#ifndef _XPG4_2
 #define _XPG4_2 1 /* SunOS 5.7 lstat() */
+#endif
 #undef  _XOPEN_SOURCE /* pacify gcc-3.1 */
 #define _XOPEN_SOURCE 1 /* popen() on Digital UNIX */
 #endif

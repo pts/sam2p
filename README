@@ -19,10 +19,23 @@ some cases sam2p can compress an image 100 times smaller than the PostScript
 output of many other common image converters. sam2p provides ZIP, RLE and
 LZW (de)compression filters even on Level1 PostScript devices. 
 
-A testimonail from Grant Ingram, UK: Anyway this is just a quick note to say
+A testimonial from Grant Ingram, UK: Anyway this is just a quick note to say
 thanks for writing the sam2p utility which I am using to create EPS figures
 of photographs for my thesis -- it works very well producing image sizes
 that are some 3% of the ones produced by ImageMagick.
+
+Does sam2p generate small EPS (and PDF) files?
+A testimonial from Tom Schneider, US:
+
+  -rw-------   1 toms     delila     88628 Mar  3 17:38 prototype-small.eps
+  -rw-------   1 toms     delila   7979299 Feb 24 12:25 prototype.eps
+ 
+  Good GRIEF you have written a nice program!!!!  The file is 90 fold
+  smaller than the one from Imagemagick's convert.
+
+  That image that was 90x smaller had been bugging me because it was so
+  large that xdvi would strongly hesitate while I passed by the page. 
+  Now it just has a minor delay, thanks to you.
 
 Many thanks to Steve Turner for reviewing and making corrections to this
 documentation.
@@ -2155,6 +2168,21 @@ A45. In the most recent version of sam2p, now it is. Just use `-m:dpi:144'
 
         % \usepackage{graphicx}
         \includegraphics[height=10cm]{foo}
+
+Q46. Is it legal to use LZW compression?
+
+A46. I think so. Also look at Q17.
+
+Q47. Help! I cannot compile it on SunOS/Solaris. I get
+
+     /usr/include/sys/wait.h:90: type specifier omitted for parameter
+     /usr/include/sys/wait.h:90: parse error before `*'
+
+A47. Until someone adds a test to ./configure, try adding the line
+
+       #define siginfo_t void
+
+     to the end of config2.h
 
 Upsampling
 ~~~~~~~~~~

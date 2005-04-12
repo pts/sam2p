@@ -1,3 +1,10 @@
+sam2p (0.44-9) unstable; urgency=low
+
+  * 64-bit fix (slen_t and slendiff_t), in reply to the
+    report by Stefan Fritsch.
+
+ -- Szabó Péter <pts@math.bme.hu>  Tue, 12 Apr 2005 20:51:40 +0200
+
 sam2p (0.44-8) unstable; urgency=low
 
   * Added /ImageDPI and -m:dpi:, see README.

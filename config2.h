@@ -24,7 +24,7 @@
 #define SIZEOF_LONG_LONG 8
 #endif
 
-#if SIZEOF_INT>=4
+#if SIZEOF_CHAR_P!=SIZEOF_LONG && SIZEOF_INT>=4
   typedef unsigned slen_t;
   typedef signed slendiff_t;
 # define SIZEOF_SLEN_T SIZEOF_INT
