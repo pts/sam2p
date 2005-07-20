@@ -33,12 +33,20 @@ fi
 set -e # exit on error
 rm -f "../$TGZ_NAME"
 mkdir "$PRO_VER"
+echo "$PRO_VER"
 (IFS='
 '; exec tar -c -- `cat files` "$@") |
 (cd "$PRO_VER" && exec tar -xv)
 # ^^^ tar(1) magically calls mkdir(2) etc.
+
+# vvv Dat: don't include sam2p-.../ in the filenames of the .tar.gz
+#(IFS='
+#'; cd "$PRO_VER" && exec tar -czf "../../$TGZ_NAME" -- `cat ../files` "$@")
+
+# vvv Dat: do include sam2p-.../ in the filenames of the .tar.gz
 (IFS='
-'; cd "$PRO_VER" && exec tar -czf "../../$TGZ_NAME" -- `cat ../files` "$@")
+'; export PRO_VER; exec tar -czf "../$TGZ_NAME" -- `perl -pe '$_="$ENV{PRO_VER}/$_"' files` "$@")
+
 rm -rf "$PRO_VER"
 set +e
 

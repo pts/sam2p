@@ -2808,7 +2808,7 @@ Missing feature list
 /* Imp: pre-transformation: making grayscale */
 /* Imp: pre-transformation: down-bit-sampling */
 /* Imp: pre-transformation: down-palette-sampling (``generate optimal palette'') */
-
+/* Imp: tif22pnm warning - non-square pixels; to fix do a 'pnmscale -yscale nan'P6 2840 2138 255 */
 ==6750== 
 ==6750== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 ==6750== malloc/free: in use at exit: 3741 bytes in 102 blocks.
@@ -2836,6 +2836,32 @@ Missing feature list
 ==6750==    still reachable: 2921 bytes in 20 blocks.
 ==6750==         suppressed: 0 bytes in 0 blocks.
 
+Known bugs
+~~~~~~~~~~
+(reported by Stefan Fritsch)
+
+> I got a bug report [1] about sam2p 0.44-10 not including a length
+> after the %%BeginData: line. As I understand it, the length is not
+> optional (see [2] p.44 (and gsview output?)). Sam2p 0.44-11 adds a
+> ";" after to this line. What does this ";" do? Is this supposed to be
+> conforming to the postscript standard? If not, are you planning to
+> write a real fix?
+>
+> [1] http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=315046
+> [2] http://partners.adobe.com/public/developer/en/ps/5001.DSC_Spec.pdf
+
+Fixing it would require a major rewrite.
+However, I don't have free time for that right now. If you really care about
+standards, remove the %%BeginData...%%EndData pair from the
+PostScript file or remove it altogether from the sam2p sources. The `;' is
+there so GSView won't complain.
+
+!! compiling on Debian SID with uclibc-toolchain
+   i386-uclibc-linux-g++, the statically linked sam2p executable becomes
+   quite biiiig: 668268 bytes.
+   for configure: export CXX='i386-uclibc-linux-gcc -x c++ -static'
+   Also, Makehelp has to be modified after running configure:
+   LDXX=i386-uclibc-linux-g++ -static
 
 Fixed bugs
 ~~~~~~~~~~

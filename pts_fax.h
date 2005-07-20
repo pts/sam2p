@@ -25,7 +25,7 @@ Free Software Foundation, Inc., 59 Temple Place Suite 330, Boston, MA
 02111-1307, USA.
  */
 
-/*$Id: pts_fax.h,v 1.3 2005-02-21 13:09:56 pts Exp $ */
+/*$Id: pts_fax.h,v 1.4 2005-07-20 21:15:08 pts Exp $ */
 /* CCITTFax filter state definition */
 /* Requires strimpl.h */
 
@@ -37,7 +37,7 @@ Free Software Foundation, Inc., 59 Temple Place Suite 330, Boston, MA
 #endif
 
 /* #include "scommon.h" */
-/*$Id: pts_fax.h,v 1.3 2005-02-21 13:09:56 pts Exp $ */
+/*$Id: pts_fax.h,v 1.4 2005-07-20 21:15:08 pts Exp $ */
 /* Definitions common to stream clients and implementors */
 
 /* #ifndef scommon_DEFINED */
@@ -225,7 +225,7 @@ struct stream_state_s {
 
 /**** pts ****/
 /* original strimpl.h coming */
-/*$Id: pts_fax.h,v 1.3 2005-02-21 13:09:56 pts Exp $ */
+/*$Id: pts_fax.h,v 1.4 2005-07-20 21:15:08 pts Exp $ */
 /* Definitions for stream implementors */
 /* Requires stdio.h */
 
@@ -462,7 +462,7 @@ typedef struct stream_CFE_state_s {
 #if SIZEOF_INT > 2
 #  define cfe_max_width (2560 * 32000 * 2 / 3)
 #else
-#  define cfe_max_width (max_int - 40)	/* avoid overflows */
+#  define cfe_max_width ((int)((unsigned)-1/2 - 40))	/* avoid overflows */
 #endif
 #ifdef __cplusplus
 extern "C"

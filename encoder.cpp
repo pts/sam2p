@@ -876,12 +876,12 @@ CCITTFaxEncode::CCITTFaxEncode(GenBuffer::Writable &out_, slendiff_t K, slen_t C
   sCFEs.Columns=Columns;
   sCFEs.EndOfLine=EndOfLine;
   sCFEs.BlackIs1=BlackIs1;
-  const slendiff_t cf_max_height=(slen_t)-1/2-100;
-  if (sCFEs.K < -cf_max_height || sCFEs.K > cf_max_height
-   || sCFEs.Columns < 0 || sCFEs.Columns > cfe_max_width
-   || sCFEs.Rows < 0 || sCFEs.Rows > cf_max_height
+  const int cf_max_height=(unsigned)-1/2-100; /* Dat: was slen_t */
+  if (sCFEs.K < -cf_max_height || sCFEs.K > cf_max_height /* Dat: .K is an int */
+   || sCFEs.Columns < 0 || sCFEs.Columns > cfe_max_width /* Dat: .Columns is an int */
+   || sCFEs.Rows < 0 || sCFEs.Rows > cf_max_height /* Dat: .Rows is an int */
    || sCFEs.DamagedRowsBeforeError < 0
-   || sCFEs.DamagedRowsBeforeError > cf_max_height
+   || sCFEs.DamagedRowsBeforeError > cf_max_height /* Dat: .DamagedRowsBeforeError is an int */
    || sCFEs.DecodedByteAlign < 1 || sCFEs.DecodedByteAlign > 16
    || (sCFEs.DecodedByteAlign & (sCFEs.DecodedByteAlign - 1)) != 0
      ) Error::sev(Error::EERROR) << "pts_fax: invalid params" << (Error*)0;

@@ -1,3 +1,15 @@
+sam2p (0.44-11) unstable; urgency=low
+
+  * %%BeginData:; hack for GSView, as reported by Zoltán Petres
+
+ -- Szabó Péter <pts@math.bme.hu>  Tue, 17 May 2005 14:39:20 +0200
+
+sam2p (0.44-10) unstable; urgency=low
+
+  * encoder.cpp slen_t -> int fixes for 64-bit. Thanks to Stefan Fritsch.
+
+ -- Szabó Péter <pts@math.bme.hu>  Thu, 14 Apr 2005 09:23:01 +0200
+
 sam2p (0.44-9) unstable; urgency=low
 
   * 64-bit fix (slen_t and slendiff_t), in reply to the

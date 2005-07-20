@@ -187,8 +187,12 @@ static void init_dicts() {
 
 Image::sf_t Rule::Cache::parseSampleFormat(char const*s, slen_t slen) {
   /* Tue Jul  2 13:48:12 CEST 2002 */
-  static char rule_dummy=(init_dicts(),0); /* call once per process */
-  (void)rule_dummy;
+  #if 0 /* BUGFIX for g++-3.4 (needs symbols __cxa_guard_acquire, __cxa_guard_release) */
+    static char rule_dummy=(init_dicts(),0); /* call once per process */
+    (void)rule_dummy;
+  #else
+    if (y_FileFormat==NULLP) init_dicts();
+  #endif
   while (slen!=0 && s[0]=='/') { s++; slen--; }
   if (slen<=0 || slen>=SampleFormat_MAXLEN) return Image::SF_max;
   char buf[SampleFormat_MAXLEN];
@@ -330,8 +334,12 @@ static MiniPS::VALUE better_colorTransform(MiniPS::VALUE v) {
 }
 
 void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
-  static char rule_dummy=(init_dicts(),0); /* call once per process */
-  (void)rule_dummy;
+  #if 0 /* BUGFIX for g++-3.4 (needs symbols __cxa_guard_acquire, __cxa_guard_release) */
+    static char rule_dummy=(init_dicts(),0); /* call once per process */
+    (void)rule_dummy;
+  #else
+    if (y_FileFormat==NULLP) init_dicts();
+  #endif
   MiniPS::VALUE dummy;  (void)dummy;
   MiniPS::VALUE FileFormat, SampleFormat, WarningOK, TransferEncoding,
     Compression, Predictor, Transparent;
