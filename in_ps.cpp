@@ -50,10 +50,18 @@ static void add_gs_cmd(SimBuffer::B &cmd, SimBuffer::Flat const& hints) {
 
 /* !! -r144 and scale back..., also for PDF -- to enhance image quality */
 
+#undef  DO_KEEP_TEMP
+#define DO_KEEP_TEMP 0
+
 static Image::Sampled *in_ps_reader_low(Image::Loader::UFD* ufd, char const*bboxline, SimBuffer::Flat const& hints) {
   SimBuffer::B mainfn;
   if (!Files::find_tmpnam(mainfn)) Error::sev(Error::EERROR) << "in_ps_reader" << ": tmpnam() failed" << (Error*)0;
-  mainfn.term0(); Files::tmpRemoveCleanup(mainfn());
+  mainfn.term0();
+  #if DO_KEEP_TEMP
+    printf("m: %s\n", mainfn());
+  #else
+    Files::tmpRemoveCleanup(mainfn());
+  #endif
   FILE *f=fopen(mainfn(),"w");
   fprintf(f, "%s/setpagedevice/pop load def\n", bboxline); /* Imp: /a4/letter etc. */
   fprintf(f, "_IFN (r) file cvx exec\n"); /* Dat: doesn't rely on GS to
@@ -75,7 +83,9 @@ static Image::Sampled *in_ps_reader_low(Image::Loader::UFD* ufd, char const*bbox
   ((Filter::PipeE*)&helper)->vi_putcc(i);
   Encoder::writeFrom(*(Filter::PipeE*)&helper, *ufdd);
   ((Filter::PipeE*)&helper)->vi_write(0,0); /* Signal EOF */
-  remove(mainfn());
+  #if !DO_KEEP_TEMP
+    remove(mainfn());
+  #endif
   return helper.getImg();
 }
 
@@ -114,8 +124,11 @@ static Image::Sampled *in_eps_reader(Image::Loader::UFD* ufd, SimBuffer::Flat co
   char bboxline[300];
   if (had!=0) {
     // fprintf(stderr, "bbox=[%"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g]\n", llx, lly, urx, ury);
-    sprintf(bboxline, "%"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g translate\n"
-      "<</PageSize[%"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g]>>setpagedevice\n", -llx, -lly, urx-llx, ury-lly);
+    /* Dat: we must call translate _after_ setpagedevice (so it will take effect), at least with ESP Ghostscript 7.05.6 (2003-02-05); BUGFIX at Fri Aug 12 22:49:07 CEST 2005 */
+    sprintf(bboxline,
+      "<</PageSize[%"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g]>>setpagedevice\n"
+      "%"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g translate\n"
+      , urx-llx, ury-lly, -llx, -lly);
   } else {
     Error::sev(Error::WARNING) << "in_eps_reader: missing EPS bbox" << (Error*)0;
     bboxline[0]='\0';

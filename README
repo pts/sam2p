@@ -2863,6 +2863,8 @@ there so GSView won't complain.
    Also, Makehelp has to be modified after running configure:
    LDXX=i386-uclibc-linux-g++ -static
 
+!! .eps import bad shift of BBX (LLX,LLY) with never Ghostscript
+
 Fixed bugs
 ~~~~~~~~~~
 (this section was formerly bad.txt)
