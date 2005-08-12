@@ -161,7 +161,10 @@ To convert an image to be included as PDF into pdf(La)TeX documents, call:
 
 If you have a large image file (possibly originating from dumb software),
 you can reduce the image size and keep the same filename. (Please note that
-some meta-information may be lost using this method.) Call:
+some meta-information may be lost using this method.) This operation is
+_DANGEROUS_ if you don't have a backup, because due to a software or
+hardware problem, sam2p might clobber time image file so the actual image
+gets lost. To overwrite a file in-place, call:
 
 	./sam2p <INPUT-OUTPUT.IMG> --
 	Example: ./sam2p test.tiff --
@@ -2182,7 +2185,48 @@ A47. Until someone adds a test to ./configure, try adding the line
 
        #define siginfo_t void
 
-     to the end of config2.h
+     to the end of config2.h, just before running `make'.
+
+Q48. Should I run sam2p overy all my EPS (or PDF) files, to see if they
+     would become smaller?
+
+A48. No! This is a bad idea in general, because you loose information, since
+     the EPS output of sam2p is always rasterized, so it is not scalable
+     anymore.
+
+     But you may run sam2p over all those EPS files which contain raster
+     graphics. But please be aware that sam2p re-renders everything at 72
+     DPI (can be overridden by `-l:gs=-r<DPI>', and the gs rendering
+     sometimes adjusts RGB color values slightly (+-2 on in the 0..255
+     domain), so there might be quality loss during the _reading_ of the
+     original EPS. There is absolutely no quality loss when sam2p _writes_
+     the EPS.
+
+Q49. Should I run sam2p over all my GIF, TIFF and XPM files, to see if they
+     would become smaller?
+
+A49. Yes, run `sam2p <filename> --' if you have a backup copy of the
+     original. Otherwise, choose a different filename for output.
+
+Q50. Should I run sam2p over all my PNG files, to see if they
+     would become smaller?
+
+A50. You might try it, there will be no quality loss, but the general
+     experience of the author is that the tools using libpng (e.g. pnmtopng)
+     produce slightly smaller PNG than sam2p. If you are an image
+     compression specialist, please help the author to find the reason of
+     this, and enhance sam2p.
+
+Q51. Should I run sam2p over all my JPEG files, to see if they
+     would become smaller?
+
+A51. sam2p doesn't change the file by default. Use the `-c:ijg' option
+     (possibly with a JPEG quality parameter, e.g. `-c:ijg:50') to make
+     sam2p re-encode the JPEG. This is a lossy operation, and the size of
+     the output file depends on quality parameter specified, so it might
+     actually become larger than the original. Please also note that JPEG
+     meta-information (such as EXIF tags inserted by digital cameras) gets
+     completely lost with `-c:ijg'.
 
 Upsampling
 ~~~~~~~~~~

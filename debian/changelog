@@ -1,3 +1,10 @@
+sam2p (0.44-12) unstable; urgency=low
+
+  * Fixed non-(0,0)-based EPS loading by putting `translate' after
+    `setpagedevice' in in_ps.cpp
+
+ -- Szabó Péter <pts@math.bme.hu>  Fri, 12 Aug 2005 23:13:38 +0200
+
 sam2p (0.44-11) unstable; urgency=low
 
   * %%BeginData:; hack for GSView, as reported by Zoltán Petres
