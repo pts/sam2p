@@ -363,6 +363,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
              if (paramlen==0 || 0==GenBuffer::nocase_strcmp(param, "job"))  do_DisplayJobFile=true;
         else if (0==GenBuffer::nocase_strcmp(param, "warn")) buildProfile_quiet=false;
         else if (GenBuffer::nocase_strbegins(param, "warn:")) buildProfile_quiet=!GenBuffer::parseBool(param+5, paramlen-5);
+        else if (0==GenBuffer::nocase_strcmp(param, "quiet")) { buildProfile_quiet=true; Error::setTopPrinted(Error::ERROR_CONT); } /* Dat: hide warnings, info etc. */ /* at Fri Aug 26 07:54:00 CEST 2005 */
         else if (GenBuffer::nocase_strbegins(param, "job:")) do_DisplayJobFile=GenBuffer::parseBool(param+4, paramlen-4);
         else do_DisplayJobFile=GenBuffer::parseBool(param, paramlen); /* Imp: better error report */
         break;
@@ -1021,7 +1022,7 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
   Rule::deleteProfile(rule_list);
   MiniPS::delete0(job); /* frees OutputFile etc. */
 
-  fputs("Success.\n", stderr);
+  if (Error::getTopPrinted()+0<=Error::NOTICE+0) fputs("Success.\n", stderr);
   fflush(stdout); fflush(stderr);
   Error::cexit(0);
 }
@@ -1041,6 +1042,8 @@ int main(int, char const*const* argv) {
   bool versionp=argv[0]!=(char const*)NULLP && argv[1]!=(char const*)NULLP && argv[2]==(char const*)NULLP && (
              option_eq(argv[1], "-version") || 
              option_eq(argv[1], "-v"));
+  bool quietp=argv[0]!=(char const*)NULLP && argv[1]!=(char const*)NULLP &&
+             option_eq(argv[1], "-j:quiet");
   init_sam2p_engine(argv[0]);
   
   if (versionp) {
@@ -1049,11 +1052,11 @@ int main(int, char const*const* argv) {
   }
 
   /* Don't print diagnostics to stdout, becuse it might be the OutputFile */
-  serr << "This is " << Error::banner0 << ".\n";
+  if (!quietp) { serr << "This is " << Error::banner0 << ".\n"; }
   init_loader();
-  serr << "Available Loaders:"; Image::printLoaders(serr); serr << ".\n";
+  if (!quietp) { serr << "Available Loaders:"; Image::printLoaders(serr); serr << ".\n"; }
   init_applier();
-  serr << "Available Appliers:"; Rule::printAppliers(serr); serr << ".\n";
+  if (!quietp) { serr << "Available Appliers:"; Rule::printAppliers(serr); serr << ".\n"; }
 
   run_sam2p_engine(sout, serr, argv+(argv[0]!=(char const*)NULLP), helpp);
   return 0; /*notreached*/

@@ -287,6 +287,10 @@ Options (case insensitive):
 -- -j -j:job   : display in-memory .job file
 -- -j:warn     : be verbose and display warnings about impossible combinations in
                  the .job file
+-- -j:quiet    : print only error and fatal error messages, suppress
+                 warnings, notices etc. Must be put at the beginning of the
+                 command line to suppress initial banners, too. For example,
+                 `sam2p -j:quiet in.gif out.eps'.
 -- -s:Indexed1:Indexed4:Indexed8: Try /SampleFormats in this order, and try
                  all others after these. Can be specified separately 
                  (e.g `-s Indexed1 -s Indexed2:Indexed8')

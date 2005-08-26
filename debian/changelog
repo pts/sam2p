@@ -1,3 +1,10 @@
+sam2p (0.44-13) unstable; urgency=low
+
+  * Added -j:quiet
+  * No >/dev/null on png22pnm and tif22pnm
+
+ -- Szabó Péter <pts@math.bme.hu>  Fri, 26 Aug 2005 08:29:56 +0200
+
 sam2p (0.44-12) unstable; urgency=low
 
   * Fixed non-(0,0)-based EPS loading by putting `translate' after

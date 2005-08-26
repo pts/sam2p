@@ -595,8 +595,9 @@ Rule::OutputRule* Rule::buildProfile(MiniPS::VALUE Profile, bool quiet) {
   #if !USE_BUILTIN_LZW
     bool lzw_warning=true;
   #endif
-  if (quiet) Error::pushPolicy((Error::level_t)0, Error::WARNING, Error::WARNING_DEFER, (GenBuffer::Writable*)NULLP);
-  
+  if (quiet) Error::pushPolicy((Error::level_t)0,
+   /*printed_:*/Error::getTopPrinted()+0>Error::WARNING+0 ? Error::getTopPrinted() : Error::WARNING,
+   Error::WARNING_DEFER, (GenBuffer::Writable*)NULLP); /* Dat: WARNING_DEFER untested */
   for (c=0, pary->getFirst(val); val!=NULLP; pary->getNext(val), c++) {
     /* val: each OutputRule of the Profile */
     or_->fromDict(*val);
@@ -634,7 +635,9 @@ Rule::OutputRule* Rule::buildProfile(MiniPS::VALUE Profile, bool quiet) {
 void Rule::applyProfile(GenBuffer::Writable& out, OutputRule*rule_list, Image::SampledInfo *sf) {
   OutputRule *or_;
   // unsigned tryc=0; /* Wed Jul  3 19:30:33 CEST 2002 */
-  Error::pushPolicy((Error::level_t)0, Error::NOTICE, Error::NOTICE_DEFER, (GenBuffer::Writable*)NULLP);
+  Error::pushPolicy((Error::level_t)0,
+    /*printed_:*/Error::getTopPrinted()+0>Error::NOTICE+0 ? Error::getTopPrinted() : Error::NOTICE,
+    Error::NOTICE_DEFER, (GenBuffer::Writable*)NULLP);
   Image::Sampled::rgb_t Transparent=0x1000000UL;
   if (rule_list->dict!=NULLP) {
     Transparent=rule_list->cache.Transparent;

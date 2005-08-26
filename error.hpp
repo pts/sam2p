@@ -98,6 +98,13 @@ class Error {
    *   delete Error::getRecorded();  popPolicy();
    */
   static void popPolicy();
+
+  /** @example Error::setTopPrinted(Error::ERROR_CONT); suppress anything
+   * below error, such as warnings.
+   */
+  static void setTopPrinted(level_t printed_);
+  
+  static level_t getTopPrinted();
   
   /** The Cleanup mechanism is similar to atexit(3) and on_exit(3). This is
    * just a simple struct with no destructors, virtual methods or inheritance.

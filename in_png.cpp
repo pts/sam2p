@@ -35,7 +35,14 @@ static Image::Sampled *in_png_reader(Image::Loader::UFD* ufd, SimBuffer::Flat co
     "png22pnm -rgba %S >%D";
   #else
     #if OS_COTY==COTY_UNIX
-      "(png22pnm -rgba %S || (pngtopnm <%S && pngtopnm -alpha <%S)) >%D";
+      #if 1
+        "(png22pnm -rgba %S || (pngtopnm <%S && pngtopnm -alpha <%S)) >%D";
+      #else
+        /* Dat: not using this to suppress `sh: png22pnm: command not found', because
+         * it would hide precious error messages printed by png22pnm.
+         */
+         "((png22pnm -rgba %S 2>/dev/null)|| (pngtopnm <%S && pngtopnm -alpha <%S)) >%D";
+      #endif
     #else
       "png22pnm -rgba %S >%D";
     #endif

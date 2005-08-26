@@ -32,7 +32,14 @@ static Image::Sampled *in_tiff_reader(Image::Loader::UFD *ufd, SimBuffer::Flat c
 #endif
   #else
     #if OS_COTY==COTY_UNIX
-      "(tif22pnm -rgba %S pnm: || tifftopnm %S)";
+      #if 1
+        "(tif22pnm -rgba %S pnm: || tifftopnm %S)";
+      #else
+        /* Dat: not using this to suppress `sh: tif22pnm: command not found', because
+         * it would hide precious error messages printed by tif22pnm.
+         */
+         "((tif22pnm -rgba %S pnm: 2>/dev/null)|| tifftopnm %S)";
+      #endif
     #else
       "tif22pnm -rgba %S pnm:"; /* Wants to seek in the file. */
     #endif

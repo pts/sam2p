@@ -28,7 +28,7 @@ static Error::Policy defaultPolicy={
   (SimBuffer::B*)NULLP, /* record */
   (Error::level_t)-9999, /* topSecret */
   (Error::level_t)-9999, /* topRecorded */
-  (Error::level_t)0, /* killer */
+  (Error::level_t)0, /* killer (level>=0) */
   (Error::level_t)-99, /* printed */
   (Error::level_t)-199, /* recorded */
   Error::serr, /* err */
@@ -114,6 +114,12 @@ SimBuffer::B *Error::getRecorded() {
   policy_top->record=(SimBuffer::B*)NULLP;
   return ret;
 }
+
+void Error::setTopPrinted(level_t printed_) {
+  policy_top->printed=printed_;
+}
+
+Error::level_t Error::getTopPrinted() { return policy_top->printed; }
 
 void Error::popPolicy() {
   if (policy_top==policy_bottom) {
