@@ -116,8 +116,57 @@ sam2p (0.43-2) unstable; urgency=low
 sam2p (0.43-1) unstable; urgency=low
 
   * Initial Debian release.
+  * PDF generation bugfixes
+  * PDF /MediaBox is output into a separate line near the beginning of file
+    (graphicP compatibility)
 
- -- Szabó Péter <pts@winter>  Fri,  7 Feb 2003 14:04:44 +0100
+sam2p (0.41) unstable; urgency=low
+
+  * vcsam2p.exe (graphic .exe with Visual Studio 6.0), merged
+  * added Below feature -m:lower:5
+  * png22pnm support
+  * Debian Slink pdfTeX integration
+
+ -- Szabó Péter <pts@winter>  Wed,  5 Feb 2003 18:40:12 +0100
+
+sam2p (0.41) unstable; urgency=low
+
+  * All earlier versions listed here:
+  * 0.29 Apr 4 2002
+       sam2p_article.tex preliminary version
+  * 0.30 Sat Apr  6 09:19:23 CEST 2002
+  * 0.31 -- Fri Apr 12 23:54:57 CEST 2002
+       not working TCL/TK GUI, sam2p_article corrected
+  * 0.32 Sat Apr 13 12:55:09 CEST 2002 --
+       PCX input, class Encoder, class Decoder
+  * 0.33 JPEG, TIFF, PNG input. JPEG output.
+  * 0.34 PDF output, PNG output.
+  * 0.35 Fri Apr 26 08:28:41 CEST 2002
+       transparency, gui, sam2p_talk, EuroBachoTeX 2002
+  * 0.36 Sat May 26 14:06:09 CEST 2002
+       Blanca bugfixes
+  * 0.37 Sat Jun  1 14:06:43 CEST 2002
+       ccdep.pl, --enable-debug, XPM output, opaque TIFF output,
+       more PS output, BMP output, transparent PNM output, one-liner mode,
+       XWD output, PS output with margins, autoconf consts,
+       built-in CCITTFaxEncode
+  * 0.38 Tue Sep  3 20:16:59 CEST 2002
+       Many portability bugfixes. Now more versions of GNU C++ compilers and
+       more achitectures are tested and supported.
+       gcc-3.1 or gcc-3.2 compliance (AC_C_CONST working const; with autoconf
+       2.53)
+  * 0.39 -j:warn, allow /OutputFile(-) (stdout) in one-liner mode,
+       one-liner mode with src == dst filename `--', EPS margins, PDF margins,
+       -m, scaling PS output command line, PSL1 Gray ZIP&LZW in all
+       TransferEncodings
+  * 0.40 Wed Dec 11 19:24:31 CET 2002
+       builds out-of-the box (./configure ...; make -> sam2p.exe) on Win32 with MinGW32 + Perl
+  * 0.41 GIF and XPM load bugfixes
+       synchronized to GIMP tif22pnm
+       transparent(+?) TIFF output, really
+       better tif22pnm support
+
+ -- Szabó Péter <pts@winter>  Wed,  5 Feb 2003 11:40:12 +0100
 
 Local variables:
 mode: debian-changelog

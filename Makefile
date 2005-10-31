@@ -151,7 +151,7 @@ dist-more: bts2.tth
 	$(BASH) mkdist.sh sam2p-more bts2.tth
 dist-install: dist-noautoconf
 	chmod 600 ../sam2p-*.tar.gz
-	scp ../sam2p-*.tar.gz k:public_html
+	scp ../sam2p-*.tar.gz kozma:public_html
 
 install: sam2p
 	-mkdir -p '$(bindir)'
