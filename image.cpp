@@ -1477,7 +1477,8 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
       iimg->packPal();
     }
     /* printf("gett=%d\n", PTS_dynamic_cast(Indexed*,img)->getTransp()); */
-    assert(PTS_dynamic_cast(Indexed*,img)->getTransp()==-1 || PTS_dynamic_cast(Indexed*,img)->getTransp()+0U<1U);
+    /* vvv BUGFIX: <1U -> <2U */
+    assert(PTS_dynamic_cast(Indexed*,img)->getTransp()==-1 || PTS_dynamic_cast(Indexed*,img)->getTransp()+0U<2U);
     /* ^^^ color 0 is opaque, color 1 is transparent, thanks to
      * img->packPal() called in SampleInfo() -- but setTranspc may have changed this
      */
