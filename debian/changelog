@@ -1,3 +1,9 @@
+sam2p (0.45-2) unstable; urgency=low
+
+  * cgif.c is indicated to be free software.
+
+ -- Szabó Péter <pts@math.bme.hu>  Sun,  2 Jul 2006 23:04:21 +0200
+
 sam2p (0.45-1) unstable; urgency=low
 
   * Small docs changes.

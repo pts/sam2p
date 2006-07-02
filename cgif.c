@@ -147,22 +147,6 @@ EXTERN_C FILE *fdopen (int fildes, const char *mode); /* GCC 3.0 SUXX */
 
 int CGIFFF _GifError = 0;
 
-#if 0 /**** pts ****/
-#ifdef SYSV
-static char *VersionStr =
-        "Gif library module,\t\tGershon Elber\n\
-	(C) Copyright 1989 Gershon Elber, Non commercial use only.\n";
-#else
-static char *VersionStr =
-	PROGRAM_NAME
-	"	IBMPC "
-	GIF_LIB_VERSION
-	"	Gershon Elber,	"
-	__DATE__ ",   " __TIME__ "\n"
-	"(C) Copyright 1989 Gershon Elber, Non commercial use only.\n";
-#endif /* SYSV */
-#endif
-
 /*****************************************************************************
 * Return the last GIF error (0 if none) and reset the error.		     *
 *****************************************************************************/
@@ -645,22 +629,6 @@ typedef struct GifFilePrivateType {
     CGIFFF GifByteType Suffix[LZ_MAX_CODE+1];	       /* So we can trace the codes. */
     unsigned int Prefix[LZ_MAX_CODE+1];
 } GifFilePrivateType;
-
-#if 0 /**** pts ****/
-#ifdef SYSV
-static char *VersionStr =
-        "Gif library module,\t\tGershon Elber\n\
-	(C) Copyright 1989 Gershon Elber, Non commercial use only.\n";
-#else
-static char *VersionStr =
-	PROGRAM_NAME
-	"	IBMPC "
-	GIF_LIB_VERSION
-	"	Gershon Elber,	"
-	__DATE__ ",   " __TIME__ "\n"
-	"(C) Copyright 1989 Gershon Elber, Non commercial use only.\n";
-#endif /* SYSV */
-#endif
 
 /* extern int _GifError; */
 
