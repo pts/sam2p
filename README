@@ -2232,6 +2232,16 @@ A51. sam2p doesn't change the file by default. Use the `-c:ijg' option
      meta-information (such as EXIF tags inserted by digital cameras) gets
      completely lost with `-c:ijg'.
 
+Q52. How do I use ZIP (Deflate) compression in LanguageLevel 2?
+
+A52. Run this:
+
+	sam2p -c:zip PSL2: in.image out.eps
+
+     This will make sam2p emit the image decoding procedure so the image
+     will be viewable (veeeery slowly) on LanguageLevel 2 devices, too. It
+     doesn't affect the rendering speed on LanguageLevel 3 devices.
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
