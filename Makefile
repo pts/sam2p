@@ -35,10 +35,10 @@ CCALL =$(CXXX) $(CXXFLAGS) $(CXXFLAGSB)
 CXDFAL=$(CXXFLAGS) $(CXXFLAGSB) $(LDFLAGS) $(LIBS)
 
 .PHONY: clean dist dist-noautoconf dist-more allclean distclean dist-install
-.PHONY: most all1 install
+.PHONY: most all all1 install
 
 ifndef MAKE_DIST
-  most: sam2p
+  most all: sam2p
   Makedep: ccdep.pl config.h; perl -x -S ./ccdep.pl --FAL=assert,no,yes,checker $(CXX)
   include Makedep
 endif
