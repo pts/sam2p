@@ -64,7 +64,9 @@ static Image::Sampled *in_ps_reader_low(Image::Loader::UFD* ufd, char const*bbox
   #endif
   FILE *f=fopen(mainfn(),"w");
   fprintf(f, "%s/setpagedevice/pop load def\n", bboxline); /* Imp: /a4/letter etc. */
-  fprintf(f, "_IFN (r) file cvx exec\n"); /* Dat: doesn't rely on GS to
+  /* vvv Dat: ignore extra calls to `showpage' */
+  fprintf(f, "/showpage [ currentdict  /showpage  {}  /put load  /showpage load ] cvx def\n");
+  fprintf(f, "_IFN (r) file cvx exec\nshowpage\n"); /* Dat: doesn't rely on GS to
     recognise EPSF-x.y comment, so works with both old and new gs */
   // ^^^ !! DOS EPSF etc. instead of exec/run
   fclose(f);
@@ -76,6 +78,7 @@ static Image::Sampled *in_ps_reader_low(Image::Loader::UFD* ufd, char const*bbox
   SimBuffer::B cmd;
   add_gs_cmd(cmd,hints);
   cmd << " -s_IFN=%S -- %*";
+  /*fprintf(stderr,"cmd:%s\n",cmd.term0()()); */
   HelperE helper(cmd.term0()(), mainfn()); /* Run external process GS */
   Filter::UngetFILED* ufdd=(Filter::UngetFILED*)ufd;
   int i=ufdd->vi_getcc();

@@ -522,7 +522,8 @@ void Filter::PipeE::vi_write(char const*buf, slen_t len) {
     vi_check();
     p=(FILE*)NULLP;
     FILE *f=fopen(tmpname(),"rb");
-    if (NULLP==f) Error::sev(Error::EERROR) << "Filter::PipeE" <<": fopen() after pclose() failed: " << tmpname << (Error*)0;
+    if (NULLP==f) Error::sev(Error::EERROR) << "Filter::PipeE" <<": fopen() after pclose() failed: "
+      << redir_cmd << ": " << tmpname << (Error*)0;
     vi_copy(f);
     // if (ferror(f)) Error::sev(Error::EERROR) << "Filter::Pipe: fread() tmpfile failed" << (Error*)0;
     // fclose(f);
@@ -800,7 +801,9 @@ bool Files::tmpRemove=true;
 
 static int cleanup_remove(Error::Cleanup *cleanup) {
   if (Files::tmpRemove) return Files::removeIf(cleanup->getBuf());
+#if 0 /* Dat: produces nested errors */
   Error::sev(Error::WARNING) << "keeping tmp file: " << cleanup->getBuf() << (Error*)0;
+#endif
   return 0;
 }
 
@@ -812,7 +815,9 @@ static int cleanup_remove_cond(Error::Cleanup *cleanup) {
   if (*(FILE**)cleanup->data!=NULLP) {
     fclose(*(FILE**)cleanup->data);
     if (Files::tmpRemove) return Files::removeIf(cleanup->getBuf());
+#if 0 /* Dat: produces nested errors */
     Error::sev(Error::WARNING) << "keeping tmp2 file: " << cleanup->getBuf() << (Error*)0;
+#endif
   }
   return 0;
 }

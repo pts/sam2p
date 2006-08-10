@@ -170,7 +170,8 @@ static const unsigned
   OPT_OutputFile=0xF2,
   OPT_Scale=0x101,
   OPT_Margins=0x112,
-  OPT_Transparent=0x122;
+  OPT_Transparent=0x122,
+  OPT_TmpRemove=0x132;
 
 /** @param s an option (lower/upper case intact), without leading `-'s
  * @param slen length of option 
@@ -206,6 +207,7 @@ static unsigned sam2p_optval(char const* s, slen_t slen) {
     /* printf("buf=(%s)\n", buf); */
     if (0==strcmp(buf, "sampleformat")) return OPT_SampleFormat;
     if (0==strcmp(buf, "loadhints")) return OPT_LoadHints;
+    if (0==strcmp(buf, "tmpremove")) return OPT_TmpRemove;
     if (0==strcmp(buf, "transparent")) return OPT_Transparent;
     if (0==strcmp(buf, "hints")) return OPT_Hints;
     if (0==strcmp(buf, "ps")
@@ -280,6 +282,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   SimBuffer::B Hints; /* MiniPS code */
   /* ^^^ Imp: separate hint for each -c arg?? */
   SimBuffer::B LoadHints;
+  bool TmpRemove_p=true;
   Rule::Cache::pr_t Predictor=Rule::Cache::PR_None; /* Imp: separate for each Compression */
   Rule::Cache::ff_t FileFormat=Rule::Cache::FF_default;
   Rule::Cache::te_t TransferEncoding=Rule::Cache::TE_default;
@@ -352,6 +355,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
       /* Dat: now opt, paramlen and param are correct */
       switch (opt) {
        case OPT_LoadHints: LoadHints << ',' << param; break;
+       case OPT_TmpRemove: TmpRemove_p=GenBuffer::parseBool(param, paramlen); break;
        case OPT_Transparent: Transparent=param; break; /* Imp: is this good memory management */
        case OPT_Hints: Hints << '\n' << param; break;
        case OPT_PSL1: FileFormat=Rule::Cache::FF_PSL1; break;
@@ -812,6 +816,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   jobss.appendDumpPS(SimBuffer::Static(OutputFile), true);
   jobss << "\n/LoadHints ";
   jobss.appendDumpPS(LoadHints, true);
+  jobss << "\n/TmpRemove " << (TmpRemove_p ? "true" : "false");
   jobss << "\n/Profile[\n";
   
   unsigned coi, sfi;

@@ -1,3 +1,9 @@
+sam2p (0.45-3) unstable; urgency=low
+
+  * in_ps.c: improved PostScript EPS load support, forcing `showpage'.
+
+ -- Szabó Péter <pts@icy.seasons.hu>  Thu, 10 Aug 2006 13:07:47 +0200
+
 sam2p (0.45-2) unstable; urgency=low
 
   * cgif.c is indicated to be free software.

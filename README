@@ -284,6 +284,8 @@ Output file extension gives a hint for /FileFormat:
 
 Options (case insensitive):
 
+-- --tmpremove {true|false} : remove temporary files after completion.
+      Set to false for debugging.  Default: true.
 -- -j -j:job   : display in-memory .job file
 -- -j:warn     : be verbose and display warnings about impossible combinations in
                  the .job file
