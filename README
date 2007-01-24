@@ -310,10 +310,10 @@ Options (case insensitive):
 -- -1c -ps:1c -ps:c PSLC:  : [pts] hint /FileFormat/PSLC among /PSL*
 -- -2  -ps:2 PSL2: EPS2:   : [tiff2ps,imagemagick] default hint /FileFormat/PSL2 among /PSL*
 -- -3  -ps:3 PSL3:         : [pts] hint /FileFormat/PSL3 among /PSL*
--- -pdf:b0 PDFB1.0:        : [pts] hint /FileFormat/PDFB1.0 among /PDF*
--- -pdf:b2 PDFB1.2:        : [pts] default hint /FileFormat/PDFB1.2 among /PDF*
--- -pdf:0 PDF1.0:          : [pts] hint /FileFormat/PDF1.0 among /PDF*
--- -pdf:2 PDF1.2:          : [pts] hint /FileFormat/PDF1.2 among /PDF*
+-- -pdf:b0 PDFB1.0:        : [pts] hint /FileFormat/PDFB1.0 among /PDF* (PDF 1.0 with inline image)
+-- -pdf:b2 PDFB1.2:        : [pts] default hint /FileFormat/PDFB1.2 among /PDF* (PDF 1.2 with inline image; default because image processors usually keep inline images intact, so they wouldn't want to inefficiently recompress our image)
+-- -pdf:0 PDF1.0:          : [pts] hint /FileFormat/PDF1.0 among /PDF* (PDF 1.0 with XObject image)
+-- -pdf:2 PDF1.2:          : [pts] hint /FileFormat/PDF1.2 among /PDF* (PDF 1.2 with XObject image)
 --  EPS: EPSF:             : [pts] hint /FileFormat/PSL2 or 
                                         /FileFormat/PSL3 (for /Compression/ZIP)
 --  PDF:                   : [pts] hint /FileFormat/PDFB1.0 or 
@@ -2243,6 +2243,16 @@ A52. Run this:
      This will make sam2p emit the image decoding procedure so the image
      will be viewable (veeeery slowly) on LanguageLevel 2 devices, too. It
      doesn't affect the rendering speed on LanguageLevel 3 devices.
+
+Q53. How do I create a GIF from an image with more than 256 colors?
+
+A53. You need the pnmquant utility, too from NetPbm. Run this:
+
+       sam2p in.image PPM:- | pnmquant 256 | sam2p - out.gif
+
+     Or, if you have the convert utility from ImageMagick, run:
+
+       sam2p in.image PPM:- | convert - out.gif
 
 Upsampling
 ~~~~~~~~~~
