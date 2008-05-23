@@ -209,8 +209,8 @@ bitmap_type bmp_load_image (at_string filename)
 			Bitmap_Head.biCompr,
 			rowbytes,
 			Grey);
-  BITMAP_WIDTH (image) = (unsigned short) Bitmap_Head.biWidth;
-  BITMAP_HEIGHT (image) = (unsigned short) Bitmap_Head.biHeight;
+  BITMAP_WIDTH (image) = (at_dimen_t) Bitmap_Head.biWidth;
+  BITMAP_HEIGHT (image) = (at_dimen_t) Bitmap_Head.biHeight;
   BITMAP_PLANES (image) = Grey ? 1 : 3;
 
   return (image);

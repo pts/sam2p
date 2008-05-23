@@ -261,8 +261,8 @@ bitmap_type pnm_load_image (at_string filename)
         FATALP ("PNM: invalid maxval while loading");
     }
 
-  BITMAP_WIDTH (bitmap) = (unsigned short) pnminfo->xres;
-  BITMAP_HEIGHT (bitmap) = (unsigned short) pnminfo->yres;
+  BITMAP_WIDTH (bitmap) = (at_dimen_t) pnminfo->xres;
+  BITMAP_HEIGHT (bitmap) = (at_dimen_t) pnminfo->yres;
 
   BITMAP_PLANES (bitmap) = (pnminfo->np)?(pnminfo->np):1;
   /* BITMAP_BITS (bitmap) = (unsigned char *) malloc (pnminfo->yres * pnminfo->xres * BITMAP_PLANES (bitmap)); */

@@ -25,11 +25,13 @@
 #define XFREE(p) delete p
 /* ^^^ Imp: arrays?? */
 
+typedef unsigned at_dimen_t; /**** pts ****/
+
 /* #include "autotrace.h" */
 typedef char *at_string;
 typedef struct _at_bitmap_type {
-  unsigned short height;
-  unsigned short width;
+  at_dimen_t height;
+  at_dimen_t width;
   unsigned char *bitmap;
   unsigned int np;
 } at_bitmap_type;
@@ -62,7 +64,7 @@ typedef at_bitmap_type bitmap_type;
 
 /* Allocate storage for the bits, set them all to white, and return an
    initialized structure.  */
-extern bitmap_type new_bitmap (unsigned short, unsigned short);
+extern bitmap_type new_bitmap (at_dimen_t, at_dimen_t);
 
 /* Free that storage.  */
 extern void free_bitmap (bitmap_type *);

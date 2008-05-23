@@ -2163,7 +2163,7 @@ A44. Do
 
 Q45. Is it possible to specify a resolution other than 72 DPI, so that the
      dimensions of the resulting PDF are accurate for print-resolution images?
-        
+
 A45. In the most recent version of sam2p, now it is. Just use `-m:dpi:144'
      to have the output EPS or PDF scaled to double size, or use
      `-m:dpi:<real>' to have it scaled by a factor of <real>/72. Note that
@@ -2193,10 +2193,10 @@ A47. Until someone adds a test to ./configure, try adding the line
 
      to the end of config2.h, just before running `make'.
 
-Q48. Should I run sam2p overy all my EPS (or PDF) files, to see if they
+Q48. Should I run sam2p over all my EPS (or PDF) files, to see if they
      would become smaller?
 
-A48. No! This is a bad idea in general, because you loose information, since
+A48. No! This is a bad idea in general, because you lose information, since
      the EPS output of sam2p is always rasterized, so it is not scalable
      anymore.
 
@@ -2246,13 +2246,41 @@ A52. Run this:
 
 Q53. How do I create a GIF from an image with more than 256 colors?
 
-A53. You need the pnmquant utility, too from NetPbm. Run this:
+A53. You need the pnmquant utility too from NetPbm. Run this:
 
        sam2p in.image PPM:- | pnmquant 256 | sam2p - out.gif
 
      Or, if you have the convert utility from ImageMagick, run:
 
        sam2p in.image PPM:- | convert - out.gif
+
+Q54. What is the maximum image size sam2p supports?
+
+A54. As of version 0.45, the following limits apply for input images:
+
+     -- Input image height times image width must be <= 2000000000 pixels.
+        Individual dimensions can be as high as necessary.
+     -- Input image memory must be <= 1000000000 bytes (1 GiB). The memory is
+        computed by multiplying image width, image height and BPC. BPC is
+        number of bytes per pixels. It is 3 for RGB images, 1 for grayscale
+        and indexed (256-color palette) images. For some temporary
+        calculations BPC might go up to 3 even if it is smaller than 3 in
+        the input image, so to be safe, always assume that BPC is 3 in image
+        memory calculations.
+     -- For JPEG input or ouput, image width and height must be <= 65535
+        pixels.
+        This is an inherent limitation in the JPEG file format.
+
+     In earlier versions (0.44 or below) the following additional limits
+     applied:
+
+     -- Image width must be <= 65535 pixels.
+     -- Image height must be <= 65535 pixels.
+
+     sam2p is a fast image conversion tool: it isn't unnecessarily slow on
+     large images. Its speed is predictable for uncompressed images: it
+     slows down proportionally to the input image memory (see the
+     calculation below).
 
 Upsampling
 ~~~~~~~~~~
