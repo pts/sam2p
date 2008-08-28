@@ -22,6 +22,7 @@
  */
 class GenBuffer {
  public:
+  virtual inline ~GenBuffer() {}
   static inline unsigned hexc2n(char c) {
     return ((unsigned char)(c-'0')<=(unsigned char)('9'-'0')) ? c-'0' 
          : ((unsigned char)(c-'A')<=(unsigned char)('F'-'A')) ? c-'A'+10
@@ -72,7 +73,7 @@ class GenBuffer {
    */
   virtual void next_sub(Sub &sub) const =0;
   inline void each_char(block_char_t block, void *data) const {
-    void *t[2]= { (void*)data, (void*)block };
+    void *t[2]= { data, (void*)(long)block };
     each_sub(iter_char_sub, (void*)t);
   }
   inline bool isEmpty() const { return getLength()==0; }
@@ -145,6 +146,7 @@ class GenBuffer {
     /** Outputs a null-terminated, C string. Not `inline' because the use
      * of strlen().
      */
+    virtual inline ~Writable() {}
     Writable& operator <<(char const*);
     Writable& operator <<(void const*);
     inline Writable& operator <<(  signed short n) { write_num((signed long)n); return*this; }
@@ -219,6 +221,7 @@ class GenBuffer {
      * read again. The default implementation does nothing.
      */
     inline virtual void vi_rewind() {}
+    virtual inline ~Readable() {}
   };
 
  protected:

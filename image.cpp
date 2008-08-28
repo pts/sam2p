@@ -1269,8 +1269,8 @@ Image::Sampled *Image::load(Image::Loader::UFD* ufd0, SimBuffer::Flat const& loa
   while (p!=NULLP) {
     /* vvv each checker() must rewind ufd for itself */
     if ((format==(char const*)NULLP || 0==strcmp(p->format, format))
-     && (Loader::checker_t)NULLP!=p->checker
-     && (Loader::reader_t)NULLP!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints, ufd0))
+     && (Loader::checker_t)0!=p->checker
+     && (Loader::reader_t)0!=(reader=p->checker(buf,buf+Loader::MAGIC_LEN, loadHints, ufd0))
        ) {
       // fprintf(stderr, "%p %p\n", ufd0, &ufd);
       return reader(ufd0, loadHints);
@@ -1342,7 +1342,7 @@ unsigned Image::printLoaders(GenBuffer::Writable &out) {
   unsigned num=0;
   Loader *p=first;
   while (p!=NULLP) {
-    if (p->checker!=(Loader::checker_t)NULLP && p->format!=(char const*)NULLP) { num++; out << ' ' << p->format; }
+    if (p->checker!=(Loader::checker_t)0 && p->format!=(char const*)NULLP) { num++; out << ' ' << p->format; }
     p=p->next;
   }
   return num;

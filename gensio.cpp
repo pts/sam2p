@@ -447,6 +447,7 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
      put:
       // if (*pp) Error::sev(Error::EERROR) << "Filter::PipeE" << ": multiple %escape" << (Error*)0;
       /* ^^^ multiple %escape is now a supported feature */
+      // fprintf(stderr, "tmpl=(%s) s=(%s)\n", pipe_tmpl, s);
       if (!*pp && !Files::find_tmpnam(*pp)) Error::sev(Error::EERROR) << "Filter::PipeE" << ": tmpnam() failed" << (Error*)0;
       assert(! !*pp); /* pacify VC6.0 */
       // *pp << ext;
@@ -459,6 +460,7 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
       pp=&tmpename;
       goto put;
      case 's': case 'S': /* temporary source file */
+      /* !! if the input is a regular, seekable file, don't copy to a temporary file */
       pp=&tmpsname;
       goto put;
      default:
@@ -774,10 +776,10 @@ FILE *Files::open_tmpnam(SimBuffer::B &dir, char const*open_mode, char const*ext
   FILE *f=(FILE*)NULLP;
   // char const* open_mode=binary_p ? "wb" : "w"; /* Dat: "bw" is bad */
   (void)( ((FILE*)NULLP!=(f=try_dir(dir, fname, 0, 0, open_mode))) ||
-          ((FILE*)NULLP!=(f=try_dir(dir, fname, PTS_CFG_P_TMPDIR, 0, open_mode))) ||
           ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("TMPDIR"), 0, open_mode))) ||
           ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("TMP"), 0, open_mode))) ||
           ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("TEMP"), 0, open_mode))) ||
+          ((FILE*)NULLP!=(f=try_dir(dir, fname, PTS_CFG_P_TMPDIR, 0, open_mode))) ||
           ((FILE*)NULLP!=(f=try_dir(dir, fname, "/tmp", 0, open_mode))) ||
           ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("WINBOOTDIR"), "//temp", open_mode))) ||
           ((FILE*)NULLP!=(f=try_dir(dir, fname, getenv("WINDIR"), "//temp", open_mode))) ||

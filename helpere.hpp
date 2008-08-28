@@ -27,7 +27,7 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
     // img=Image::load("-", SimBuffer::B(), (Image::filep_t)f, (char const*)"PNM");
     /* fclose(f); */
     Filter::UngetFILED ufd((char const*)NULLP, f, Filter::UngetFILED::CM_closep|Filter::UngetFILED::CM_keep_stdinp);
-    img=Image::load((Image::Loader::UFD*)&ufd, SimBuffer::B(), (char const*)"PNM");
+    img=Image::load((Image::Loader::UFD*)(long)&ufd, SimBuffer::B(), (char const*)"PNM");
   }
   inline Image::Sampled *getImg() const { return img; }
  protected:

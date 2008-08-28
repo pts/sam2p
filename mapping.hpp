@@ -21,6 +21,7 @@ class Mapping {
    */
   class Gen {
    public:
+    inline virtual ~Gen() {}
     /** Returns the length of one data value (same for all values, determined
      * at construction of Gen).
      */
@@ -80,6 +81,7 @@ class Mapping {
   /** Double hashing. Still abstract. */
   class DoubleHash: public Gen {
    public:
+    inline virtual ~DoubleHash() {}
     /** If it modifies `scale', then it must modify alloced, may modify minlen
      * and maxused, and must not modify anything else. If it does not modify
      * `scale', it must not modify anything else. After it returns,

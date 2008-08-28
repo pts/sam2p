@@ -84,47 +84,47 @@ L1_FLAGS=-DCFG_FMT_ZLIB_ONLY=1 -DNDEBUG=1 \
 TTT_QUOTE=perl -e '$$s=$$_=join"",<STDIN>; $$s=~s@([()\\])@\\$$1@g; die if $$ARGV[0]!~/^(\w+)/; print "\n% TTT_QUOTE\n/$$1 ($$s)\n\n"' --
 # vvv Dat: input file for `g++ -E' must have .h extension
 l1g8z.pst: l1zip.psm psmlib.psm ps_tiny
-	<$< >tmp.h perl -pe0
-	$(CXX) -E $(L1_FLAGS) -DUSE_A85D=1 tmp.h >tmp.i
-	<tmp.i >tmp.pin $(PREPROC_STRIP)
-	<tmp.pin >tmp.ps0 ./ps_tiny
-	<tmp.ps0 >tmp.pst $(TTT_QUOTE) $@
-	mv -f tmp.pst $@
+	<$< >$@.tmp.h perl -pe0
+	$(CXX) -E $(L1_FLAGS) -DUSE_A85D=1 $@.tmp.h >$@.tmp.i
+	<$@.tmp.i >$@.tmp.pin $(PREPROC_STRIP)
+	<$@.tmp.pin >$@.tmp.ps0 ./ps_tiny
+	<$@.tmp.ps0 >$@.tmp.pst $(TTT_QUOTE) $@
+	mv -f $@.tmp.pst $@
 l1ghz.pst: l1zip.psm psmlib.psm ps_tiny
-	<$< >tmp.h perl -pe0
-	$(CXX) -E $(L1_FLAGS) -DUSE_HEXD=1 tmp.h >tmp.i
-	<tmp.i >tmp.pin $(PREPROC_STRIP)
-	<tmp.pin >tmp.ps0 ./ps_tiny
-	<tmp.ps0 >tmp.pst $(TTT_QUOTE) $@
-	mv -f tmp.pst $@
+	<$< >$@.tmp.h perl -pe0
+	$(CXX) -E $(L1_FLAGS) -DUSE_HEXD=1 $@.tmp.h >$@.tmp.i
+	<$@.tmp.i >$@.tmp.pin $(PREPROC_STRIP)
+	<$@.tmp.pin >$@.tmp.ps0 ./ps_tiny
+	<$@.tmp.ps0 >$@.tmp.pst $(TTT_QUOTE) $@
+	mv -f $@.tmp.pst $@
 l1gbz.pst: l1zip.psm psmlib.psm ps_tiny
-	<$< >tmp.h perl -pe0
-	$(CXX) -E $(L1_FLAGS) -DUSE_BINARY=1 tmp.h >tmp.i
-	<tmp.i >tmp.pin $(PREPROC_STRIP)
-	<tmp.pin >tmp.ps0 ./ps_tiny
-	<tmp.ps0 >tmp.pst $(TTT_QUOTE) $@
-	mv -f tmp.pst $@
+	<$< >$@.tmp.h perl -pe0
+	$(CXX) -E $(L1_FLAGS) -DUSE_BINARY=1 $@.tmp.h >$@.tmp.i
+	<$@.tmp.i >$@.tmp.pin $(PREPROC_STRIP)
+	<$@.tmp.pin >$@.tmp.ps0 ./ps_tiny
+	<$@.tmp.ps0 >$@.tmp.pst $(TTT_QUOTE) $@
+	mv -f $@.tmp.pst $@
 l1g8l.pst: l1lzw.psm psmlib.psm ps_tiny
-	<$< >tmp.h perl -pe0
-	$(CXX) -E $(L1_FLAGS) -DUSE_A85D=1 tmp.h >tmp.i
-	<tmp.i >tmp.pin $(PREPROC_STRIP)
-	<tmp.pin >tmp.ps0 ./ps_tiny
-	<tmp.ps0 >tmp.pst $(TTT_QUOTE) $@
-	mv -f tmp.pst $@
+	<$< >$@.tmp.h perl -pe0
+	$(CXX) -E $(L1_FLAGS) -DUSE_A85D=1 $@.tmp.h >$@.tmp.i
+	<$@.tmp.i >$@.tmp.pin $(PREPROC_STRIP)
+	<$@.tmp.pin >$@.tmp.ps0 ./ps_tiny
+	<$@.tmp.ps0 >$@.tmp.pst $(TTT_QUOTE) $@
+	mv -f $@.tmp.pst $@
 l1ghl.pst: l1lzw.psm psmlib.psm ps_tiny
-	<$< >tmp.h perl -pe0
-	$(CXX) -E $(L1_FLAGS) -DUSE_HEXD=1 tmp.h >tmp.i
-	<tmp.i >tmp.pin $(PREPROC_STRIP)
-	<tmp.pin >tmp.ps0 ./ps_tiny
-	<tmp.ps0 >tmp.pst $(TTT_QUOTE) $@
-	mv -f tmp.pst $@
+	<$< >$@.tmp.h perl -pe0
+	$(CXX) -E $(L1_FLAGS) -DUSE_HEXD=1 $@.tmp.h >$@.tmp.i
+	<$@.tmp.i >$@.tmp.pin $(PREPROC_STRIP)
+	<$@.tmp.pin >$@.tmp.ps0 ./ps_tiny
+	<$@.tmp.ps0 >$@.tmp.pst $(TTT_QUOTE) $@
+	mv -f $@.tmp.pst $@
 l1gbl.pst: l1lzw.psm psmlib.psm ps_tiny
-	<$< >tmp.h perl -pe0
-	$(CXX) -E $(L1_FLAGS) -DUSE_BINARY=1 tmp.h >tmp.i
-	<tmp.i >tmp.pin $(PREPROC_STRIP)
-	<tmp.pin >tmp.ps0 ./ps_tiny
-	<tmp.ps0 >tmp.pst $(TTT_QUOTE) $@
-	mv -f tmp.pst $@
+	<$< >$@.tmp.h perl -pe0
+	$(CXX) -E $(L1_FLAGS) -DUSE_BINARY=1 $@.tmp.h >$@.tmp.i
+	<$@.tmp.i >$@.tmp.pin $(PREPROC_STRIP)
+	<$@.tmp.pin >$@.tmp.ps0 ./ps_tiny
+	<$@.tmp.ps0 >$@.tmp.pst $(TTT_QUOTE) $@
+	mv -f $@.tmp.pst $@
 # vvv copy the .ttt, not the .tth
 #     The perl program down there is a portable cat(1) implementation.
 bts1.ttt: bts.ttt $(L1_LIST)
@@ -133,7 +133,7 @@ bts2.ttt: bts1.ttt ps_tiny
 	./ps_tiny --copy <$< >$@
 
 clean:
-	rm -f *~ a.out DEADJOE core *.o *.tth .rgd *.rgd tmp.pin tmp.i tmp.ps0 tmp.h tmp.pst autom4te.cache/*
+	rm -f *~ a.out DEADJOE core *.o *.tth .rgd *.rgd *.tmp.pin *.tmp.i *.tmp.ps0 *.tmp.h *.tmp.pst autom4te.cache/*
 	rm -f debian/changelog.dch debian/*~ 
 	rm -f $(ALL) $(ALL:=.yes) $(ALL:=.no) $(ALL:=.assert) $(ALL:=.checker)
 	-rmdir -- autom4te.cache

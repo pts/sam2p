@@ -1,6 +1,6 @@
 #define DUMMY \
 set -ex; \
-${CC:-gcc} -DNDEBUG=1 -DPTS_DEFL_MAIN -O3 -ansi \
+"${CC:-gcc}" -DNDEBUG=1 -DPTS_DEFL_MAIN -O3 -ansi \
   -Wall -W -Wstrict-prototypes -Wtraditional -Wnested-externs -Winline \
   -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wmissing-prototypes \
   -Wmissing-declarations pts_defl.c -o flateenc; \
@@ -96,7 +96,7 @@ exit
    subject to change. Applications should only use zlib.h.
  */
 
-/* @(#) $Id: pts_defl.c,v 1.5 2005-01-18 16:05:16 pts Exp $ */
+/* @(#) $Id: pts_defl.c,v 1.6 2008-08-28 20:16:47 pts Exp $ */
 
 #ifndef _Z_UTIL_H
 #define _Z_UTIL_H
@@ -148,7 +148,7 @@ exit
  * For conditions of distribution and use, see copyright notice in zlib.h 
  */
 
-/* @(#) $Id: pts_defl.c,v 1.5 2005-01-18 16:05:16 pts Exp $ */
+/* @(#) $Id: pts_defl.c,v 1.6 2008-08-28 20:16:47 pts Exp $ */
 
 /*#ifndef _ZCONF_H*/
 /*#define _ZCONF_H*/
