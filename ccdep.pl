@@ -224,6 +224,7 @@ while ($R=~/\G(.*)\n?/g) {
   } elsif ($S=~/: No such file or directory$/) {
     # ^^^ gcc-3.3
     undef $included_from;
+  } elsif ($S=~/^distcc\[/) {
   } else {
     die "$0: invalid depret: [$S]\n";
   }
