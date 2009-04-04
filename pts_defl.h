@@ -75,14 +75,20 @@ typedef struct z_stream_s {
     unsigned long   reserved;   /* reserved for future use */
 } z_stream;
 
-extern int zlib_deflate_workspacesize (void);
-extern int zlib_deflate (z_stream* strm, int flush);
-extern int zlib_deflateEnd (z_stream* strm);
-extern int zlib_deflateParams (z_stream* strm, int level, int strategy);
+#ifdef __cplusplus
+#define EXTERN_C extern "C"
+#else
+#define EXTERN_C extern
+#endif
 
-extern int zlib_deflateInit_ (z_stream* strm, int level,
+EXTERN_C int zlib_deflate_workspacesize (void);
+EXTERN_C int zlib_deflate (z_stream* strm, int flush);
+EXTERN_C int zlib_deflateEnd (z_stream* strm);
+EXTERN_C int zlib_deflateParams (z_stream* strm, int level, int strategy);
+
+EXTERN_C int zlib_deflateInit_ (z_stream* strm, int level,
                                      const char *version, int stream_size);
-extern int zlib_deflateInit2_ (z_stream* strm, int  level, int  method,
+EXTERN_C int zlib_deflateInit2_ (z_stream* strm, int  level, int  method,
                                       int windowBits, int memLevel,
                                       int strategy, const char *version,
                                       int stream_size);
