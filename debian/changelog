@@ -1,3 +1,13 @@
+sam2p (0.46-1) unstable; urgency=low
+
+  * Small bugfixes.
+  * encoder.cpp: Fixed ``/Predictor 15'' so it produces an efficient
+    predictor, similar to what libpng does.
+  * sam2p_main.cpp: Made ``/Predictor 15'' automatic for ZIP or LZW
+    compression if no `-c' command line flag was specified.
+
+ -- Szabó Péter <pts@fazekas.hu>  Sun,  5 Apr 2009 01:50:53 +0200
+
 sam2p (0.45-3) unstable; urgency=low
 
   * in_ps.c: improved PostScript EPS load support, forcing `showpage'.

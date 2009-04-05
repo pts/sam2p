@@ -342,10 +342,14 @@ class PNGPredictorPaeth: public Encoder {
   unsigned char bpccpp;
 };
 
-class PNGPredictorAuto: public Encoder {
+/** This class implements inferior predictor autoselection heuristics.
+ * Please use PNGPredictorAuto instead.
+ * Imp: code reuse with PNGPredictorAuto
+ */
+class PNGPredictorAutoBadSigned: public Encoder {
  public:
   /** @param maxcpl_: maximum # hex digits per line, should be even */
-  PNGPredictorAuto(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
+  PNGPredictorAutoBadSigned(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
   virtual void vi_write(char const*buf, slen_t len);
  protected:
   unsigned PTS_INT32_T h, g;
@@ -356,11 +360,36 @@ class PNGPredictorAuto: public Encoder {
   slen_t opleft;
 };
 
-/* Imp: code reuse with PNGPredictorAuto */
-class PNGPredictorAutoUnsigned: public Encoder {
+/** This class implements inferior predictor autoselection heuristics.
+ * Please use PNGPredictorAuto instead.
+ * Imp: code reuse with PNGPredictorAuto
+ */
+class PNGPredictorAutoBadUnsigned: public Encoder {
  public:
   /** @param maxcpl_: maximum # hex digits per line, should be even */
-  PNGPredictorAutoUnsigned(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
+  PNGPredictorAutoBadUnsigned(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
+  virtual void vi_write(char const*buf, slen_t len);
+ protected:
+  unsigned PTS_INT32_T h, g;
+  unsigned char *obuf, *o_prior, *o_0, *o_1, *o_2, *o_3, *o_4, *oo[5];
+  slen_t rlen;
+  GenBuffer::Writable &out;
+  unsigned char bpccpp;
+  slen_t opleft;
+};
+
+/** This class implements to so-called ``minimum sum of absolute differences''
+ * predictior autoselection heuristics, the same as what pngwutil.c
+ * contains in function png_write_find_filter() in libpng 1.2.20. (See that
+ * function for a discussion of other heuristics. A summary of this heuristics:
+ * we find which method provides the smallest value when summing the absolute
+ * values of the distances from zero, using anything >= 128 as negative
+ * numbers.
+ */
+class PNGPredictorAuto: public Encoder {
+ public:
+  /** @param maxcpl_: maximum # hex digits per line, should be even */
+  PNGPredictorAuto(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
   virtual void vi_write(char const*buf, slen_t len);
  protected:
   unsigned PTS_INT32_T h, g;
@@ -1504,7 +1533,13 @@ void PNGPredictorPaeth::vi_write(char const*buf, slen_t len) {
 
 /* --- */
 
-PNGPredictorAuto::PNGPredictorAuto(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_)
+#if SIZEOF_INT >= 4
+typedef int weight_t;
+#else
+typedef long weight_t;
+#endif
+
+PNGPredictorAutoBadSigned::PNGPredictorAutoBadSigned(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_)
  : h(0), g(0), out(out_) {
   param_assert(cpp_*bpc_<=32);
   opleft=rlen=(columns_*cpp_*bpc_+7)>>3;
@@ -1520,7 +1555,7 @@ PNGPredictorAuto::PNGPredictorAuto(GenBuffer::Writable &out_, unsigned char bpc_
   bpccpp=((cpp_*bpc_+7)&~7)-8;
 }
 
-void PNGPredictorAuto::vi_write(char const*buf, slen_t len) {
+void PNGPredictorAutoBadSigned::vi_write(char const*buf, slen_t len) {
   unsigned char const *p=(unsigned char const*)buf, *pend0=p+len;
   register unsigned int i;
   register unsigned raw_x_bpp, prior_x, prior_x_bpp;
@@ -1545,7 +1580,7 @@ void PNGPredictorAuto::vi_write(char const*buf, slen_t len) {
     h=(h<<8)|i; g=(g<<8)|*(o_prior-opleft); *(o_prior-opleft)=*p++;
     if (--opleft==0) {
       /* Select the predictor having the smallest signed sum of values. */
-      slendiff_t min_weight, cur_weight;
+      weight_t min_weight, cur_weight;
       unsigned min_pred=0, cur_pred;
       register signed char *beg, *end;
       min_weight=0; beg=(end=(signed char*)o_0)-rlen; while (beg!=end) min_weight+=*beg++;
@@ -1565,7 +1600,7 @@ void PNGPredictorAuto::vi_write(char const*buf, slen_t len) {
 
 /* --- */
 
-PNGPredictorAutoUnsigned::PNGPredictorAutoUnsigned(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_)
+PNGPredictorAutoBadUnsigned::PNGPredictorAutoBadUnsigned(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_)
  : h(0), g(0), out(out_) {
   param_assert(cpp_*bpc_<=32);
   opleft=rlen=(columns_*cpp_*bpc_+7)>>3;
@@ -1581,7 +1616,7 @@ PNGPredictorAutoUnsigned::PNGPredictorAutoUnsigned(GenBuffer::Writable &out_, un
   bpccpp=((cpp_*bpc_+7)&~7)-8;
 }
 
-void PNGPredictorAutoUnsigned::vi_write(char const*buf, slen_t len) {
+void PNGPredictorAutoBadUnsigned::vi_write(char const*buf, slen_t len) {
   unsigned char const *p=(unsigned char const*)buf, *pend0=p+len;
   register unsigned int i;
   register unsigned raw_x_bpp, prior_x, prior_x_bpp;
@@ -1608,7 +1643,7 @@ void PNGPredictorAutoUnsigned::vi_write(char const*buf, slen_t len) {
     h=(h<<8)|i; g=(g<<8)|*(o_prior-opleft); *(o_prior-opleft)=*p++;
     if (--opleft==0) {
       /* Select the predictor having the smallest unsigned sum of values. */
-      slen_t min_weight, cur_weight;
+      weight_t min_weight, cur_weight;
       unsigned min_pred=0, cur_pred;
       register unsigned char *beg, *end;
       min_weight=0; beg=(end=(unsigned char*)o_0)-rlen; while (beg!=end) min_weight+=*beg++;
@@ -1628,9 +1663,74 @@ void PNGPredictorAutoUnsigned::vi_write(char const*buf, slen_t len) {
 
 /* --- */
 
+PNGPredictorAuto::PNGPredictorAuto(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_)
+ : h(0), g(0), out(out_) {
+  param_assert(cpp_*bpc_<=32);
+  opleft=rlen=(columns_*cpp_*bpc_+7)>>3;
+  obuf=new unsigned char[6*rlen+6];
+  o_prior=obuf+rlen+1; /* Prior(x): ooprior[-opleft] */
+  obuf[rlen*1+1]='\0'; o_0=obuf+2*rlen+2;
+  obuf[rlen*2+2]='\1'; o_1=obuf+3*rlen+3;
+  obuf[rlen*3+3]='\2'; o_2=obuf+4*rlen+4;
+  obuf[rlen*4+4]='\3'; o_3=obuf+5*rlen+5;
+  obuf[rlen*5+5]='\4'; o_4=obuf+6*rlen+6;
+  oo[0]=o_0; oo[1]=o_1; oo[2]=o_2; oo[3]=o_3; oo[4]=o_4;
+  memset(obuf, '\0', rlen+1);
+  bpccpp=((cpp_*bpc_+7)&~7)-8;
+}
+
+void PNGPredictorAuto::vi_write(char const*buf, slen_t len) {
+  unsigned char const *p=(unsigned char const*)buf, *pend0=p+len;
+  register unsigned int i;
+  register unsigned raw_x_bpp, prior_x, prior_x_bpp;
+  // unsigned lines=0;
+  if (len==0) {
+    assert(opleft==rlen); /* unflushed (half-ready) row disallowed */
+    assert(obuf!=NULLP);
+    delete [] obuf;
+    obuf=(unsigned char*)NULLP;
+    out.vi_write(0,0);
+    return;
+  }
+  // fprintf(stderr, "rlen=%u len=%u opleft=%u\n", rlen, len, opleft);
+  while (p!=pend0) {
+    raw_x_bpp=(h>>bpccpp) &255;
+    prior_x=*(o_prior-opleft);
+    prior_x_bpp=(g>>bpccpp) &255;
+    i=*p;
+    *(o_0-opleft)=i;
+    *(o_1-opleft)=i-raw_x_bpp;
+    *(o_2-opleft)=i-prior_x;
+    *(o_3-opleft)=i-((raw_x_bpp+prior_x)>>1);
+    *(o_4-opleft)=i-paeth_predictor(raw_x_bpp, prior_x, prior_x_bpp);
+    h=(h<<8)|i; g=(g<<8)|*(o_prior-opleft); *(o_prior-opleft)=*p++;
+    if (--opleft==0) {
+      /* Select the predictor having the smallest unsigned sum of values. */
+      weight_t min_weight, cur_weight;
+      unsigned min_pred=0, cur_pred;
+      register signed char *beg, *end;
+      /* abs_(...) here converts '\xFF' to 1. Good. */
+      min_weight=0; beg=(end=(signed char*)o_0)-rlen; while (beg!=end) min_weight+=abs_(*beg++);
+      for (cur_pred=1; cur_pred<=4; cur_pred++) {
+        cur_weight=0; beg=(end=(signed char*)oo[cur_pred])-rlen; while (beg!=end) cur_weight+=abs_(*beg++);
+        if (cur_weight<min_weight) { min_weight=cur_weight; min_pred=cur_pred; }
+      }
+      // fprintf(stderr, "cp=%u\n", min_pred);
+
+      out.vi_write((char*)(oo[min_pred]-rlen-1),rlen+1);
+      opleft=rlen; h=0; g=0;
+      // lines++;
+    }
+  }
+  // fprintf(stderr, "oen=%u opleft=%u lines=%u\n", len, opleft, lines);
+}
+
+/* --- */
+
 Encoder* PSEncoder::newPredictor(GenBuffer::Writable &out_, unsigned char type, unsigned char bpc_, slen_t columns_, unsigned char cpp_) {
   switch ((unsigned)type) {
    /* Imp: make these faster with `register int' etc. tricks */
+   /* See also better_predictor in rule.cpp for the list of predictor numbers */
    case 1:  return new Filter::VerbatimE(out_);
    case 2:  return new TIFFPredictor2(out_, bpc_, columns_, cpp_);
    case 10: return new PNGPredictorNone(out_, bpc_, columns_, cpp_);
@@ -1639,7 +1739,8 @@ Encoder* PSEncoder::newPredictor(GenBuffer::Writable &out_, unsigned char type, 
    case 13: return new PNGPredictorAverage(out_, bpc_, columns_, cpp_);
    case 14: return new PNGPredictorPaeth(out_, bpc_, columns_, cpp_);
    case 15: return new PNGPredictorAuto(out_, bpc_, columns_, cpp_);
-   case 45: return new PNGPredictorAutoUnsigned(out_, bpc_, columns_, cpp_); /* pts' extension */
+   case 45: return new PNGPredictorAutoBadUnsigned(out_, bpc_, columns_, cpp_); /* pts' extension */
+   case 55: return new PNGPredictorAutoBadSigned(out_, bpc_, columns_, cpp_); /* pts' extension */
   }
   // fprintf(stderr, "pred=%d\n", type);
   param_assert(0 && "invalid predictor requested");

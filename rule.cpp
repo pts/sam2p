@@ -297,7 +297,8 @@ char const* Rule::CacheHints::dumpScale(sc_t Scale) {
  */
 static MiniPS::VALUE better_predictor(MiniPS::VALUE v) {
   return v==MiniPS::Qundef ? MiniPS::Qinteger(1) /* PR_None */
-       : v==MiniPS::Qinteger(1) || v==MiniPS::Qinteger(2) || v==MiniPS::Qinteger(45) ||
+       : v==MiniPS::Qinteger(1) || v==MiniPS::Qinteger(2) ||
+         v==MiniPS::Qinteger(45) || v==MiniPS::Qinteger(55) ||
          ((v&1)!=0 && v>=MiniPS::Qinteger(10) && v<=MiniPS::Qinteger(15)) ? v
        : MiniPS::Qundef;
 }

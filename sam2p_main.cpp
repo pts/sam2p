@@ -669,6 +669,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   }
   if (badp) return true;
   
+  int prcc = (colen==0) ? 2 : 1;
   if (colen==0) { /* apply default if Compression is unspecified */
     // Error::sev(Error::FATAL) << "FileFormat=" << (unsigned)FileFormat << (Error*)0;
     switch (FileFormat) {
@@ -704,6 +705,11 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
      default:
       APPEND_co(Rule::Cache::CO_None); break;
      /* for others FileFormats: CO_None, but that is _not_ appended anyway */
+    }
+  } else {
+    if ((int)Predictor == 55 || (int)Predictor == 45) {
+      Error::sev(Error::WARNING) << "predictor: /Predictor " << (int)Predictor
+          << " is inefficient; use /Predictor 15 instead" << (Error*)0;
     }
   }
   /* Dat: don't append /Compression/None if the user has specified `-c'. The
@@ -821,24 +827,45 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   
   unsigned coi, sfi;
   slen_t orc=0;
+  int prc;
+  bool is_predictor_recommended;
   for (sfi=0;sfi<sflen;sfi++) { for (coi=0;coi<colen;coi++) {
   // for (coi=0;coi<colen;coi++) for (sfi=0;sfi<sflen;sfi++)
-      if (cot[coi]==Rule::Cache::CO_JAI) {
-        if (!jaip || sft[sfi]!=Image::SF_Asis) continue;
+      Rule::Cache::co_t co=cot[coi];
+      Image::sf_t sf=sft[sfi];
+      if (co==Rule::Cache::CO_JAI) {
+        if (!jaip || sf!=Image::SF_Asis) continue;
       }
-      jobss << "<<% OutputRule #" << orc++
-            << "\n  /FileFormat /" << protect_null(Rule::Cache::dumpFileFormat(FileFormat, cot[coi]))
-            << "\n  /TransferEncoding /" << protect_null(Rule::Cache::dumpTransferEncoding(TransferEncoding))
-            << "\n  /SampleFormat /" << protect_null(Rule::Cache::dumpSampleFormat(sft[sfi]))
-            << "\n  /Compression /"  << protect_null(Rule::Cache::dumpCompression (cot[coi]))
-            << "\n  /Predictor " << (cot[coi]==Rule::Cache::CO_LZW || cot[coi]==Rule::Cache::CO_ZIP ? Predictor : 1)
-            << "\n  /Hints << " << Hints << " >>";
-      // jobss << "  /Transparent (\377\377\377)\n";
-      if (Transparent!=NULL) {
-        jobss << "\n  /Transparent ";
-        jobss.appendDumpPS(SimBuffer::Static(Transparent), true);
+      for (prc=prcc; prc>0; --prc) {
+        /* Add an extra predictor only for LZW or ZIP, appropriate SampleFormat
+         * and if the `-c' command line option was not specified.
+         * So if the user specifies `-c zip', he won't get a predictor by
+         * default; but if he specifies no `-c', he might get a `-c:zip:15'.
+         * To get the smallest file size, he should specify `-c zip:15:9'.
+         */
+        is_predictor_recommended =
+            sf==Image::SF_Gray1 || sf==Image::SF_Gray2 ||
+            sf==Image::SF_Gray4 || sf==Image::SF_Gray8 ||
+            sf==Image::SF_Rgb1 || sf==Image::SF_Rgb2 ||
+            sf==Image::SF_Rgb4 || sf==Image::SF_Rgb8;
+        if (prc>1 && ((co!=Rule::Cache::CO_LZW && co!=Rule::Cache::CO_ZIP) ||
+            !is_predictor_recommended)) continue;
+        jobss << "<<% OutputRule #" << orc++
+              << "\n  /FileFormat /" << protect_null(Rule::Cache::dumpFileFormat(FileFormat, co))
+              << "\n  /TransferEncoding /" << protect_null(Rule::Cache::dumpTransferEncoding(TransferEncoding))
+              << "\n  /SampleFormat /" << protect_null(Rule::Cache::dumpSampleFormat(sf))
+              << "\n  /Compression /"  << protect_null(Rule::Cache::dumpCompression (co))
+              << "\n  /Predictor " << (int)(co==Rule::Cache::CO_LZW || co==Rule::Cache::CO_ZIP ?
+                  /* If no compression (or predictor) specified, try predictor 15, then 1; otherwise try the specified predictor */
+                  (prc>1 ? Rule::Cache::PR_PNGAuto : Predictor != Rule::Cache::PR_PNGAutoMaybe ? Predictor : is_predictor_recommended ? Rule::Cache::PR_PNGAuto : Rule::Cache::PR_None) : Rule::Cache::PR_None)
+              << "\n  /Hints << " << Hints << " >>";
+        // jobss << "  /Transparent (\377\377\377)\n";
+        if (Transparent!=NULL) {
+          jobss << "\n  /Transparent ";
+          jobss.appendDumpPS(SimBuffer::Static(Transparent), true);
+        }
+        jobss  << "\n>>\n";
       }
-      jobss  << "\n>>\n";
     }
   }
   jobss << "]>>% __EOF__\n";
@@ -873,7 +900,7 @@ void init_sam2p_engine(char const*argv0) {
   Error::long_argv0=argv0==(char const*)NULLP ? "sam2p" : argv0;
   Error::argv0=Files::only_fext(Error::long_argv0);
   Error::tmpargv0="_sam2p_";
-  Error::banner0="sam2p v0.45";
+  Error::banner0="sam2p v0.46";
 }
 
 /* --- */

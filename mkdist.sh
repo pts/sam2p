@@ -10,7 +10,18 @@ if [ -f debian/changelog ]; then :; else
   echo "$0: missing: debian/changelog" >&2
   exit 2
 fi
-if [ -f files ]; then :; else
+if [ -f files ]; then
+  FILES="`cat files`"
+elif [ -d CVS ]; then
+  FILES=$( IFS='
+'
+    find -type d -name CVS | while read D; do
+      F="$D/Entries"
+      export E="${D%/CVS}/"
+      E="${E#./}"
+      perl -ne 'print"$ENV{E}$1\n"if m@^/([^/]+)/[1-9]@' <"$F"
+    done)
+else
   echo "$0: missing: files" >&2
   exit 3
 fi
@@ -35,17 +46,17 @@ rm -f "../$TGZ_NAME"
 mkdir "$PRO_VER"
 echo "$PRO_VER"
 (IFS='
-'; exec tar -c -- `cat files` "$@") |
+'; exec tar -c -- $FILES "$@") |
 (cd "$PRO_VER" && exec tar -xv)
 # ^^^ tar(1) magically calls mkdir(2) etc.
 
 # vvv Dat: don't include sam2p-.../ in the filenames of the .tar.gz
 #(IFS='
-#'; cd "$PRO_VER" && exec tar -czf "../../$TGZ_NAME" -- `cat ../files` "$@")
+#'; cd "$PRO_VER" && exec tar -czf "../../$TGZ_NAME" -- $FILES "$@")
 
 # vvv Dat: do include sam2p-.../ in the filenames of the .tar.gz
 (IFS='
-'; export PRO_VER; exec tar -czf "../$TGZ_NAME" -- `perl -pe '$_="$ENV{PRO_VER}/$_"' files` "$@")
+'; export PRO_VER; exec tar -czf "../$TGZ_NAME" -- `echo "$FILES" | perl -pe '$_="$ENV{PRO_VER}/$_"'` "$@")
 
 rm -rf "$PRO_VER"
 set +e

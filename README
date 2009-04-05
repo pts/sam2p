@@ -2282,6 +2282,46 @@ A54. As of version 0.45, the following limits apply for input images:
      slows down proportionally to the input image memory (see the
      calculation below).
 
+Q55. How do I get the smallest PNG output?
+
+A55. If your input image is truecolor, please consider a lossy compression
+     file format (such as JPEG), because the ZIP compression used in PNG is
+     not particularly well-suited for truecolor images.
+
+     If your input image has only a few colors, specify `-c zip:25:9', which
+     forces the ZIP compression whith a high effort (9) and predictor
+     autodetection (25). This is considerably slower than not specifying
+     any `-c' flag at all, and getting `-c zip:25', because the high effort
+     (9) is slower than the default effort.
+
+     Please also note that the free software ``optipng'' and the free-to-use
+     closed-source software PNGOUT (for Win32, Linux and Mac OS X) can
+     produce PNGs about 10% smaller than what sam2p produces -- but they are
+     a 100 times (or even more) slower than sam2p. The tool ``pnmtopng''
+     (tested with one linked to libpng 1.2.20) does not produce smaller PNGs
+     than sam2p >= 0.46. For older versionf of sam2p, the output of
+     ``pnmtopng'' was about 5--10% smaller.
+
+     Please also note that the the PNG output of Ghostscript -sDEVICE=pngmono
+     etc. is not optimal. Convert it with sam2p or the tools mentioned above
+     to reduce the file size.
+
+Q56. How do I get the smallest PDF output?
+
+A56. If your input image is truecolor, specify `-c jpeg', possibly tuning it
+     with a low quality parameter e.g. `-c jpeg:30'.
+
+     If your input image has only a few colors, specify `-c zip:25:9', which
+     forces the ZIP compression whith a high effort (9) and predictor
+     autodetection (15). This is considerably slower than not specifying
+     any `-c' flag at all, and getting `-c zip:25', because the high effort
+     (9) is slower than the default effort.
+
+     Please also have a look at Q55. Unfortunately, sam2p doesn't yet
+     support calling external PNG optimizers and converting their output to
+     PDF.
+
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
@@ -2817,8 +2857,27 @@ Compilation problems
    I've integrated his #ifndef __APPLE__ patch. There should be a better way
    to handle this situation, though.
 
-Revision history
-~~~~~~~~~~~~~~~~
+-- How to compile with i386-uclibc-gcc on Debian Etch:
+
+   by pts@fazekas.hu at Sun Apr  5 00:28:53 CEST 2009
+
+   $ i386-uclibc-gcc -v
+   Invoked as i386-uclibc-gcc
+   arg[ 0] = gcc
+   arg[ 1] = -v
+   Using built-in specs.
+   Target: i486-linux-gnu
+   Configured with: ../src/configure -v --enable-languages=c,c++,fortran,objc,obj-c++,treelang --prefix=/usr --enable-shared --with-system-zlib --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --enable-nls --program-suffix=-4.1 --enable-__cxa_atexit --enable-clocale=gnu --enable-libstdcxx-debug --enable-mpfr --with-tune=i686 --enable-checking=release i486-linux-gnu
+   Thread model: posix
+   gcc version 4.1.2 20061115 (prerelease) (Debian 4.1.1-21)
+   $ CXX='i386-uclibc-gcc -static' CC=i386-uclibc-gcc ./configure --enable-gif --enable-lzw
+   # change LDXX=... to LDXX=$CXX in Makehelp
+   $ make
+   # (Unfortunately, the executable is large, 410KB)
+
+
+Revision history, changes
+~~~~~~~~~~~~~~~~~~~~~~~~~
 See in the file debian/changelog.
 
 Missing feature list

@@ -86,7 +86,9 @@ class Rule { public:
       PR_PNGAverage=13,
       PR_PNGPaeth=14,
       PR_PNGAuto=15,
-      PR_PNGAutoUnsigned=45
+      PR_PNGAutoMaybe=25,
+      PR_PNGAutoBadUnsigned=45,
+      PR_PNGAutoBadSigned=55,
     END_STATIC_ENUM()
     pr_t Predictor;
 
