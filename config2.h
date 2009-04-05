@@ -13,7 +13,11 @@
 #if _MSC_VER > 1000
 #  include "config-vc6.h"
 #else
-#  include "config.h"
+#  if USE_CONFIG_MINGW_H
+#    include "config-mingw.h"
+#  else
+#    include "config.h"
+#  endif
 #endif
 
 #if 0
