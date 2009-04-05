@@ -4,7 +4,7 @@
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
-/* $Id: crc32.c,v 1.2 2002-12-11 14:01:52 pts Exp $ */
+/* $Id: crc32.c,v 1.2 2002/12/11 14:01:52 pts Exp $ */
 
 #ifdef __GNUC__
 #pragma implementation
