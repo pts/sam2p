@@ -880,7 +880,7 @@ void Rule::writeTTE(
       out << "0 " << i;
       while (j--!=1) out << " 0 " << i;
       break;
-     case 'D': /* 0..1 /Decode values for indexed, 0..max-1 for others */
+     case 'D': /* 0..max-1 /Decode values for indexed, 0..1 for others */
       i=(or_->cache.isIndexed())?(1<<img->getBpc())-1:1;
       goto emit_Decode;
      case 'S': /* image data stream */
