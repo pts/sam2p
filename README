@@ -2290,9 +2290,14 @@ A55. If your input image is truecolor, please consider a lossy compression
 
      If your input image has only a few colors, specify `-c zip:25:9', which
      forces the ZIP compression whith a high effort (9) and predictor
-     autodetection (25). This is considerably slower than not specifying
-     any `-c' flag at all, and getting `-c zip:25', because the high effort
-     (9) is slower than the default effort.
+     autodetection (25). This is considerably slower than not specifying any
+     `-c' flag at all, and getting `-c zip:25', because the high effort (9)
+     is slower than the default effort. Please note that `-c zip:25:9'
+     disables the predictor unless the SampleFormat is Rgb8 or Gray8. (This
+     is the same what libpng-1.2.15 does by default.) For large images (of
+     Rgb{1,2,4,8} or Gray{1,2,4,8}), you may want to specify `-c zip:15:9'
+     to forcibly enable the predictor, being autodetected for each image
+     row.
 
      Please also note that the free software ``optipng'' and the free-to-use
      closed-source software PNGOUT (for Win32, Linux and Mac OS X) can
@@ -2311,11 +2316,8 @@ Q56. How do I get the smallest PDF output?
 A56. If your input image is truecolor, specify `-c jpeg', possibly tuning it
      with a low quality parameter e.g. `-c jpeg:30'.
 
-     If your input image has only a few colors, specify `-c zip:25:9', which
-     forces the ZIP compression whith a high effort (9) and predictor
-     autodetection (15). This is considerably slower than not specifying
-     any `-c' flag at all, and getting `-c zip:25', because the high effort
-     (9) is slower than the default effort.
+     If your input image has only a few colors, specify `-c zip:25:9' or
+     `-c zip:15:9', see also Q55.
 
      Please also have a look at Q55. Unfortunately, sam2p doesn't yet
      support calling external PNG optimizers and converting their output to

@@ -842,12 +842,13 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
          * So if the user specifies `-c zip', he won't get a predictor by
          * default; but if he specifies no `-c', he might get a `-c:zip:15'.
          * To get the smallest file size, he should specify `-c zip:15:9'.
+         *
+         * The value we assign to is_predictor_recommended comes from the
+         * do_filter = ... assignment in png_write_IHDR() in pngwutil.c of
+         * libpng-1.2.15 .
          */
-        is_predictor_recommended =
-            sf==Image::SF_Gray1 || sf==Image::SF_Gray2 ||
-            sf==Image::SF_Gray4 || sf==Image::SF_Gray8 ||
-            sf==Image::SF_Rgb1 || sf==Image::SF_Rgb2 ||
-            sf==Image::SF_Rgb4 || sf==Image::SF_Rgb8;
+        is_predictor_recommended = (
+            sf==Image::SF_Gray8 || sf==Image::SF_Rgb8);
         if (prc>1 && ((co!=Rule::Cache::CO_LZW && co!=Rule::Cache::CO_ZIP) ||
             !is_predictor_recommended)) continue;
         jobss << "<<% OutputRule #" << orc++
@@ -857,7 +858,8 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
               << "\n  /Compression /"  << protect_null(Rule::Cache::dumpCompression (co))
               << "\n  /Predictor " << (int)(co==Rule::Cache::CO_LZW || co==Rule::Cache::CO_ZIP ?
                   /* If no compression (or predictor) specified, try predictor 15, then 1; otherwise try the specified predictor */
-                  (prc>1 ? Rule::Cache::PR_PNGAuto : Predictor != Rule::Cache::PR_PNGAutoMaybe ? Predictor : is_predictor_recommended ? Rule::Cache::PR_PNGAuto : Rule::Cache::PR_None) : Rule::Cache::PR_None)
+                  /* +0 down there to avoid linking problems with g++ on Mac OS X 10.5.6 */
+                  (prc>1 ? Rule::Cache::PR_PNGAuto+0 : Predictor != Rule::Cache::PR_PNGAutoMaybe ? Predictor : is_predictor_recommended ? Rule::Cache::PR_PNGAuto+0 : Rule::Cache::PR_None+0) : Rule::Cache::PR_None+0)
               << "\n  /Hints << " << Hints << " >>";
         // jobss << "  /Transparent (\377\377\377)\n";
         if (Transparent!=NULL) {
