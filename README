@@ -1119,7 +1119,7 @@ Output rule entries:
      input file must be a JPEG file -- its contents are transferred
      unmodified into the /DCTDecode JPEG stream). This requires
      /SampleFormat/Asis, and doesn't work with any other /SampleFormats
--- Predictor: enum (see later), numbering same as PSL1 filter.
+-- Predictor: enum (see later), default: 25, numbering same as PSL1 filter.
    1 -- no predictor. (default) Must be this unless Compression is /LZW or
         /Flate
    2 -- TIFF predictor 2 (horizontal differencing)
@@ -1128,8 +1128,15 @@ Output rule entries:
    12 -- PNG predictor, Up function
    13 -- PNG predictor, Average function
    14 -- PNG predictor, Paeth function
-   15 -- PNG predcitor, individually chosen for each line (signed minimum)
+   15 -- PNG predcitor, individually chosen for each line (absolute minimum)
+         This is the same as what libpng uses by default when creating PNG.
+   25 -- Pick 15 or 1 based on the SampleFormat: use 15 for Gray8 and Rgb8,
+         and use 1 (no predictor) for everything else. This is the default.
    45 -- PNG predcitor, individually chosen for each line (unsigned minimum)
+         Don't use this, it is quite inefficient.
+   55 -- PNG predcitor, individually chosen for each line (signed minimum)
+         Don't use this, it is quite inefficient.
+
 -- Transparent: color. Default: null. Specify a color forced to be
    transparent. Old transparency, if exists, is blacked!
 -- Hints: dict
@@ -2323,6 +2330,18 @@ A56. If your input image is truecolor, specify `-c jpeg', possibly tuning it
      support calling external PNG optimizers and converting their output to
      PDF.
 
+Q57. Does sam2p convert images to canonical form, i.e. if I have two
+     source images with identical width, height and RGB8 pixel
+     representation, and I convert both with sam2p with the same flags,
+     will the two output image files be byte-by-byte identical?
+
+A57. Yes, since version 0.46-2.
+
+     The only code code needed for that was sorting the indexed palette.
+
+     For blackbox input images which sam2p doesn't decompress (e.g. JPEG
+     with /Compression/JAI), the output is only guaranteed to be
+     byte-byte-byte identical, if the input was byte-byte-byte identical.
 
 Upsampling
 ~~~~~~~~~~

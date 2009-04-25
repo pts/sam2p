@@ -152,6 +152,7 @@ class Image {
    public:
     /** @param ncols_ must be >= the colors used */
     Indexed(dimen_t wd_, dimen_t ht_, unsigned short ncols_, unsigned char bpc_);
+    /** This includes the transparent color as well. */
     inline unsigned short getNcols() const { return (rowbeg-headp)/3; }
     /** Destroys the color table, and creates one with ncols_ colors.
      * @param ncols_ must be <= the ncols_ specified in the constructor
@@ -216,6 +217,10 @@ class Image {
     /* Index of the transparent color, or -1. */
     signed short transp;
     virtual /*Image::*/Sampled* addAlpha(/*Image::*/Gray *al);
+    /** Sorts the palette colors in lexicographic, stable order.
+     * Called from packPal() to get a consistent palette.
+     */
+    void sortPal();
   };
   class Gray: public Sampled {
    public:
@@ -322,9 +327,21 @@ class Image {
 
   /** Contains (and memory-manages) an image, and optimization information
    * as a cache.
+   *
+   * A SampledInfo contains an image in a canonical format. That is, if two
+   * images have the same RGB8 (identical width, height and pixels) or
+   * blackbox (identical bytes) representation, and SampledInfo{} are
+   * created for both of them, it is guaranteed that the two SampledInfo{}s
+   * contain the same image data (width, height, canGray, minRGBBpc,
+   * SampleFormat (except for bpc), pixel data, palette (same size, colors
+   * and color order)).
    */
   class SampledInfo {
    public:
+    /** This constructor call takes ownership of the `img_' pointer: it either
+     * reuses the original image (and will delete it in ~SampledInfo), or it
+     * immediately deletes the image, and uses another image.
+     */
     SampledInfo(Sampled *img_);
     ~SampledInfo();
     inline Sampled* getImage() const { return img; }

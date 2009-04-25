@@ -1,3 +1,12 @@
+sam2p (0.46-2) unstable; urgency=low
+
+  * image.cpp: added sortPal(), so now sam2p converts source images to
+    canonical form.
+  * encoder.cpp, sam2p_main.cpp: Fixed predictor autodetection ultimately.
+  * Small compliation and documentation improvements.
+
+ -- Szabó Péter <pts@fazekas.hu>  Sun,  5 Apr 2009 01:50:53 +0200
+
 sam2p (0.46-1) unstable; urgency=low
 
   * Small bugfixes.

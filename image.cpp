@@ -671,14 +671,14 @@ void Image::Indexed::packPal() {
 
   // assert((newTransp==-1) == (transp==-1));
   assert(newTransp==-1 || transp!=-1);
-  /* ^^^ BUGFIX: not true, because image may have transparency, but no
+  /* ^^^ BUGFIX: == not true, because image may have transparency, but no
    *     transparent pixels.
    */
   assert((char*)p==headp+oldNcols*3);
   if (newNcols==oldNcols && transp==newTransp) {
     /* Could not change # colors. */
-    if (transp==-1) return;
-    if ((unsigned)transp==oldNcols-1) { setPal(transp, 0); return; }
+    if (transp==-1) goto done;
+    if ((unsigned)transp==oldNcols-1) { setPal(transp, 0); goto done; }
   }
 
   /* Make the transparent color last. */
@@ -698,15 +698,87 @@ void Image::Indexed::packPal() {
     assert(*p<oldNcols);
     *p=old2new[*p];
   }
-  
+
   /* Update the palette. */
-  headp=rowbeg-3*newNcols;
+  headp=rowbeg-3*newNcols;  /* public method getNcols() uses rowbeg-headp */
   memcpy(headp, newpal, 3*newNcols);
   transp=newTransp;
   /* vvv BUGFIX at Tue May 21 13:10:30 CEST 2002 */
   if (newTransp==-1) transpc=0x1000000UL; /* Dat: this means: no transparent color */
                 else { transp=-1; setTransp(newTransp); }
+
+ done:
+  sortPal();
 }
+void Image::Indexed::sortPal() {
+  /* Run packPal() first (but it's recursive!) if transp is in the middle. */
+  unsigned ncols = getNcols(), i;
+  assert(transp == -1 || transp + 0U == ncols - 1);
+  assert(ncols < 256);
+  if (transp + 0U == ncols - 1) --ncols;
+  if (ncols <= 1) return;
+  #if SIZEOF_SHORT>=4
+    typedef unsigned short d_t;
+  #elif SIZEOF_INT>=4
+    typedef unsigned d_t;
+  #else
+    typedef unsigned long d_t;
+  #endif
+  d_t d[256];
+  unsigned char *p, *pend;
+  for (i = 0, p = (unsigned char*)headp; i < ncols; ++i, p += 3) {
+    d[i] = (d_t)p[0] << 24 | (d_t)p[1] << 16 | (d_t)p[2] << 8 | i;
+    /*printf("c[%d]=0x%08x\n", i, d[i]);*/
+  }
+  for (i = 1; i < ncols; ++i) {
+    if (d[i] < d[i - 1]) break;
+  }
+  if (i >= ncols) return;  /* Palette already sorted. */ 
+
+  /* Heap sort (unstable). Based on Knuth's TAOCP 5.2.3.H .
+   * Although heap sort is unstable, sortPal implements a stable sort, because
+   * the color index (i) is included in the sorted number (d[i]).
+   */
+  { unsigned k;
+    d_t tmp, *i, *j, *l=d+(ncols>>1), *r=d+ncols-1;
+    while (1) { /* h2: */
+      k=l-d;
+      if (k!=0) {
+        tmp=*--l;
+      } else {
+        tmp=*r; *r=d[0];
+        if (--r==d) { d[0]=tmp; break; }
+        k++;
+      }
+      i=j=l;
+      while ((j+=k)<=r) { /* h4: */
+        k<<=1;
+        if (j<r && j[0]<j[1]) {
+          if (!(tmp<*++j)) break;
+          k++;
+        } else if (!(tmp<*j)) break;
+        *i=*j; i=j;
+      }
+      /* h8: */
+      *i=tmp;
+    }
+  }
+
+  unsigned char old2new[256];
+  for (i = 0, p = (unsigned char*)headp; i < ncols; ++i) {
+    d_t di = d[i];
+    /*printf("d[%d]=0x%08x\n", i, di);*/
+    assert((i == 0 || di >= d[i - 1]) && "bug in sorting palette");
+    old2new[di & 255] = i;
+    *p++ = di >> 24;  *p++ = di >> 16;  *p++ = di >> 8;
+  }
+
+  /* Update the image. */
+  for (p=(unsigned char*)rowbeg, pend=p+wd*ht; p!=pend; p++) {
+    *p=old2new[*p];
+  }
+}
+
 void Image::Indexed::delete_separated(register Indexed **p) {
   while (*p!=NULLP) delete *p++;
 }
@@ -1365,6 +1437,9 @@ Image::SampledInfo::SampledInfo(Sampled *img_)
     if (bak!=img) delete bak;
     assert(img->getTy()==img->TY_INDEXED);
     Indexed *iimg=PTS_dynamic_cast(Image::Indexed*,img);
+    /* This packPal() contains a call to sortPal(), which converts the indexed
+     * image to canonical form.
+     */
     iimg->packPal();
     nncols=iimg->getNcols();
     if (true==(hasTransp=iimg->hasTransp())) nncols--;
