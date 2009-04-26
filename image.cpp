@@ -714,7 +714,7 @@ void Image::Indexed::sortPal() {
   /* Run packPal() first (but it's recursive!) if transp is in the middle. */
   unsigned ncols = getNcols(), i;
   assert(transp == -1 || transp + 0U == ncols - 1);
-  assert(ncols < 256);
+  assert(ncols <= 256);
   if (transp + 0U == ncols - 1) --ncols;
   if (ncols <= 1) return;
   #if SIZEOF_SHORT>=4
