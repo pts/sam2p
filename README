@@ -2343,6 +2343,39 @@ A57. Yes, since version 0.46-2.
      with /Compression/JAI), the output is only guaranteed to be
      byte-byte-byte identical, if the input was byte-byte-byte identical.
 
+Q58. Can sam2p generate a PDF which is scaled proportionally (i.e. keeping
+     the aspect ratio) to a specified page size, and centered on the page?
+
+A58. No, but the Perl script sam2p_pdf_scale.pl bundled with sam2p can
+     post-process the file created by sam2p. For example, to scale and
+     center a PDF on an A4 paper, do:
+
+       $ sam2p input.img output.pdf
+       $ sam2p_pdf_scale.pl 595 842 output.pdf
+
+     Please also have a look at the LaTeX package pdfpages.sty for more
+     options. It can also be used to concatenate multiple PDFs.
+     Its documentation:
+     http://www.ctan.org/get/macros/latex/contrib/pdfpages/pdfpages.pdf
+
+     Example output.tex file:
+
+       \documentclass{article}
+       \pdfcompresslevel9
+       \paperwidth 21cm    \pdfpagewidth\paperwidth
+       \paperheight29.7cm  \pdfpageheight\paperheight
+       \usepackage{pdfpages}
+       \begin{document}
+       \includepdf{output_tmp.pdf}
+       \end{document}
+
+     How to compile the .tex file above:
+
+       $ sam2p input.img output_tmp.pdf
+       $ pdflatex output.tex
+
+     Please note that a2ping.pl or pdftk won't work either.
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
