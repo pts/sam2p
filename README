@@ -2925,7 +2925,7 @@ Compilation problems
    Thread model: posix
    gcc version 4.1.2 20061115 (prerelease) (Debian 4.1.1-21)
    $ CXX='i386-uclibc-gcc -static' CC=i386-uclibc-gcc ./configure --enable-gif --enable-lzw
-   # change LDXX=... to LDXX=$CXX in Makehelp
+   # change LDXX=... to LDXX=$(CXX) in Makehelp
    $ make
    # (Unfortunately, the executable is large, 410KB)
 
