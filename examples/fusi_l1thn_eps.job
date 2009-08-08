@@ -1,0 +1,11 @@
+<<%sam2p-job; by pts@fazekas.hu at Sun Jun  2 15:58:00 CEST 2002
+% original fusi_tral1_eps.job by pts@fazekas.hu at Sat Jun  1 19:00:48 CEST 2002
+/InputFile  (examples/fusi.tiff)
+/OutputFile (test.eps)
+/Profile [
+  << /FileFormat/PSL1
+     /SampleFormat/Transparent4
+     /TransferEncoding/Hex
+     /Compression/None >>
+ ]
+>>

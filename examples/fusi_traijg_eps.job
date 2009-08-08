@@ -1,0 +1,13 @@
+<<%sam2p-job; by pts@fazekas.hu at Wed Apr 24 13:32:12 CEST 2002
+% Doesn't work (of course), because JPEG compression requires a bit depth of
+% 8, but /Transparent* provides a bit depth of 1.
+/InputFile  (examples/fusi.tiff)
+/OutputFile (test.eps)
+/Profile [
+  << /FileFormat/PSL2
+     /SampleFormat/Transparent4
+     %/SampleFormat/Indexed4 % doesn't work, contains transparent pixels
+     /TransferEncoding/A85
+     /Compression/IJG >>
+ ]
+>>

@@ -1,0 +1,11 @@
+<<%sam2p-job; by pts@fazekas.hu at Tue Jun 11 18:18:51 CEST 2002
+/InputFile  (examples/fusi.tiff)
+/OutputFile (test.eps)
+/Profile [
+  << /FileFormat/PSL2
+     /SampleFormat/Gray8
+     %/SampleFormat/Indexed4 % doesn't work, contains transparent pixels
+     /TransferEncoding/A85
+     /Compression/DCT >>
+ ]
+>>

@@ -1,0 +1,10 @@
+<<%sam2p-job; by pts@fazekas.hu at Sun Jun  2 12:11:08 CEST 2002
+/InputFile  (examples/fishwbb.gif)
+/OutputFile (test.eps)
+/Profile [
+  << /FileFormat/PSLC
+     /SampleFormat/Indexed8
+     /TransferEncoding/A85
+     /Compression/None >>
+ ]
+>>

@@ -1,0 +1,10 @@
+<<%sam2p-job; by Fri Mar 22 13:10:53 CET 2002
+/InputFile  (examples/ptsbanner.gif)
+/OutputFile (test.ps)
+/Profile [
+  << /FileFormat/PSL2 /SampleFormat/Indexed8 /TransferEncoding/Hex
+     /Compression/LZW /Predictor 15
+     /Hints << /Scale/RotateOK /LeftMargin 10.5 /RightMargin 21 >>
+  >>
+ ]
+>>

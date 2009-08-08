@@ -1,0 +1,9 @@
+<<%sam2p-job; by pts@fazekas.hu at Sun Jun  2 15:31:48 CEST 2002
+/InputFile  (examples/pts2.pbm)
+/OutputFile (test.eps)
+/Profile [
+  << /FileFormat/PSL1 /SampleFormat/Gray2
+     /TransferEncoding/Binary
+     /Compression/RLE >>
+ ]
+>>

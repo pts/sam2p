@@ -1,0 +1,12 @@
+<<%sam2p-job; by pts@fazekas.hu at Tue Jun  4 22:13:03 CEST 2002
+/InputFile  (examples/shot.gif)
+/OutputFile (test.tiff)
+/Profile [
+  << /FileFormat/TIFF
+     % /SampleFormat/Indexed8
+     /SampleFormat/Indexed1
+     /TransferEncoding/MSBfirst
+     /Compression/CCITTFax
+     % default: /Hints << /K 0 >>
+  >> ]
+>>

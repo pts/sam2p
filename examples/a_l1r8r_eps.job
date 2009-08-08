@@ -1,0 +1,9 @@
+<<%sam2p-job; by pts@fazekas.hu at Sun Jun  2 16:57:49 CEST 2002
+/InputFile  (examples/a.jpg)
+/OutputFile (test.eps)
+/Profile [
+  << /FileFormat/PSLC /SampleFormat/RGB8
+     /TransferEncoding/A85
+     /Compression/RLE >>
+ ]
+>>

@@ -1,0 +1,9 @@
+<<%sam2p-job; by pts@fazekas.hu at Sat Jun 15 15:03:47 CEST 2002
+/InputFile  (examples/fusi.gif)
+/OutputFile (test.pnm)
+/unknown pop
+/Profile [
+  << /FileFormat/PNM /SampleFormat/Transparent4 /TransferEncoding/ASCII
+     /Compression/None >>
+]
+>>
