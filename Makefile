@@ -136,7 +136,7 @@ clean:
 	rm -f *~ a.out DEADJOE core *.o *.tth .rgd *.rgd *.tmp.pin *.tmp.i *.tmp.ps0 *.tmp.h *.tmp.pst autom4te.cache/*
 	rm -f debian/changelog.dch debian/*~ 
 	rm -f $(ALL) $(ALL:=.yes) $(ALL:=.no) $(ALL:=.assert) $(ALL:=.checker)
-	-rmdir -- autom4te.cache
+	test ! -d autom4te.cache || rmdir autom4te.cache
 allclean: clean
 	rm -f configure config.h Makehelp config.cache config.log \
 	  config.status test.eps test.pdf build build-stamp
@@ -153,8 +153,10 @@ dist-install: dist-noautoconf
 	chmod 600 ../sam2p-*.tar.gz
 	scp ../sam2p-*.tar.gz kozma:public_html
 
+# Mac OS/X cp doesn't have -a, so we don't use it
 install: sam2p
 	-mkdir -p '$(bindir)'
-	cp -a sam2p '$(bindir)'
+	cp sam2p '$(bindir)'
+	chmod 755 '$(bindir)'/sam2p
 
 # __END__ of Makefile
