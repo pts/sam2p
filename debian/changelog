@@ -1,3 +1,11 @@
+sam2p (0.47-1) unstable; urgency=low
+
+  * Fixed some bugs.
+  * Added some missing example files.
+  * Clarified the documentation a bit.
+
+ -- Szabó Péter <pts@fazekas.hu>  Sun,  8 Aug 2009 01:50:53 +0200
+
 sam2p (0.46-2) unstable; urgency=low
 
   * image.cpp: added sortPal(), so now sam2p converts source images to

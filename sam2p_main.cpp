@@ -902,7 +902,7 @@ void init_sam2p_engine(char const*argv0) {
   Error::long_argv0=argv0==(char const*)NULLP ? "sam2p" : argv0;
   Error::argv0=Files::only_fext(Error::long_argv0);
   Error::tmpargv0="_sam2p_";
-  Error::banner0="sam2p v0.46";
+  Error::banner0="sam2p v0.47";
 }
 
 /* --- */
