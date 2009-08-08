@@ -1,0 +1,8 @@
+<<%sam2p-job; by pts@fazekas.hu at Tue Jun  4 22:07:29 CEST 2002
+/InputFile  (examples/fishg.gif)
+/OutputFile (test.pdf)
+/Profile [
+  << /FileFormat/PDFB1.0 /SampleFormat/Indexed2 /TransferEncoding/Binary
+     /Compression/LZW /Predictor 12 >>
+ ]
+>>

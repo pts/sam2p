@@ -1,0 +1,10 @@
+<<%sam2p-job; by pts@fazekas.hu at Sun Jun  2 15:59:13 CEST 2002
+/InputFile  (examples/fusi.tiff)
+/OutputFile (test.eps)
+/Profile [
+  << /FileFormat/PSL1
+     /SampleFormat/Transparent4
+     /TransferEncoding/Binary
+     /Compression/RLE >>
+ ]
+>>

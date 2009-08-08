@@ -1,0 +1,14 @@
+<<%sam2p-job; by pts@fazekas.hu at Sat Jun 15 11:38:37 CEST 2002
+/InputFile  (examples/xv_cant_display.gif)
+/OutputFile (test.eps)
+/Profile [
+  << /FileFormat/PSL2
+     /SampleFormat/Rgb8
+     % /SampleFormat/Indexed8
+     % /SampleFormat/Gray1
+     % /SampleFormat/Transparent2
+     /TransferEncoding/Binary
+     /Compression/RLE
+     % /Transparent null
+  >> ]
+>>

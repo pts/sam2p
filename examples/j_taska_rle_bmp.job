@@ -1,0 +1,11 @@
+<<%sam2p-job; by pts@fazekas.hu at Sun Jun 23 21:20:59 CEST 2002
+/InputFile  (/tmp/j_taska.png)
+/OutputFile (test.bmp)
+%/LoadHints (asis)
+/Profile [
+  << /FileFormat/BMP /SampleFormat/Indexed8 /TransferEncoding/Binary
+     /Compression/RLE
+     % /Compression/None
+  >>
+ ]
+>>

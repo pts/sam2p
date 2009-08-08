@@ -1,0 +1,8 @@
+<<%sam2p-job; by pts@fazekas.hu at Sat Jun  1 16:46:25 CEST 2002
+/InputFile  (examples/fusiwhite.gif)
+/OutputFile (test.eps)
+/Profile [
+  << /FileFormat/PSL1 /SampleFormat/Gray4 /TransferEncoding/Binary
+     /Compression/None >>
+]
+>>

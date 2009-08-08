@@ -1,0 +1,9 @@
+<<%sam2p-job; by pts@fazekas.hu at Sun Jun 23 19:18:10 CEST 2002
+/InputFile  (examples/shot.gif)
+/OutputFile (test.pdf)
+% triggers Ghostscript 5.50 lowest-bit rendering bug
+/Profile [
+  << /FileFormat/PDFB1.2 /SampleFormat/Indexed1 /TransferEncoding/Hex
+     /Compression/ZIP /Predictor 45 >>
+ ]
+>>

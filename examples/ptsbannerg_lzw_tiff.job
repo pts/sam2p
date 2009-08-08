@@ -1,0 +1,12 @@
+<<%sam2p-job; by Tue Jun  4 18:28:53 CEST 2002
+/InputFile  (examples/ptsbannerg.jpg)
+/OutputFile (test.tiff)
+/Profile [
+  << /FileFormat/TIFF
+     % /SampleFormat/Indexed8
+     /SampleFormat/Gray8
+     /TransferEncoding/LSBfirst
+     /Compression/LZW /Predictor 2
+     % /Compression/None
+  >> ]
+>>

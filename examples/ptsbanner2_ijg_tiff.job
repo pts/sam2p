@@ -1,0 +1,9 @@
+<<%sam2p-job; by pts@fazekas.hu at Tue Jun 11 19:49:26 CEST 2002
+/InputFile  (examples/ptsbanner2a.jpg)
+/OutputFile (test.tiff)
+%/LoadHints (asis)
+/Profile [
+  << /FileFormat/TIFF /SampleFormat/Rgb8 /TransferEncoding/Binary
+     /Compression/IJG >>
+ ]
+>>

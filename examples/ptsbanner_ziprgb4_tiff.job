@@ -1,0 +1,13 @@
+<<%sam2p-job; by Tue Jun  4 19:41:52 CEST 2002
+% Note: this doesn't work with libtiff, because they haven't implemented
+% the predictor...
+/InputFile  (examples/ptsbanner.gif)
+/OutputFile (test.tiff)
+/Profile [
+  << /FileFormat/TIFF
+     % /SampleFormat/Indexed8
+     /SampleFormat/Rgb4
+     /TransferEncoding/LSBfirst
+     /Compression/ZIP /Predictor 2
+  >> ]
+>>

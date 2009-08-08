@@ -1,0 +1,13 @@
+<<%sam2p-job; by pts@fazekas.hu at Sat Sep  7 15:48:57 CEST 2002
+/InputFile  (examples/ptsbanner.gif)
+/OutputFile (test.eps)
+/Profile [
+  << /FileFormat/PSL2 /SampleFormat/Indexed8 /TransferEncoding/Hex
+     /Compression/LZW /Predictor 15
+     /Hints <<
+       /LeftMargin 20  /TopMargin 15
+       /RightMargin 10 /BottomMargin 25
+     >>
+  >>
+ ]
+>>
