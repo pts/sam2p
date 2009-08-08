@@ -63,7 +63,7 @@ static Image::Sampled *in_ps_reader_low(Image::Loader::UFD* ufd, char const*bbox
     Files::tmpRemoveCleanup(mainfn());
   #endif
   FILE *f=fopen(mainfn(),"w");
-  fprintf(f, "%s/setpagedevice/pop load def\n", bboxline); /* Imp: /a4/letter etc. */
+  fprintf(f, "%s", bboxline);
   /* vvv Dat: ignore extra calls to `showpage' */
   fprintf(f, "/showpage [ currentdict  /showpage  {}  /put load  /showpage load ] cvx def\n");
   fprintf(f, "_IFN (r) file cvx exec\nshowpage\n"); /* Dat: doesn't rely on GS to
@@ -93,10 +93,16 @@ static Image::Sampled *in_ps_reader_low(Image::Loader::UFD* ufd, char const*bbox
 }
 
 static Image::Sampled *in_ps_reader(Image::Loader::UFD* ufd, SimBuffer::Flat const& hints) {
+  /* Use the paper size (<</PageSize[...]>> setpagedevice; a4; letter etc.)
+   * set up by the PostScript file, or the system default paper size.
+   */
   return in_ps_reader_low(ufd, "", hints);
 }
 
 static Image::Sampled *in_eps_reader(Image::Loader::UFD* ufd, SimBuffer::Flat const& hints) {
+  /* Use the *BoundingBox if available, else use the paper size set up by
+   * the EPS file, or the system default paper size.
+   */
   double llx=0.0, lly=0.0, urx=0.0, ury=0.0;
   Filter::UngetFILED* ufdd=(Filter::UngetFILED*)ufd;
   /* ^^^ SUXX: no warning for ufdd=ufdd */
@@ -124,12 +130,21 @@ static Image::Sampled *in_eps_reader(Image::Loader::UFD* ufd, SimBuffer::Flat co
     // printf("line: %s", line()+line0ofs);
   }
   ufdd->unread(line(), line.getLength()); line.clearFree();
-  char bboxline[300];
+  char bboxline[400];
   if (had!=0) {
     // fprintf(stderr, "bbox=[%"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g]\n", llx, lly, urx, ury);
     /* Dat: we must call translate _after_ setpagedevice (so it will take effect), at least with ESP Ghostscript 7.05.6 (2003-02-05); BUGFIX at Fri Aug 12 22:49:07 CEST 2005 */
     sprintf(bboxline,
       "<</PageSize[%"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g]>>setpagedevice\n"
+      /* removing /PageSize also cancels /a4, /a5 etc. */
+      /* we need `currentmatrix ... setpagedevice setmatrix' because
+       * setpagedevice cancels the current transformation matrix so our
+       * `translate' below would be canceled if the EPS file contains
+       * `a5', `setpagedevice' etc.
+       */
+      "/setpagedevice{matrix currentmatrix exch "
+      "dup length dict copy dup /PageSize undef setpagedevice "
+      "setmatrix}bind def\n"
       "%"PTS_CFG_PRINTFGLEN"g %"PTS_CFG_PRINTFGLEN"g translate\n"
       , urx-llx, ury-lly, -llx, -lly);
   } else {

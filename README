@@ -2376,6 +2376,25 @@ A58. No, but the Perl script sam2p_pdf_scale.pl bundled with sam2p can
 
      Please note that a2ping.pl or pdftk won't work either.
 
+Q59. How does sam2p detect the bounding box of PostScript and EPS input?
+
+A59. For PostScript input, the paper size specified in the PostScript code
+     is used, reverting to the system's default paper size if missing.
+     PostScript input is detected by finding `%!PS-Adobe-' at the beginning
+     of the file, but `EPSF-' missing from the first line. Paper size can be
+     specified in the PostScript code using `<</PageSize[...]>> setpagedevice', 'a4', `letter' etc.
+     The comments `%%BoundingBox:' etc. are ignored.
+
+     For EPS input, the `%%ExactBoundingBox:' is used, reverting to
+     `%%HiResBoundingBox:', reverting to `%%BoundingBox:', reverting to the
+     system's default paper size. The paper size specified in the PostScript
+     code is ignored. EPS input is detected by finding `%!PS-Adobe-' at the
+     beginning of the file and `EPSF-' in the first line. When converting to
+     PostScript, EPS or PDF, the (in.llx, in.lly) coordinates of the input
+     bounding box are not preserved: the output file will always have (0, 0)
+     as its lower left corner and (in.urx-in.llx, in.ury-in.lly) as its
+     upper right corner.
+
 Upsampling
 ~~~~~~~~~~
 Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
