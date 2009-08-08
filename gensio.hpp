@@ -95,6 +95,9 @@ class Filter { public:
   
   /** Gobbles all data written to it, just like /dev/null */
   class NullE: public Encoder {
+   public:
+    inline NullE() {}
+    inline virtual ~NullE() {}
     inline virtual void vi_putcc(char) {}
     inline virtual void vi_write(char const*, slen_t) {}
   };

@@ -18,6 +18,9 @@
 #include "snprintf.h"
 /* #include <stdarg.h> -- from snprintf.h */
 #define P_CONST PTS_const
+#ifdef NULL  /* as on Mac OS/X 10.5.7 <stdlib.h> */
+#  undef NULL
+#endif
 #define NULL ((void*)0)
 #ifdef __cplusplus
 #  define malloc ::operator new

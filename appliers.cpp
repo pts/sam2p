@@ -562,7 +562,7 @@ Rule::Applier::cons_t out_gif89a_check_rule(Rule::OutputRule* or_) {
   }
 #else
 /*#  define out_gif89a_check_rule (Rule::Applier::check_rule_t)NULLP*/
-#  define out_gif89a_work       (Rule::Applier::work_t)      NULLP
+#  define out_gif89a_work       (Rule::Applier::work_t)0
 #endif
 
 Rule::Applier out_gif89a_applier = {
