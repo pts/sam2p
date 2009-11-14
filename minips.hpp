@@ -297,10 +297,12 @@ class MiniPS {
    * @return true iff v==i
    */
   static bool isEq(VALUE v, double d);
-  /** Dumps the human-readable real or integer value of the sum (m/72)*a+b+c-sub
-   * to `out'.
+  /** Dumps the human-readable real or integer value of the sum
+   * (mscale/72)*a+b+c-sub to `out'.
    * @param rounding 0: nothing. 1: round the sum _up_ to integers. 2:
    *        round the sum _up_ to non-negative integers
+   * @param m must be T_REAL or T_INTEGER. mscale = m/72 if m is positive,
+   *   or 72/m if m is negative.
    * @param a must be T_REAL or T_INTEGER
    * @param b must be T_REAL or T_INTEGER
    * @param c must be T_REAL or T_INTEGER
