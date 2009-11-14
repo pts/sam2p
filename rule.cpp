@@ -391,7 +391,7 @@ void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
     "TransferCPL",     MiniPS::S_PINTEGER,MiniPS::Qinteger(78),  &TransferCPL,
     "DCT",             MiniPS::T_DICT,    MiniPS::Qnull,         &DCT,
     "Scale",           MiniPS::S_SENUM,   y_Scale,               &Scale,
-    "ImageDPI",        MiniPS::S_PNUMBER, MiniPS::Qinteger(72),  &cacheHints.ImageDPI,
+    "ImageDPI",        MiniPS::S_NUMBER,  MiniPS::Qinteger(72),  &cacheHints.ImageDPI,
     "TopMargin",       MiniPS::S_NUMBER,  MiniPS::Qinteger(0),   &cacheHints.TopMargin,
     "BottomMargin",    MiniPS::S_NUMBER,  MiniPS::Qinteger(0),   &cacheHints.BottomMargin,
     "LeftMargin",      MiniPS::S_NUMBER,  MiniPS::Qinteger(0),   &cacheHints.LeftMargin,
@@ -957,8 +957,9 @@ void Rule::writeTTE(
      case 's': /* scaling to a full PostScript page or translation for PDF and EPS */
       nzp=!(MiniPS::isZero(or_->cacheHints.LowerMargin)
          && MiniPS::isZero(or_->cacheHints.TopMargin));
-      scp=!MiniPS::isEq(or_->cacheHints.ImageDPI, 72);
-      
+      scp=!MiniPS::isEq(or_->cacheHints.ImageDPI, 72) &&
+          !MiniPS::isEq(or_->cacheHints.ImageDPI, -72);
+
       if (or_->cache.isPDF()) {
         SimBuffer::B scf;
         if (scp) MiniPS::dumpScale(scf, or_->cacheHints.ImageDPI);

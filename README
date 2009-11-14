@@ -2171,12 +2171,22 @@ A44. Do
 Q45. Is it possible to specify a resolution other than 72 DPI, so that the
      dimensions of the resulting PDF are accurate for print-resolution images?
 
-A45. In the most recent version of sam2p, now it is. Just use `-m:dpi:144'
-     to have the output EPS or PDF scaled to double size, or use
-     `-m:dpi:<real>' to have it scaled by a factor of <real>/72. Note that
-     this works only for EPS and PDF output. For all other FileFormat{}s,
-     `-m:dpi:' is ignored. The `-m:dpi:' option doesn't scale the values
-     specified for the other `-m:...' options.
+A45. Yes, it is. Use `-m:dpi:144' to have the output EPS or PDF scaled to
+     double size, or use `-m:dpi:<real>' to have it scaled by a factor of
+     <real>/72, or 72/-<real>, if <real> is negative.
+
+     If you know that your input image resolution is <res> DPI, and you want
+     to sam2p to create an EPS or PDF keeping the image resolution, you
+     should use `-m:dpi:-<res>'.
+
+     Note that this works only for EPS and PDF output. For all other
+     FileFormat{}s, `-m:dpi:' is ignored. The `-m:dpi:' option doesn't scale
+     the values specified for the other `-m:...' options.
+
+     Some image file formats such as PNG an JPEG can contain resolution
+     information. sam2p ignores this and assumes that the input image
+     resolution is 72 DPI). It would be possible to improve sam2p to use
+     this information, but it would be too much work.
 
      To proper way of scaling an image, however, is
      using your DTP or word processor program to resize it properly. For
