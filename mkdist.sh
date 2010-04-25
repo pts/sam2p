@@ -83,6 +83,13 @@ if test -s "../$TGZ_NAME"; then :; else
   echo "$0: failed to create distfile: ../$TGZ_NAME" >&2
   exit 6
 fi
-(cd ..; echo "Created distfile: `pwd`/$TGZ_NAME" >&2)
+
+FULL_TGZ_NAME="`cd ..;echo "$PWD/$TGZ_NAME"`"
+echo "Created distfile: $FULL_TGZ_NAME"
+if type -p pts-xclip >/dev/null; then
+  echo -n "$FULL_TGZ_NAME" | pts-xclip -i
+  echo -n "$FULL_TGZ_NAME" | pts-xclip -i -selection clipboard
+  echo "Name of distfile added to the X11 primary + clipboard."
+fi
 
 # __EOF__
