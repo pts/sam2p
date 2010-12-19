@@ -440,7 +440,9 @@ MiniPS::Dict::Dict() { /* Sun Mar 24 21:02:41 CET 2002 */
   ty=T_DICT;
 }
 void MiniPS::Dict::free() {
-  char const*const* keyy; slen_t keylen; VALUE *val; bool touched;
+  char const*const* keyy; slen_t keylen;
+  VALUE *val = 0;  /* pacify gcc-4.2.1 by giving initial value */
+  bool touched;
   getFirst(keyy, keylen, val, touched);
   while (keyy!=(char const*const*)NULLP) {
     MiniPS::delete0(*val);
@@ -520,7 +522,9 @@ void MiniPS::Dict::dump(GenBuffer::Writable &out_, unsigned indent, bool dump_de
   if (len==0) {
     if (dump_delimiters) out_ << "<<>>";
   } else {
-    char const*const* keyy; slen_t keylen; VALUE *val; bool touched;
+    char const*const* keyy; slen_t keylen;
+    VALUE *val = 0;  /* pacify gcc-4.2.1 by giving initial value */
+    bool touched;
     indent+=2;
     char *spaces=new char[indent];
     memset(spaces, ' ', indent);
@@ -970,7 +974,8 @@ void MiniPS::scanf_dict(VALUE job, bool show_warnings, ...) {
   va_end(ap);
   if (show_warnings) {
     // VALUE *keyy, *val;
-    char const*const* keyy; slen_t keylen; VALUE *val; bool touched;
+    char const*const* keyy; slen_t keylen; VALUE *val;
+    bool touched = false;  /* pacify gcc-4.2.1 by giving initial value */
     dict->getFirst(keyy, keylen, val, touched);
     // fprintf(stderr, "> %p\n", keyy);
     PTS_va_start(ap, show_warnings);
