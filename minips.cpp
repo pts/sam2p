@@ -931,9 +931,9 @@ void MiniPS::scanf_dict(VALUE job, bool show_warnings, ...) {
       /* Dat: red is: (\377\0\0), (#f00), (#ff0000) */
       if (getType(got)!=T_STRING || !(
              RSTRING(got)->getLength()==3 /* Imp: `transparent -red' shouldn't work */
-          || RSTRING(got)->getLength()==4 && RSTRING(got)->begin_()[0]=='#' && !toHex3(RSTRING(got)->begin_()+1, hex3) && (got=(VALUE)new String(hex3, 3), true)
-          || RSTRING(got)->getLength()==7 && RSTRING(got)->begin_()[0]=='#' && !toHex6(RSTRING(got)->begin_()+1, hex3) && (got=(VALUE)new String(hex3, 3), true)
-          || RSTRING(got)->getLength()==6 && !toHex6(RSTRING(got)->begin_(), hex3) && (got=(VALUE)new String(hex3, 3), true)
+          || (RSTRING(got)->getLength()==4 && RSTRING(got)->begin_()[0]=='#' && !toHex3(RSTRING(got)->begin_()+1, hex3) && (got=(VALUE)new String(hex3, 3), true))
+          || (RSTRING(got)->getLength()==7 && RSTRING(got)->begin_()[0]=='#' && !toHex6(RSTRING(got)->begin_()+1, hex3) && (got=(VALUE)new String(hex3, 3), true))
+          || (RSTRING(got)->getLength()==6 && !toHex6(RSTRING(got)->begin_(), hex3) && (got=(VALUE)new String(hex3, 3), true))
          )) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be an RGB color triplet" << (Error*)0;
       break;
      case S_SENUM:
@@ -958,8 +958,8 @@ void MiniPS::scanf_dict(VALUE job, bool show_warnings, ...) {
       break;
      case S_PNUMBER:
       if ((got&1)==0 && getType(got)!=T_REAL) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be real or integer" << (Error*)0;
-      if ((got&1)!=0 && got<=Qinteger(0)
-       || getType(got)==T_REAL && RREAL(got)->getBp()<=0
+      if (((got&1)!=0 && got<=Qinteger(0))
+       || (getType(got)==T_REAL && RREAL(got)->getBp()<=0)
          ) Error::sev(Error::EERROR) << "scanf_dict: key /" << key << " must be positive" << (Error*)0;
       break;
      default:
@@ -1040,8 +1040,8 @@ void MiniPS::dumpAdd3(GenBuffer::Writable &out, MiniPS::VALUE m, MiniPS::VALUE a
   bool no_real_real=true;
   double d=0, dd;
   long l=0;
-  if (getType(m)==T_REAL && (isEq(m, 72) || isEq(m, -72)) || /* Imp: not so exact comparison */
-      getType(m)==T_INTEGER && isEq(m, -72))
+  if ((getType(m)==T_REAL && (isEq(m, 72) || isEq(m, -72))) || /* Imp: not so exact comparison */
+      (getType(m)==T_INTEGER && isEq(m, -72)))
     m = Qinteger(72);
   MiniPS::VALUE t[5], *tt;
   t[0]=a; t[1]=m; t[2]=b; t[3]=c; t[4]=sub;

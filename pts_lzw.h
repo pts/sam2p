@@ -10,6 +10,8 @@
 #pragma interface
 #endif
 
+#include "config2.h"  /* PTS_const */
+
 /**** pts ****/
 #ifndef ___
 #if (defined(__STDC__) || defined(__cplusplus)) && !defined(NO_PROTO)
@@ -35,7 +37,7 @@ struct pts_lzw_state {
 	tbool_t		tif_revbits_p;  /**** pts ****/
 #endif
 	tbool_t		tif_reading_p;  /**** pts ****/
-	char*		tif_name;	/* name of open file, used for debugging */
+	char PTS_const*	tif_name;	/* name of open file, used for debugging */
 /* compression scheme hooks */
 	tidataval_t*	tif_data;	/* compression scheme private data */
 /* input/output buffering */

@@ -161,9 +161,9 @@ int CGIFFF GifLastError(void)
 
 /**** pts ****/
 /** May return NULL. */
-char *CGIFFF GetGifError(void)
+PTS_const char *CGIFFF GetGifError(void)
 {
-    char *Err;
+    PTS_const char *Err;
 
     switch(_GifError) {
 #if 0 /**** pts ****/
@@ -249,7 +249,7 @@ char *CGIFFF GetGifError(void)
 *****************************************************************************/
 void CGIFFF PrintGifError(void)
 {
-    char *Err=GetGifError();
+    PTS_const char *Err=GetGifError();
     if (Err != NULL)
 	fprintf(stderr, "\nGIF-LIB error: %s.\n", Err);
     else
@@ -1166,7 +1166,8 @@ static int DGifSetupDecompress(CGIFFF GifFileType *GifFile)
     unsigned int *Prefix;
     GifFilePrivateType *Private = (GifFilePrivateType *) GifFile->Private;
 
-    fread(&CodeSize, 1, 1, Private->File);    /* Read Code size from file. */
+    if (fread(&CodeSize, 1, 1, Private->File) != 1)  /* Read Code size from file. */
+      return GIF_ERROR;
     BitsPerPixel = CodeSize;
 
     Private->Buf[0] = 0;			      /* Input Buffer empty. */

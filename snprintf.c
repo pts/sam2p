@@ -435,7 +435,7 @@ static size_t dopr(char *buffer, size_t maxlen, P_CONST char *format, va_list ar
 }
 
 static void fmtstr(char *buffer, size_t *currlen, size_t maxlen,
-		    char *value, int flags, int min, int max)
+                   char *value, int flags, int min, int max)
 {
 	int padlen, strln;     /* amount to pad */
 	int cnt = 0;
@@ -444,7 +444,7 @@ static void fmtstr(char *buffer, size_t *currlen, size_t maxlen,
 	printf("fmtstr min=%d max=%d s=[%s]\n", min, max, value);
 #endif
 	if (value == 0) {
-		value = "<NULL>";
+		value = (char*)"<NULL>";
 	}
 
 	for (strln = 0; value[strln]; ++strln); /* strlen */

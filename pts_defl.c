@@ -1410,7 +1410,7 @@ int zlib_deflateInit2_(
 {
     deflate_state *s;
     int noheader = 0;
-    static char* my_version = ZLIB_VERSION;
+    static char my_version[] = ZLIB_VERSION;
     deflate_workspace *mem;
 
     ush *overlay;

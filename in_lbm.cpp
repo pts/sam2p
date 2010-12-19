@@ -48,7 +48,7 @@ class LBMRead {
  protected:
   inline int getcn();
   void errUnEOF();
-  void err(char *s);
+  void err(char const*s);
   u32_t getUnpack(unsigned len, char *where);
   u32_t getu32();
   unsigned getu16();
@@ -84,7 +84,7 @@ static void debit(char *picput, char *lines, unsigned wd, unsigned depth) {
 void LBMRead::errUnEOF() {
   Error::sev(Error::EERROR) << "LBM: unexpected EOF" << (Error*)0;
 }
-void LBMRead::err(char *s) {
+void LBMRead::err(char const*s) {
   Error::sev(Error::EERROR) << s << (Error*)0;
 }
 

@@ -1040,7 +1040,7 @@ CjpegEncode::P::P(GenBuffer::Writable &out_, slen_t Columns, slen_t Rows, bool r
   *this << (rgbp_?"P6 ":"P5 ") << Columns << ' ' << Rows << " 255\n";
 }
 void CjpegEncode::P::vi_copy(FILE *f) {
-  char r[9];
+  char r[10];
   static char jfif[9]="\377\340\000\020JFIF";
   static unsigned char adobe[16]= {
     0xff, /* marker */

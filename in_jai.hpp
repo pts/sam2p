@@ -30,7 +30,7 @@ struct jai_gfxinfo {
   slen_t SOF_offs;
 };
 
-extern char *jai_errors[];
+extern char const*jai_errors[];
 #if 0
   extern void jai_parse_jpeg(struct gfxinfo *result, Filter::FlatR *f);
   extern void jai_parse_jpeg(struct gfxinfo *result, FILE *f);
