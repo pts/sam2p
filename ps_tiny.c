@@ -49,6 +49,7 @@ exit
 #endif
 
 #define ULE(a,b) (((a)+0U)<=((b)+0U))
+#define ISWSPACEE(i) ((i)==32 || ULE(i-9,13-9) || i==0)
 #define ISWSPACE(i,j) ((i j)==32 || ULE(i-9,13-9) || i==0)
 
 #define PROGNAME "ps_tiny"
@@ -413,7 +414,7 @@ static void getkey(char const *key) {
     if (c!=*p++) erri("this key expected: ", key);
     c=getcc();
   }
-  while (ISWSPACE(c,)) c=getcc();
+  while (ISWSPACEE(c)) c=getcc();
   if (c!='=') erri("key `=' expected", 0);
 }
 
@@ -426,7 +427,7 @@ static void getval(void) {
   while (ISWSPACE(c,=getcc())) ;
   while (1) {
     if (c=='"') g=!g;
-    else if (g && (ISWSPACE(c,) || c=='/' || c=='>')) { ungetcc(c); break; }
+    else if (g && (ISWSPACEE(c) || c=='/' || c=='>')) { ungetcc(c); break; }
     else if (c<0) erri("unfinished tag val",0);
     else if (c==0) erri("\\0 disallowed in tag val",0);
     else if (ibufb==ibufend1) erri("tag val too long",0);

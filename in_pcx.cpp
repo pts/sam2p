@@ -149,8 +149,8 @@ static Image::Sampled *LoadPCX
 #endif
 
   /* read the PCX header */
-  fread(hdr, (size_t) 128, (size_t) 1, fp);
-  if (ferror(fp) || feof(fp)) {
+  if (fread(hdr, (size_t) 128, (size_t) 1, fp) != 1 ||
+      ferror(fp) || feof(fp)) {
     /* fclose(fp); */
     return_pcxError(bname, "EOF reached in PCX header.\n");
   }
@@ -224,11 +224,9 @@ static Image::Sampled *LoadPCX
       PAL_G(pinfo,i) = MACRO_GETC(fp);
       PAL_B(pinfo,i) = MACRO_GETC(fp);
     }
-#else
-    fread(pinfo->pal, 1, colors*3, fp);
 #endif
-
-    if (ferror(fp) || feof(fp)) {
+    if (fread(pinfo->pal, 1, colors*3, fp) != colors * 3 + 0U ||
+        ferror(fp) || feof(fp)) {
       pcxError(bname,"Error reading PCX colormap.  Using grayscale.");
       for (i=0; i<256; i++) PAL_R(pinfo,i) = PAL_G(pinfo,i) = PAL_B(pinfo,i) = i;
     }
