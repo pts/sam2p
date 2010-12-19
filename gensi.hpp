@@ -98,10 +98,11 @@ class GenBuffer {
     /** @return true on conversion error (overflow etc.) */
     bool toInteger(signed PTS_CFG_LONGEST &dst);
   #endif
-  inline bool toInteger(unsigned short &i) { unsigned long l; bool b=toInteger(l); i=l; return b; }
-  inline bool toInteger(  signed short &i) {   signed long l; bool b=toInteger(l); i=l; return b; }
-  inline bool toInteger(unsigned int   &i) { unsigned long l; bool b=toInteger(l); i=l; return b; }
-  inline bool toInteger(  signed int   &i) {   signed long l; bool b=toInteger(l); i=l; return b; }
+  /* Zero-initialize to pacify gcc-4.2.1 by giving initial value */
+  inline bool toInteger(unsigned short &i) { unsigned long l = 0; bool b=toInteger(l); i=l; return b; }
+  inline bool toInteger(  signed short &i) {   signed long l = 0; bool b=toInteger(l); i=l; return b; }
+  inline bool toInteger(unsigned int   &i) { unsigned long l = 0; bool b=toInteger(l); i=l; return b; }
+  inline bool toInteger(  signed int   &i) {   signed long l = 0; bool b=toInteger(l); i=l; return b; }
   /** Allocates a fresh new, null-terminated string. @return true */
   bool toCString(char *&dst);
   /** @return negative iff (this)<s2, positive iff (this)>s2 */
