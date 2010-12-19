@@ -5,16 +5,8 @@
  * aclocal.m4.
  */
 
-#include <stdio.h>
 #include <stdlib.h>
-
-/* vvv make these a macro to make them fast */
-#define XMALLOC_CODE() (unsigned len) { \
-  void *p=malloc(len); \
-  if (p==0) { fputs("out of memory\n",stderr); abort(); } \
-  return p; \
-}
-#define XFREE_CODE() (void* p) { if (p!=0) free(p); }
+#include <unistd.h>  /* for write(), also available on Windows */
 
 /* Sat Jul  6 16:39:19 CEST 2002
  * empirical checkerg++ helper routines for gcc version 2.95.2 20000220 (Debian GNU/Linux)
@@ -32,13 +24,30 @@ extern "C" void __pure_virtual(); void __pure_virtual() { abort(); }
 
 #else
 
-/* Tue Sep  3 18:24:26 CEST 2002
- * empirical g++-3.2 helper routines for gcc version 3.2.1 20020830 (Debian prerelease)
+/* at Tue Sep  3 18:24:26 CEST 2002:
+ *   empirical g++-3.2 helper routines for gcc version 3.2.1 20020830 (Debian prerelease)
+ * at Sun Dec 19 19:25:31 CET 2010:
+ *   works for g++-4.2.1 and g++-4.4.1 as well
+ *   removed dependency on stdio, so we get more reliable OOM reporting
  */
-void* operator new      XMALLOC_CODE()
-void* operator new[]    XMALLOC_CODE()
-void  operator delete   XFREE_CODE()
-void  operator delete[] XFREE_CODE()
-void* __cxa_pure_virtual=0;
+extern "C" void* emulate_cc_new(unsigned len) { \
+  void *p = malloc(len);
+  if (p == 0) {
+    /* Don't use stdio (e.g. fputs), because that may want to allocate more
+     * memory.
+     */
+    (void)!write(2, "out of memory\n", 14);
+    abort();
+  }
+  return p;
+}
+extern "C" void emulate_cc_delete(void* p) {
+  if (p!=0) free(p);
+}
+void* operator new  (unsigned len) __attribute__((alias("emulate_cc_new")));
+void* operator new[](unsigned len) __attribute__((alias("emulate_cc_new")));
+void  operator delete  (void* p)   __attribute__((alias("emulate_cc_delete")));
+void  operator delete[](void* p)   __attribute__((alias("emulate_cc_delete")));
+void* __cxa_pure_virtual = 0;
 
 #endif
