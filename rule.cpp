@@ -544,7 +544,8 @@ void Rule::OutputRule::appendDecoderSpec(GenBuffer::Writable &out) const {
 
 bool Rule::OutputRule::hasPredictorSpec() const {
   return cache.Compression==cache.CO_Fax
-      || (cache.Compression==cache.CO_ZIP || cache.Compression==cache.CO_LZW) && cache.Predictor!=cache.PR_None;
+    || ((cache.Compression==cache.CO_ZIP || cache.Compression==cache.CO_LZW) &&
+        cache.Predictor!=cache.PR_None);
 }
 
 void Rule::OutputRule::appendPredictorSpec(GenBuffer::Writable &out) const {

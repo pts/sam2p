@@ -116,7 +116,7 @@ Rule::Applier::cons_t out_l2jbin_check_rule(Rule::OutputRule* or_) {
   /* ^^^ 0+: pacify g++-3.1 */
 }
 Rule::Applier::cons_t out_l2jbin_work(GenBuffer::Writable& out, Rule::OutputRule*or_, Image::SampledInfo *sf) {
-  char *strings[]={ (char*)NULLP/*LanguageLevel, PDF-1.`0'*/, ""/*colorSpace*/ };
+  char const*strings[]={ (char const*)NULLP/*LanguageLevel, PDF-1.`0'*/, ""/*colorSpace*/ };
   //, " F closefile T closefile"/*closes*/ };
   //  Error::sev(Error::WARNING_DEFER) << "l2jbin: /ZIP without /PSL3 will be slow" << (Error*)0;
   if (out_l2jbin_check_rule(or_)!=Rule::Applier::OK) return Rule::Applier::DONT_KNOW;
@@ -218,7 +218,7 @@ Rule::Applier::cons_t out_l23_check_rule(Rule::OutputRule* or_) {
 
   // assert(cache->isPSL2() && (sf==Image::SF_Transparent2 || sf==Image::SF_Transparent4 || sf==Image::SF_Transparent8));
 
-  if (!cache->isPSL2() && !cache->isPDF()
+  if ((!cache->isPSL2() && !cache->isPDF())
    || (sf!=Image::SF_Gray1    && sf!=Image::SF_Gray2        && sf!=Image::SF_Gray4        && sf!=Image::SF_Gray8
     && sf!=Image::SF_Indexed1 && sf!=Image::SF_Indexed2     && sf!=Image::SF_Indexed4     && sf!=Image::SF_Indexed8
     && sf!=Image::SF_Rgb1     && sf!=Image::SF_Rgb2         && sf!=Image::SF_Rgb4         && sf!=Image::SF_Rgb8

@@ -304,8 +304,8 @@ void jai_parse_jpeg(struct jai_gfxinfo *result, DecoderTeller *fp, bool must_be_
   }
 }
 
-char *jai_errors[]={
-  (char*)NULLP,
+char const*jai_errors[]={
+  (char const*)NULLP,
   /*1*/ "missing SOF0 marker",
   /*2*/ "premature EOF",
   /*3*/ "not a Baseline JPEG (SOF must be SOF0)",

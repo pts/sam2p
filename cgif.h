@@ -43,6 +43,8 @@ THE SOFTWARE.
 #pragma interface
 #endif
 
+#include "config2.h"  /* PTS_const */
+
 #define GIF_LIB_VERSION	" Version 3.0, "
 
 #define	GIF_ERROR	0
@@ -181,7 +183,7 @@ EXTERN int DGifCloseFile(GifFileType *GifFile);
 * O.K., here are the routines from GIF_LIB file GIF_ERR.C.		      *
 ******************************************************************************/
 EXTERN void PrintGifError(void);
-EXTERN char *GetGifError(void);
+EXTERN PTS_const char *GetGifError(void);
 EXTERN int GifLastError(void);
 
 /*****************************************************************************

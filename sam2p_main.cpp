@@ -143,7 +143,7 @@ void init_applier() {
   had_init_applier=true;
 }
 
-static char *bts_ttt=
+static char bts_ttt[] =
 #include "bts2.tth"
 ;
 
@@ -1067,12 +1067,12 @@ int main(int, char const*const* argv) {
   Files::FILEW serr(stderr);
   /* --- Initialize */
 
-  bool helpp=argv[0]==(char const*)NULLP || argv[0]!=(char const*)NULLP && argv[1]!=(char const*)NULLP && argv[2]==(char const*)NULLP && (
+  bool helpp=argv[0]==(char const*)NULLP || (argv[0]!=(char const*)NULLP && argv[1]!=(char const*)NULLP && argv[2]==(char const*)NULLP && (
              option_eq(argv[1], "-help") || 
              option_eq(argv[1], "-h") || 
              option_eq(argv[1], "-?") || 
              option_eq(argv[1], "/h") || 
-             option_eq(argv[1], "/?"));
+             option_eq(argv[1], "/?")));
   bool versionp=argv[0]!=(char const*)NULLP && argv[1]!=(char const*)NULLP && argv[2]==(char const*)NULLP && (
              option_eq(argv[1], "-version") || 
              option_eq(argv[1], "-v"));

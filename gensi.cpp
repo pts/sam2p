@@ -1194,8 +1194,8 @@ int GenBuffer::nocase_strcmp(char const*a, char const*b) {
 bool GenBuffer::parseBool(char const *s, slen_t slen) {
   if (slen==0) return true;
   char c=s[0];
-  if (slen==2 && (c=='o' || c=='O') && (s[1]=='n' || s[1]=='N')
-   || slen==3 && (c=='o' || c=='O') && (s[1]=='u' || s[1]=='U')
+  if ((slen==2 && (c=='o' || c=='O') && (s[1]=='n' || s[1]=='N'))
+   || (slen==3 && (c=='o' || c=='O') && (s[1]=='u' || s[1]=='U'))
      ) return true;
   /* on  true  yes ja   igen oui enable  1 true  vrai? right sure allowed
    * off false no  nein nem  non disable 0 false faux? wrong nope disallowed
