@@ -1,3 +1,10 @@
+sam2p (0.48-1) karmic; urgency=low
+
+  * Added sam2p_pdf_scale.pl to the files list.
+  * Added examples/sam2p.spec for Fedora.
+
+ -- Peter Szabo <pts@fazekas.hu>  Tue, 22 Mar 2011 19:23:07 +0100
+
 sam2p (0.47-1) unstable; urgency=low
 
   * Fixed some bugs.
