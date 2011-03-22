@@ -232,3 +232,4 @@ debian/control
 debian/copyright
 debian/dirs
 debian/rules
+sam2p_pdf_scale.pl
