@@ -61,7 +61,7 @@ extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list 
 #endif
 
 static void cleanup(int) {
-  Error::cexit(126);
+  Error::cexit(Error::runCleanups(126));
 }
 
 void Files::doSignalCleanup() {
@@ -802,10 +802,13 @@ bool Files::find_tmpnam(SimBuffer::B &dir)  {
 bool Files::tmpRemove=true;
 
 static int cleanup_remove(Error::Cleanup *cleanup) {
-  if (Files::tmpRemove) return Files::removeIf(cleanup->getBuf());
-#if 0 /* Dat: produces nested errors */
+  if (Files::tmpRemove) {
+    int err = Files::removeIf(cleanup->getBuf());
+    if (err)
+      Error::sev(Error::ERROR_CONT) << "could not remove tmp file: " << cleanup->getBuf() << (Error*)0;
+    return err;
+  }
   Error::sev(Error::WARNING) << "keeping tmp file: " << cleanup->getBuf() << (Error*)0;
-#endif
   return 0;
 }
 
@@ -816,10 +819,7 @@ void Files::tmpRemoveCleanup(char const* filename) {
 static int cleanup_remove_cond(Error::Cleanup *cleanup) {
   if (*(FILE**)cleanup->data!=NULLP) {
     fclose(*(FILE**)cleanup->data);
-    if (Files::tmpRemove) return Files::removeIf(cleanup->getBuf());
-#if 0 /* Dat: produces nested errors */
-    Error::sev(Error::WARNING) << "keeping tmp2 file: " << cleanup->getBuf() << (Error*)0;
-#endif
+    return cleanup_remove(cleanup);
   }
   return 0;
 }

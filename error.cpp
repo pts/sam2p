@@ -140,7 +140,13 @@ void Error::popPolicy() {
 
 Error::Cleanup *Error::first_cleanup=(Error::Cleanup*)NULLP;
 
-void Error::cexit(int exitCode) {
+int Error::runCleanups(int exitCode) {
+  /* Flush buffered messages and revert to the default policy so subsequent
+   * errors can be logged.
+   */
+  while (policy_top != policy_bottom)
+    popPolicy();
+
   Cleanup *next;
   int exit2;
   while (first_cleanup!=NULLP) {
@@ -150,6 +156,10 @@ void Error::cexit(int exitCode) {
     delete [] (char*)first_cleanup; /* Allocated from as an array, but has no destructors. */
     first_cleanup=next;
   }
+  return exitCode;
+}
+
+void Error::cexit(int exitCode) {
   #if _MSC_VER > 1000
     ExitThread(exitCode);
   #else

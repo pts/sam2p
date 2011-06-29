@@ -127,9 +127,12 @@ class Error {
   /** Creates and registers a new Cleanup, and puts it before old ones. */
   static Cleanup* newCleanup(Cleanup::handler_t handler, void *data, slen_t size);
   static Cleanup* newCleanup(Cleanup::handler_t handler, void *data, char const*cstr);
-  /** Executes the cleanups (in reverse-registration order), and exits from
-   * the current process with the specified or higher exit code.
+  /** Reverts to the default logging policy,
+   * executes the cleanups (in reverse-registration order), and returns the
+   * new exit code, which is at least exitCode.
    */
+  static int runCleanups(int exitCode);
+  /* Exits from the process with the specified exit code. */
   static void cexit(int exitCode);
  protected:
   static Cleanup *first_cleanup;

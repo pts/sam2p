@@ -911,6 +911,7 @@ void init_sam2p_engine(char const*argv0) {
 
 /* --- */
 
+/* Never returns. */
 void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*argv1, bool helpp) {
   Error::serr=&serr;
 
@@ -931,7 +932,7 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
     sout << "Usage:   " << Error::long_argv0 << " <filename.job>\n" <<
             "         " << Error::long_argv0 << " [options] <in.img> [OutputFormat:] <out.img>\n" <<
             "Example: " << Error::long_argv0 << " test.gif EPS: test.eps\n";
-    if (helpp) Error::cexit(0);
+    if (helpp) Error::cexit(Error::runCleanups(0));
     Error::sev(Error::EERROR) << "Incorrect command line" << (Error*)0;
   } else { /* one_liner */
     SimBuffer::B jobss;
@@ -1060,9 +1061,12 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
   Rule::deleteProfile(rule_list);
   MiniPS::delete0(job); /* frees OutputFile etc. */
 
-  if (Error::getTopPrinted()+0<=Error::NOTICE+0) fputs("Success.\n", stderr);
+  bool successp = Error::getTopPrinted()+0<=Error::NOTICE+0;
+  int exitCode = Error::runCleanups(0);
   fflush(stdout); fflush(stderr);
-  Error::cexit(0);
+  if (successp && exitCode == 0)
+    fputs("Success.\n", stderr);
+  Error::cexit(exitCode);
 }
 
 /** main: process entry point for the sam2p utility. */
