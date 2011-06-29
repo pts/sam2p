@@ -11,24 +11,6 @@ if test "$1" = --cd; then
   test "$MYDIR" || MYDIR=.
   cd "$MYDIR"
 fi
-echo "Creating distfile in $PWD"
-
-# Get the list of files.
-if test -f files; then
-  FILES="`cat files`"
-elif test -d CVS; then
-  FILES=$( IFS='
-'
-    find -type d -name CVS | while read D; do
-      F="$D/Entries"
-      export E="${D%/CVS}/"
-      E="${E#./}"
-      perl -ne 'print"$ENV{E}$1\n"if m@^/([^/]+)/[1-9]@' <"$F"
-    done)
-else
-  echo "$0: missing: files or **/CVS/Entries" >&2
-  exit 3
-fi
 
 # Get the release version number.
 if test -f debian/changelog; then
@@ -48,6 +30,31 @@ else
   echo "$0: missing: debian/changelog or RELEASE= in Makefile.in" >&2
   exit 2
 fi
+
+if test "$1" = --getversion; then
+  echo "${PRODUCT_AND_VERSION##*-}"
+  exit
+fi
+
+echo "Creating distfile in $PWD"
+
+# Get the list of files.
+if test -f files; then
+  FILES="`cat files`"
+elif test -d CVS; then
+  FILES=$( IFS='
+'
+    find -type d -name CVS | while read D; do
+      F="$D/Entries"
+      export E="${D%/CVS}/"
+      E="${E#./}"
+      perl -ne 'print"$ENV{E}$1\n"if m@^/([^/]+)/[1-9]@' <"$F"
+    done)
+else
+  echo "$0: missing: files or **/CVS/Entries" >&2
+  exit 3
+fi
+
 
 if test -e "$PRODUCT_AND_VERSION"; then
   echo "$0: directory $PRODUCT_AND_VERSION already exists, remove it first" >&2

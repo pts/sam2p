@@ -12,6 +12,10 @@
 #include "main.hpp"
 #include "in_jai.hpp"
 
+#ifndef SAM2P_VERSION
+#include "sam2p_version.h"
+#endif
+
 /* Sat Jul  6 16:39:19 CEST 2002
  * empirical checkerg++ helper routines for gcc version 2.95.2 20000220 (Debian GNU/Linux)
  * see c_lgcc.cpp for more
@@ -902,7 +906,7 @@ void init_sam2p_engine(char const*argv0) {
   Error::long_argv0=argv0==(char const*)NULLP ? "sam2p" : argv0;
   Error::argv0=Files::only_fext(Error::long_argv0);
   Error::tmpargv0="_sam2p_";
-  Error::banner0="sam2p v0.47";
+  Error::banner0="sam2p " SAM2P_VERSION;
 }
 
 /* --- */
