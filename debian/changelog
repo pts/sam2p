@@ -1,4 +1,11 @@
-sam2p (0.49) karmic; urgency=low
+sam2p (0.49-2) karmic; urgency=low
+
+  * Fixed error reporting at cleanup time.
+  * Fixed file closing for temporary file removal on Windows.
+
+ -- Peter Szabo <pts@fazekas.hu>  Thu, 30 Jun 2011 01:24:59 +0200
+
+sam2p (0.49-1) karmic; urgency=low
 
   * Fixed version reporting in `sam2p --version'.
 
