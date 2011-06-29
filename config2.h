@@ -16,7 +16,11 @@
 #  if USE_CONFIG_MINGW_H
 #    include "config-mingw.h"
 #  else
-#    include "config.h"
+#    if USE_CONFIG_UCLIBC_H
+#      include "config-uclibc.h"
+#    else
+#      include "config.h"
+#    endif
 #  endif
 #endif
 

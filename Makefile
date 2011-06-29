@@ -34,6 +34,8 @@ CXXALL=$(CXXX) $(CXXFLAGS) $(CXXFLAGSB)
 CCALL =$(CXXX) $(CXXFLAGS) $(CXXFLAGSB)
 CXDFAL=$(CXXFLAGS) $(CXXFLAGSB) $(LDFLAGS) $(LIBS)
 
+SAM2P_VERSION=$(shell $(BASH) ./mkdist.sh --getversion)
+
 .PHONY: clean dist dist-noautoconf dist-more allclean distclean dist-install
 .PHONY: most all all1 install
 
@@ -58,6 +60,15 @@ CXD_checker=checkerg++ $(GFLAG)
 # .PHONY: clean dist allclean distclean
 
 Makedep: config.h
+
+sam2p_version.h: debian/changelog
+	(echo '/* Generated automatically by Makefile. */' && \
+	 echo '#ifndef SAM2P_VERSION_H' && \
+	 echo '#define SAM2P_VERSION_H 1' && \
+	 echo '#define SAM2P_VERSION "$(SAM2P_VERSION)"' && \
+	 echo '#endif') >$@
+
+sam2p_main.o: sam2p_version.h
 
 xpmc.h: cols2.pl
 	perl -x cols2.pl >xpmc.h
@@ -133,7 +144,7 @@ bts2.ttt: bts1.ttt ps_tiny
 	./ps_tiny --copy <$< >$@
 
 clean:
-	rm -f *~ a.out DEADJOE core *.o *.tth .rgd *.rgd *.tmp.pin *.tmp.i *.tmp.ps0 *.tmp.h *.tmp.pst autom4te.cache/*
+	rm -f *~ a.out DEADJOE core *.o *.tth .rgd *.rgd *.tmp.pin *.tmp.i *.tmp.ps0 *.tmp.h *.tmp.pst autom4te.cache/* sam2p_version.h
 	rm -f debian/changelog.dch debian/*~ 
 	rm -f $(ALL) $(ALL:=.yes) $(ALL:=.no) $(ALL:=.assert) $(ALL:=.checker)
 	test ! -d autom4te.cache || rmdir autom4te.cache
@@ -145,10 +156,10 @@ distclean: allclean
 dist: distclean dist-noautoconf
 dist-noautoconf:
 	chmod 755 configure
-	$(BASH) mkdist.sh
+	$(BASH) ./mkdist.sh
 # vvv Create a distribution with more files to aid compilation
 dist-more: bts2.tth
-	$(BASH) mkdist.sh sam2p-more bts2.tth
+	$(BASH) ./mkdist.sh sam2p-more bts2.tth
 dist-install: dist-noautoconf
 	chmod 600 ../sam2p-*.tar.gz
 	scp ../sam2p-*.tar.gz kozma:public_html
