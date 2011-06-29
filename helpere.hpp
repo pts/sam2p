@@ -25,9 +25,13 @@ class HelperE: public Filter::NullE, public Filter::PipeE {
   }
   inline virtual void vi_copy(FILE *f) {
     // img=Image::load("-", SimBuffer::B(), (Image::filep_t)f, (char const*)"PNM");
-    /* fclose(f); */
     Filter::UngetFILED ufd((char const*)NULLP, f, Filter::UngetFILED::CM_closep|Filter::UngetFILED::CM_keep_stdinp);
     img=Image::load((Image::Loader::UFD*)(long)&ufd, SimBuffer::B(), (char const*)"PNM");
+    /* We must close f, this is part of the vi_copy contract. If we fail to
+     * close it, cleanup_remove won't be able to remove the tmp files at
+     * Error::runCleanups() time.
+     */
+    fclose(f);
   }
   inline Image::Sampled *getImg() const { return img; }
  protected:

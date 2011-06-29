@@ -85,7 +85,7 @@ class Filter { public:
     virtual void vi_check();
    protected:
     /** Copies the rest of (seekable) file `f' to `out' (subsequent filters).
-     * `f' is initially positioned at the beginning. Must call fclose().
+     * `f' is initially positioned at the beginning. Must call fclose(f).
      * vi_copy() should raise Error::...s. The default implementation
      * just copies the data bytes verbatim. `out.vi_write(0,0);' will be called
      * by vi_write().
