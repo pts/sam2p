@@ -322,7 +322,7 @@ int main(int argc, char **argv) {
 
   sout << "Success (test_main).\n";
   fflush(stdout);
-  Error::cexit(0);
+  Error::cexit(Error::runCleanups(0));
   assert(0);
   return 0; /*notreached*/
 }
