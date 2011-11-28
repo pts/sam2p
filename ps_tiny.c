@@ -160,7 +160,7 @@ static void setword(int c, char const*word, int slash) {
   slen_t len;
   assert(slash==0 || slash==1);
   if (words[c][0]!='\0') erri("abbr letter already used",0);
-  if (sbuf+SBUFSIZE-sbufb+0U<(len=strlen(word))+slash+1U) erri("words overflow",0);
+  if (sbuf+SBUFSIZE-sbufb+(slen_t)0<(len=strlen(word))+slash+1U) erri("words overflow",0);
   /* fprintf(stderr,"setword(%d,\"%s\");\n", c, word); */
   words[c]=sbufb;
   if (slash) *sbufb++='/';
