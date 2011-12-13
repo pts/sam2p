@@ -32,6 +32,11 @@ my $GCCP; # 'g++' or 'gcc': C/C++ preproc with `-E -MG' switches
 $GCCP="@ARGV";
 $GCCP="gcc" if $GCCP!~y/ \t//c;
 
+# Make sure we get English error messages from gcc.
+delete $ENV{LANG};
+delete $ENV{LANGUAGE};
+$ENV{LC_ALL} = "C";
+
 # ---
 
 sub find_ds() {
