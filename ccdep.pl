@@ -132,7 +132,10 @@ sub backtick(@) {
   #die "$ENV{PATH}";
   # Dat: if `.' is part of $ENV{PATH}, `Insecure directory...' is reported
   #die unless $S=~/(.*)/s; # Dat: untaint()
-  readpipe $S # `` qx``
+  print STDERR "running: $S\n";
+  my $result = readpipe $S;
+  print STDERR "$result\nend of result\n";
+  $result
 }
 
 my @DS=find_ds();

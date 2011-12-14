@@ -59,7 +59,7 @@ CXD_checker=checkerg++ $(GFLAG)
 
 # .PHONY: clean dist allclean distclean
 
-Makedep: config.h
+Makedep: config.h sam2p_version.h
 
 sam2p_version.h: debian/changelog
 	(echo '/* Generated automatically by Makefile. */' && \
