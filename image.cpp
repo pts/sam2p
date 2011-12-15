@@ -1281,7 +1281,7 @@ void Image::register0(Image::Loader *anew) {
 }
 
 #if 0 /* removed by code refactoring */
-Image::Sampled* Image::load(char const* format, filep_t f_, SimBuffer::Flat const& loadHints) {
+Image::Sampled* Image::load(char const* format, filep_t f_, SimBuffer::Flat const& loadHints) {}  /* Removed. */
 #endif
 
 // #include <unistd.h> /* sleep() */
@@ -1354,8 +1354,8 @@ Image::Sampled *Image::load(Image::Loader::UFD* ufd0, SimBuffer::Flat const& loa
   return 0; /*notreached*/
 }
 
-#if 0 /* not used anywhere */
-Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHints, filep_t stdin_f, char const* format) {
+#if 0 /* not used anywhere, except in test_main. */
+Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHints, filep_t stdin_f, char const* format) {  /* Commented out. */
   Filter::UngetFILED ufd(filename, stdin_f==NULLP ? stdin : (FILE*)stdin_f,
     Filter::UngetFILED::CM_closep|Filter::UngetFILED::CM_keep_stdinp);
   return load((Image::Loader::UFD*)&ufd, loadHints, format);
