@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 Files::FILEW sout(stdout);
 
@@ -83,13 +84,13 @@ static void test_data() {
     sout << b;
   }
   { sout << "Hello,"+Buffer(" World2!\n"); }
-  { Buffer b; sout << b.format("Hello,%cWorld %d%s", ' ', -42, "!\n"); }
-  { Buffer b; sout << b.format("123456789012\n"); }
-  { Buffer b; sout << b.format("1234567890123\n"); }
-  { Buffer b; sout << b.format("12345678901234\n"); }
-  { Buffer b; sout << b.format("123456789012345\n"); }
-  { Buffer b; sout << b.format("1234567890123456\n"); }
-  { Buffer b; sout << b.format("1234567890%u\n",123456789L); }
+  { Buffer b; b.format("Hello,%cWorld %d%s", ' ', -42, "!\n"); sout << b; }
+  { Buffer b; b.format("123456789012\n"); sout << b; }
+  { Buffer b; b.format("1234567890123\n"); sout << b; }
+  { Buffer b; b.format("12345678901234\n"); sout << b; }
+  { Buffer b; b.format("123456789012345\n"); sout << b; }
+  { Buffer b; b.format("1234567890123456\n"); sout << b; }
+  { Buffer b; b.format("1234567890%u\n",123456789L); sout << b; }
   { Buffer b("Hello, World!\n"); memcpy(b.substr_grow(7,5,3), "Bar", 3); sout << b; }
   { Buffer b("Hello, World!\n"); memcpy(b.substr_grow(7,5,6), "FooBar", 6); sout << b; }
   { Buffer b("Hello, World!\n"); memcpy(b.substr_grow(7,15,8), "FooBar!\n", 8); sout << b; }
@@ -98,6 +99,9 @@ static void test_data() {
   sout << "Done.\n";
 }
 
+#if OBJDEP
+#  warning REQUIRES: image.o
+#endif
 static void test_image() {
   // Image::Sampled *img=Image::load("at-logo.xpm");
   // Image::Sampled *img=Image::load("pts.xpm");
@@ -296,8 +300,8 @@ static void test_hash() {
 static void test_decoder() {
   SimBuffer::B sb("Hello, World!\n");
   char const*p=sb();
-  Filter::BufD bd(sb);
-  Filter::PipeD pd(bd, "tr A-Z a-z <%S");
+  Filter::FlatD fd(sb(), sb.getLength());
+  Filter::PipeD pd(fd, "tr A-Z a-z <%S");
   int i;
   while ((i=pd.vi_getcc())>=0) {
     putchar(':');
@@ -319,6 +323,14 @@ int main(int argc, char **argv) {
   init_loader();
 
   test_data();
+  test_hash();
+  test_decoder();
+  // test_image();  // Needs file and more refactoring.
+  // test_encoder();  // Needs file.
+  test_dump();
+  // test_parser();  // Needs stdin.
+  // test_tokenizer();  // Needs stdin.
+  // test_predictor();  // Needs file and more refactoring.
 
   sout << "Success (test_main).\n";
   fflush(stdout);
