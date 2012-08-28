@@ -137,8 +137,13 @@ sub backtick(@) {
 
 my @DS=find_ds();
 my @DSQ=map{shq$_}@DS;
-my $R="$GCCP -DOBJDEP -M -MG -E 2>&1 @DSQ";
-$R=backtick($R);
+my $Q="$GCCP -DOBJDEP -fno-diagnostics-show-caret -M -MG -E 2>&1 @DSQ";
+my $R=backtick($Q);
+if ($R=~/\berror: .*-fno-diagnostics-show-caret\b/) {
+  # gcc-4.6 and earlier don't have this flag, and they fail.
+  $Q=~s@ -fno-diagnostics-show-caret(?=\s)@@;
+  $R=backtick($Q);
+}
 
 if ($R!~/: warning: #warning\b/) {
   # config2.h:314:4: warning: #warning REQUIRES: c_lgcc3.o
