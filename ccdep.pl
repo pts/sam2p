@@ -137,18 +137,20 @@ sub backtick(@) {
 
 my @DS=find_ds();
 my @DSQ=map{shq$_}@DS;
-my $Q="$GCCP -DOBJDEP -fno-diagnostics-show-caret -M -MG -E 2>&1 @DSQ";
+my $DIAG=" -fno-diagnostics-show-caret";
+my $Q="$GCCP -DOBJDEP$DIAG -M -MG -E 2>&1 @DSQ";
 my $R=backtick($Q);
 if ($R=~/\berror: .*-fno-diagnostics-show-caret\b/) {
   # gcc-4.6 and earlier don't have this flag, and they fail.
   $Q=~s@ -fno-diagnostics-show-caret(?=\s)@@;
+  $DIAG="";
   $R=backtick($Q);
 }
 
 if ($R!~/: warning: #warning\b/) {
   # config2.h:314:4: warning: #warning REQUIRES: c_lgcc3.o
   # Dat: g++-3.3 ignores #warning with -M -MG -E
-  $R.="\n".backtick("$GCCP -DOBJDEP -E 2>&1 >/dev/null @DSQ");
+  $R.="\n".backtick("$GCCP -DOBJDEP$DIAG -E 2>&1 >/dev/null @DSQ");
 }
 
 ## die $R;
