@@ -43,7 +43,7 @@ class Rule { public:
       FF_XPM=10,
       FF_BMP=11,
       FF_XWD=12,
-      FF_X11=13
+      FF_X11=13  /* Don't add a comma, gcc-4.8.1. can't compile it that way. */
     END_STATIC_ENUM()
     ff_t FileFormat;
     Image::sf_t SampleFormat;
@@ -88,7 +88,7 @@ class Rule { public:
       PR_PNGAuto=15,
       PR_PNGAutoMaybe=25,
       PR_PNGAutoBadUnsigned=45,
-      PR_PNGAutoBadSigned=55,
+      PR_PNGAutoBadSigned=55
     END_STATIC_ENUM()
     pr_t Predictor;
 
