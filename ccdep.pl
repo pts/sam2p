@@ -238,6 +238,8 @@ while ($R=~/\G(.*)\n?/g) {
     undef $included_from;
   } elsif ($S eq 'compilation terminated.') {  # Useless message, ignore.
   } elsif ($S=~/^distcc\[/) {  # Useless message, ignore.
+  } elsif ($S=~/^ *#/) {  # Useless message from gcc 4.8, ignore.
+  } elsif ($S=~/^ *\^/) {  # Useless message from gcc 4.8, ignore.
   } else {
     die "$0: invalid depret: [$S]\n";
   }
