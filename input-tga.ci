@@ -290,7 +290,7 @@ ReadImage (FILE              *fp,
   int j, k;
   int pelbytes, wbytes, bsize, npels, pels;
   int rle, badread;
-  int itype=0, dtype;
+  int itype=0;
   unsigned char *cmap = NULL;
   int (*myfread)(unsigned char *, int, int, FILE *);
 
@@ -352,33 +352,18 @@ ReadImage (FILE              *fp,
       if (bpp != 8)
 	    /* We can only cope with 8-bit indices. */
           FATALP ("TGA: index sizes other than 8 bits are unimplemented");
-
-      if (abpp)
-        dtype = INDEXEDA_IMAGE;
-      else
-        dtype = INDEXED_IMAGE;
       break;
 
     case TGA_TYPE_GRAY_RLE:
       rle = 1;
     case TGA_TYPE_GRAY:
       itype = GRAY;
-
-      if (abpp)
-        dtype = GRAYA_IMAGE;
-      else
-        dtype = GRAY_IMAGE;
       break;
 
     case TGA_TYPE_COLOR_RLE:
       rle = 1;
     case TGA_TYPE_COLOR:
       itype = TGA_RGB;
-
-      if (abpp)
-        dtype = TGA_RGBA_IMAGE;
-      else
-        dtype = TGA_RGB_IMAGE;
       break;
 
     default:

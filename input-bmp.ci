@@ -258,7 +258,7 @@ ReadImage (FILE   *fd,
   unsigned char *temp, *buffer;
   long rowstride, channels;
   unsigned short rgb;
-  int i, j, notused;
+  int i, j;
 
   if (bpp >= 16) /* color image */
     {
@@ -347,8 +347,8 @@ ReadImage (FILE   *fd,
 		  }
 		if (xpos == width)
 		  {
-		    notused = ReadOK (fd, buffer, rowbytes - 1 -
-                                                (width * bpp - 1) / 8);
+		    (void) ReadOK (fd, buffer, rowbytes - 1 -
+                                   (width * bpp - 1) / 8);
 		    ypos--;
 		    xpos = 0;
 
@@ -362,7 +362,7 @@ ReadImage (FILE   *fd,
 	  {
 	    while (ypos >= 0 && xpos <= width)
 	      {
-		notused = ReadOK (fd, buffer, 2);
+		(void) ReadOK (fd, buffer, 2);
 		if ((unsigned char) buffer[0] != 0) 
 		  /* Count + Color - record */
 		  {
@@ -388,7 +388,7 @@ ReadImage (FILE   *fd,
 		    howmuch = buffer[1];
 		    for (j = 0; j < howmuch; j += (8 / bpp))
 		      {
-			notused = ReadOK (fd, &v, 1);
+			(void) ReadOK (fd, &v, 1);
 			i = 1;
 			while ((i <= (8 / bpp)) && (xpos < width))
 			  {
@@ -403,7 +403,7 @@ ReadImage (FILE   *fd,
 		      howmuch++;
 
 		    if ((howmuch / (8 / bpp)) % 2)
-		      notused = ReadOK (fd, &v, 1);
+		      (void) ReadOK (fd, &v, 1);
 		    /*if odd(x div (8 div bpp )) then blockread(f,z^,1);*/
 		  }
 		if (((unsigned char) buffer[0] == 0) && ((unsigned char) buffer[1]==0))
@@ -420,7 +420,7 @@ ReadImage (FILE   *fd,
 		if (((unsigned char) buffer[0]==0) && ((unsigned char) buffer[1]==2))
 		  /* Deltarecord */
 		  {
-		    notused = ReadOK (fd, buffer, 2);
+		    (void) ReadOK (fd, buffer, 2);
 		    xpos += (unsigned char) buffer[0];
 		    ypos -= (unsigned char) buffer[1];
 		  }
