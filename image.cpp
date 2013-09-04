@@ -835,7 +835,7 @@ Image::Indexed *Image::Indexed::calcAlpha() {
   register unsigned int i, i8, i7;
   unsigned char transpx=transp;
 
-  ret->headp[0]=ret->headp[0]=ret->headp[0]='\xFF'; /* white */
+  ret->headp[0]=ret->headp[1]=ret->headp[2]='\xFF'; /* white */
   ret->headp[3]=ret->headp[4]=ret->headp[5]='\x00'; /* black, transparent */
   ret->setTransp(1);
   to=ret->rowbeg; p=(unsigned char*)rowbeg;
