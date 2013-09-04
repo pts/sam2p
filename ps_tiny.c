@@ -668,7 +668,7 @@ static void copydata(char const*tag) {
 /* --- Main */
 
 int main(int argc, char**argv) {
-  slen_t acount, xcount, inlining, slen;
+  slen_t acount, xcount, inlining;
   char tmp[40];
   (void)argc;
 
@@ -796,7 +796,7 @@ int main(int argc, char**argv) {
   copy("Test");
 
   getotag("S");
-  getkey("len");  slen=getuintval(); /* Imp: verify slen for overruns */ 
+  getkey("len");  (void)getuintval(); /* Imp: verify slen for overruns */ 
   gettagbeg();
   setifmt("{%</I>",0); copy("I"); noifmt(); /*}*/
   copy("S");

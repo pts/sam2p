@@ -1051,7 +1051,6 @@ int CGIFFF DGifGetExtensionNext(CGIFFF GifFileType *GifFile, CGIFFF GifByteType 
 int CGIFFF DGifCloseFile(CGIFFF GifFileType *GifFile)
 {
     GifFilePrivateType *Private;
-    FILE *File;
 
     if (GifFile == NULL) return GIF_ERROR;
 
@@ -1062,8 +1061,6 @@ int CGIFFF DGifCloseFile(CGIFFF GifFileType *GifFile)
 	_GifError = D_GIF_ERR_NOT_READABLE;
 	return GIF_ERROR;
     }
-
-    File = Private->File;
 
     #if 0 /**** pts ****/
     if (GifFile->Image.ColorMap)
@@ -1454,7 +1451,6 @@ int CGIFFF DGifSlurp(CGIFFF GifFileType *GifFile)
                     InterlacedJumps[] = { 8, 8, 4, 2 };  /* be read - offsets and jumps... */
     /**** pts: unused vars ****/
     /* int i, j, Error, ImageSize; */
-    char eatit;
     int ext_code;
     
     GifRecordType RecordType;
@@ -1525,17 +1521,14 @@ int CGIFFF DGifSlurp(CGIFFF GifFileType *GifFile)
 		      memcpy(ep->Bytes, ExtData, ep->ByteCount * sizeof(char));
 		    #else
                       /**** pts ****/
-                      eatit=0;
                       if (0xf9==(unsigned char)(ext_code)) {
                         assert(ExtData[0]>=4);
                         ext.dispose=ExtData[1]>>2;
                         ext.delay=(ExtData[3] << 8) | ExtData[2];
                         if ((ExtData[1] & 0x01) == 1) ext.transp=ExtData[4];
-                        eatit=1; /* Eat this extension. */
                       } else if (0xff==(unsigned char)(ext_code)) {
                         assert(ExtData[0]>=3);
                         ext.iter=(ExtData[3] << 8) | ExtData[2];
-                        eatit=1; /* Eat this extension. */
                       } else {
                         AddExtensionBlock(&ext, ExtData[0], ExtData+1);
                         ext.ExtensionBlocks[ext.ExtensionBlockCount-1].code=ext_code;
