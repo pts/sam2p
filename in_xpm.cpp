@@ -282,7 +282,7 @@ static Image::Sampled *in_xpm_reader(Image::Loader::UFD *ufd, SimBuffer::Flat co
   #if USE_BIG_MEMORY
    } else if (cpp==2 && colors<=256) { /* Similarly easy job: make an Indexed image; defer .packPal() */
     signed short *bin=new short[65536], s;
-    memset(bin, 255, sizeof(bin)); /* Make bin[*]=-1 */
+    memset(bin, 255, sizeof(*bin) * 65536); /* Make bin[*]=-1 */
     for (i=0,p=tab; (unsigned)i<colors; i++, p+=2) {
       iimg->setPal(i, rgb[i]);
       bin[(p[0]<<8)+p[1]]=i;
@@ -300,7 +300,7 @@ static Image::Sampled *in_xpm_reader(Image::Loader::UFD *ufd, SimBuffer::Flat co
   } else if (cpp==2 && colors<=65535) {
     Image::Sampled::rgb_t rgb1;
     unsigned short *bin=new unsigned short[65536], s;
-    memset(bin, 255, sizeof(bin)); /* Make bin[*]=max */
+    memset(bin, 255, sizeof(*bin) * 65536); /* Make bin[*]=max */
     for (i=0,p=tab; (unsigned)i<colors; i++, p+=2) bin[(p[0]<<8)+p[1]]=i;
     while (ht--!=0) {
       tok.getComma();
