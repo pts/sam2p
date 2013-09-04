@@ -1294,10 +1294,11 @@ Rule::Applier::cons_t out_tiffjai_work(GenBuffer::Writable& out, Rule::OutputRul
   tp.dirSL(tp.ResolutionUnit, 1); /* SHORT */
   if (inks) tp.dirSL(tp.InkSet, 1); /* SHORT */
   tp.dirUNDEFINED(tp.JPEGTables, databeg-img->getHeadp()-2, img->getHeadp(), 2, "\xFF\xD9");
-  unsigned char hvs=img->end_()[-1];
+  const unsigned char hvs=img->end_()[-1];
   if (hvs!=0x22 && cs==Image::Sampled::CS_YCbCr) {
     // printf("hvs=0x%02X\n", hvs);
-    unsigned short horiz_vert[2]={ hvs>>4, hvs&15 };
+    const unsigned short horiz_vert[2]={ (unsigned short)((hvs+0U)>>4),
+                                         (unsigned short)(hvs&15U) };
     tp.dirSHORT(tp.YCbCrSubsampling, 2, horiz_vert);
   }
   if (refe) tp.dirRATIONAL(tp.ReferenceBlackWhite, 6, rats+2);
@@ -1706,9 +1707,10 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
   
   if (compr==tp.COMPRESSION_JPEG) {
     tp.dirUNDEFINED(tp.JPEGTables, jp->getJPEGTables().getLength(), jp->getJPEGTables()() /* , 2, "\xFF\xD9" */);
-    unsigned char hvs=jp->getHVS();
+    const unsigned char hvs=jp->getHVS();
     if (hvs!=0x22 && phot==tp.PHOTOMETRIC_YCBCR) {
-      unsigned short horiz_vert[2]={ hvs>>4, hvs&15 };
+      const unsigned short horiz_vert[2]={ (unsigned short)((hvs+0U)>>4),
+                                           (unsigned short)(hvs&15U) };
       tp.dirSHORT(tp.YCbCrSubsampling, 2, horiz_vert);
     }
     if (refe) tp.dirRATIONAL(tp.ReferenceBlackWhite, 6, rats+2);
