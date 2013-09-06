@@ -1,9 +1,21 @@
+sam2p (0.49.2) lucid; urgency=low
+
+  * Fixed GCC 4.8 incompatibilities in ccdep.pl (the dependency generator
+    of the build system) and elsewhere.
+  * Fixed GCC gcc 4.6 and 4.8 warnings.
+  * Fixed some harmless memory leaks.
+  * Fixed integer-pointer sign bug with `gcc -fPIC' (so it works with the
+    defaults of https://wiki.debian.org/Hardening, see
+    https://code.google.com/p/sam2p/issues/detail?id=11).
+
+ -- Peter Szabo <pts@fazekas.hu>  Fri, 06 Sep 2013 15:06:32 +0200
+
 sam2p (0.49.1) lucid; urgency=low
 
   * Fixed GCC 4.6 incompatibilities in ccdep.pl (the dependency generator
     of the build system).
 
- -- Peter Szabo <pts@google.com>  Wed, 14 Dec 2011 17:44:47 +0100
+ -- Peter Szabo <pts@fazekas.hu>  Wed, 14 Dec 2011 17:44:47 +0100
 
 sam2p (0.49-2) karmic; urgency=low
 
