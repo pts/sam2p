@@ -85,11 +85,22 @@ bool Rule::Cache::isZIPOK() const {
 static MiniPS::Dict *y_FileFormat=(MiniPS::Dict*)NULLP,
   *y_SampleFormat, *y_TransferEncoding,
   *y_Compression, *y_Scale;
-static const slen_t SampleFormat_MAXLEN=32;
+static class ValueDeleter {
+ public:
+  ~ValueDeleter() {
+    MiniPS::delete0((MiniPS::VALUE)y_FileFormat);
+    MiniPS::delete0((MiniPS::VALUE)y_SampleFormat);
+    MiniPS::delete0((MiniPS::VALUE)y_TransferEncoding);
+    MiniPS::delete0((MiniPS::VALUE)y_Compression);
+    MiniPS::delete0((MiniPS::VALUE)y_Scale);
+  }
+} value_deleter;
 
+static const slen_t SampleFormat_MAXLEN=32;
 static void init_dicts() {
   register MiniPS::Dict*y;
  
+  /** TODO: Make this thread-safe. */
   if (y_FileFormat!=NULLP) return;
 
   y=y_FileFormat=new MiniPS::Dict();

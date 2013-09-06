@@ -219,7 +219,7 @@ void MiniPS::delete0(VALUE v) {
   if (ty==T_DICT) RDICT(v)->free();
   else if (ty==T_ARRAY) RARRAY(v)->free();
   else if (ty==T_VOID) ;
-  else if (vp->hasPtr()) delete [] (char*)vp->begin_();
+  else if (vp->hasPtr()) delete [] vp->begin_();
   delete vp; /* BUGFIX at Sat Sep  7 12:50:13 CEST 2002 */
 }
 void MiniPS::dump(VALUE v, unsigned indent) {
