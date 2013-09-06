@@ -913,6 +913,13 @@ void init_sam2p_engine(char const*argv0) {
 
 /* Never returns. */
 int run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*argv1, bool helpp) {
+  class SerrResetter {
+   public:
+    SerrResetter(GenBuffer::Writable *old_serr_): old_serr(old_serr_) {}
+    ~SerrResetter() { Error::serr = old_serr; }
+   private:
+    GenBuffer::Writable *old_serr;
+  } serr_resetter(Error::serr);
   Error::serr=&serr;
 
   /* --- Parse arguments, generate/read .job file */
