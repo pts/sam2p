@@ -32,7 +32,7 @@ class Error {
     NOTICE_DEFER=-6, INFO=-111, DEBUG=-222
   END_STATIC_ENUM()
   /** Standard error stream (stderr) of the current process. */
-  static GenBuffer::Writable *serr;
+  static GenBuffer::Writable * serr;
   /** Returns address to statically allocated buffer. */
   static char const*level2str(level_t level);
   /** This is the (carefully hidden :-)) method of raising errors (i.e

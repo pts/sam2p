@@ -23,7 +23,11 @@ char const* Error::banner0=(char const*)NULLP;
 char const* Error::tmpargv0=(char const*)"pRg_tMp";
 
 static Filter::NullE devNull;
-GenBuffer::Writable *Error::serr=new Files::FILEW(stderr);
+GenBuffer::Writable * Error::serr = new Files::FILEW(stderr);
+static class SerrDeleter {
+ public:
+  ~SerrDeleter() { delete Error::serr; }
+} serr_deleter;
 static Error::Policy defaultPolicy={
   (SimBuffer::B*)NULLP, /* record */
   (Error::level_t)-9999, /* topSecret */
