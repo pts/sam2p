@@ -295,6 +295,7 @@ Mapping::DoubleHash15::DoubleHash15(slen_t datalen_) {
   maxused=(alloced>>4)*15;
 }
 Mapping::DoubleHash15::~DoubleHash15() {
+  minlen=0;
   clear();
   delete [] ary;
 }

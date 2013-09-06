@@ -120,7 +120,7 @@ class Mapping {
     // static const slen_t NEVER_USED=(slen_t)-1, DELETED=(slen_t)-2;
     struct Ary {
       slen_t keylen;
-      /** key is located at keydata, data is located keydata-datalen */
+      /** data is located at keydata, key is located keydata-datalen */
       char *keydata;
     } *ary;
     /* The minimum number of keys before rehashing. */
