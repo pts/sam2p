@@ -912,7 +912,7 @@ void init_sam2p_engine(char const*argv0) {
 /* --- */
 
 /* Never returns. */
-void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*argv1, bool helpp) {
+int run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*argv1, bool helpp) {
   Error::serr=&serr;
 
   /* --- Parse arguments, generate/read .job file */
@@ -1036,7 +1036,7 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
   
   Files::FILEW wf(of);
   Rule::applyProfile(wf, rule_list, &info);
-  
+
   /* --- Done, flush files and clean up. */
 
   fflush(of);
@@ -1066,7 +1066,10 @@ void run_sam2p_engine(Files::FILEW &sout, Files::FILEW &serr, char const*const*a
   fflush(stdout); fflush(stderr);
   if (successp && exitCode == 0)
     fputs("Success.\n", stderr);
-  Error::cexit(exitCode);
+  /* Don't do Error::cexit(exitCode);, it won't run destructors of
+   * stack-allocated objects, and valgrind will complain about memory leaks.
+   */
+  return exitCode;
 }
 
 /** main: process entry point for the sam2p utility. */
@@ -1100,6 +1103,6 @@ int main(int, char const*const* argv) {
   init_applier();
   if (!quietp) { serr << "Available Appliers:"; Rule::printAppliers(serr); serr << ".\n"; }
 
-  run_sam2p_engine(sout, serr, argv+(argv[0]!=(char const*)NULLP), helpp);
-  return 0; /*notreached*/
+  return run_sam2p_engine(
+      sout, serr, argv+(argv[0]!=(char const*)NULLP), helpp);
 }
