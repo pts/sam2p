@@ -790,6 +790,7 @@ MiniPS::VALUE MiniPS::Parser::parse1(int closer, int sev) {
    from_master:
     /* vvv EOF_ALLOWED means: the master cannot close our open '>' or ']' */
     if ((v=master->parse1(EOF_ALLOWED, sev))!=Qundef) return v;
+    delete0(v);
     delete master;
     master=(Parser*)NULLP;
     // fprintf(stderr, "closed master\n");
@@ -818,9 +819,12 @@ MiniPS::VALUE MiniPS::Parser::parse1(int closer, int sev) {
      /* Process external file inclusion */
      assert(master==NULLP);
      /* Imp: prevent infinite recursion */
-     if (specRuns!=NULLP && Qundef!=(w=specRuns->get(RSTRING(v)->begin_(), RSTRING(v)->getLength())))
+     if (specRuns!=NULLP && Qundef!=(w=specRuns->get(RSTRING(v)->begin_(), RSTRING(v)->getLength()))) {
        master=new Parser((GenBuffer::Readable*)RVOID(w)->getPtr());
-       else master=new Parser(RSTRING(v)->getCstr());
+     } else {
+       master=new Parser(RSTRING(v)->getCstr());  /* Open external file. */
+     }
+     delete0(v);
      master->setDepth(depth+1);
      master->setSpecRuns(specRuns);
      goto from_master;
@@ -881,11 +885,15 @@ MiniPS::VALUE MiniPS::Parser::parse1(int closer, int sev) {
       if (Qundef==(key=parse1('>', sev))) break;
       if (key==Qerror) return Qerror;
       if (getType(key)!=T_SNAME) {
+        MiniPS::delete0(key);
         Error::sev(Error::EERROR) << "MiniPS::Parser: dict key must be a /name" << (Error*)0;
         return Qerror;
       }
       val=parse1(EOF_ILLEGAL_POP, sev); /* No EOF allowed here */
-      if (val==Qerror) return Qerror;
+      if (val==Qerror) {
+        MiniPS::delete0(key);
+        return Qerror;
+      }
       if (val!=Qpop) {
         // if (Qundef!=ap->push(RSNAME(key)->begin_(),RSNAME(key)->getLength(),val)) Error::sev(Error::EERROR) << "MiniPS::Parser: duplicate dict key" << (Error*)0;
         /* ^^^ should free if non-fatal error */
