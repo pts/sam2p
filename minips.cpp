@@ -203,7 +203,7 @@ inline static unsigned typerr() { assert(0); return 0; }
 
 unsigned MiniPS::getType(VALUE v) {
   return (v&1)!=0 ? T_INTEGER
-       : v>Qmax_ ? RVALUE(v)->getType()
+       : v+0U>Qmax_+0U ? RVALUE(v)->getType()
        : v==Qnull ? T_NULL+0/*avoid gcc-3.0 ld bug*/
        : T_BOOLEAN;
 }
