@@ -19,7 +19,11 @@ extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list 
 #ifndef __APPLE__ /* SUXX: Max OS X has #ifndef _POSIX_SOURCE around lstat() :-( */
 #define _POSIX_SOURCE 1 /* also popen() */
 #endif
+#ifdef USE_GNU_SOURCE_INSTEAD_OF_POSIX_SOURCE
+#define _GNU_SOURCE 1  /* Implies _POSIX_C_SOURCE >= 2. */
+#else
 #define _POSIX_C_SOURCE 2 /* also popen() */
+#endif
 #define _XOPEN_SOURCE_EXTENDED 1 /* Digital UNIX lstat */
 #ifndef _XPG4_2
 #define _XPG4_2 1 /* SunOS 5.7 lstat() */
@@ -164,24 +168,24 @@ GenBuffer::Writable& Files::FILEW::vformat(char const *fmt, va_list ap) {
 /* --- */
 
 /** Must be <=32767. Should be a power of two. */
-static const slen_t BUFLEN=4096;
+static const slen_t GENSIO_BUFLEN=4096;
 
 void Encoder::vi_putcc(char c) { vi_write(&c, 1); }
 int Decoder::vi_getcc() { char ret; return vi_read(&ret, 1)==1 ? (unsigned char)ret : -1; }
 void Encoder::writeFrom(GenBuffer::Writable& out, FILE *f) {
-  char *buf=new char[BUFLEN];
+  char *buf=new char[GENSIO_BUFLEN];
   int wr;
   while (1) {
-    if ((wr=fread(buf, 1, BUFLEN, f))<1) break;
+    if ((wr=fread(buf, 1, GENSIO_BUFLEN, f))<1) break;
     out.vi_write(buf, wr);
   }
   delete [] buf;
 }
 void Encoder::writeFrom(GenBuffer::Writable& out, GenBuffer::Readable& in) {
-  char *buf=new char[BUFLEN];
+  char *buf=new char[GENSIO_BUFLEN];
   int wr;
   while (1) {
-    if ((wr=in.vi_read(buf, BUFLEN))<1) break;
+    if ((wr=in.vi_read(buf, GENSIO_BUFLEN))<1) break;
     out.vi_write(buf, wr);
   }
   delete [] buf;
@@ -653,9 +657,9 @@ void Filter::PipeD::do_close() {
   state=2;
 }
 void Filter::PipeD::vi_precopy() {
-  char *buf0=new char[BUFLEN], *buf;
+  char *buf0=new char[GENSIO_BUFLEN], *buf;
   slen_t len, wr;
-  while (0!=(len=in.vi_read(buf0, BUFLEN))) {
+  while (0!=(len=in.vi_read(buf0, GENSIO_BUFLEN))) {
     // printf("[%s]\n", buf0);
     for (buf=buf0; len!=0; buf+=wr, len-=wr) {
       wr=fwrite(buf, 1, len>0x4000?0x4000:len, p);

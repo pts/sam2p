@@ -580,17 +580,17 @@ void Rule::OutputRule::appendTransferSpec(GenBuffer::Writable &out) const {
 
 /* --- */
 
-static Rule::Applier *first=(Rule::Applier*)NULLP;
+static Rule::Applier *first_rule=(Rule::Applier*)NULLP;
 
 void Rule::register0(Rule::Applier *anew) {
   param_assert(anew!=NULLP);
-  anew->next=first;
-  first=anew;
+  anew->next=first_rule;
+  first_rule=anew;
 }
 
 unsigned Rule::printAppliers(GenBuffer::Writable &out) {
   unsigned num=0;
-  Applier *p=first;
+  Applier *p=first_rule;
   while (p!=(Applier*)NULLP) {
     if (p->check_rule!=0/*NULLP*/ && p->work!=0/*NULLP*/) { num++;  out << ' ' << p->format; }
     p=p->next;
@@ -615,7 +615,7 @@ Rule::OutputRule* Rule::buildProfile(MiniPS::VALUE Profile, bool quiet) {
     /* val: each OutputRule of the Profile */
     or_->fromDict(*val);
     or_->c=c;
-    Applier *p=first;
+    Applier *p=first_rule;
     // printf("building: %s...\n", p->format);
     #if !USE_BUILTIN_LZW
       if (or_->cache.Compression==or_->cache.CO_LZW && lzw_warning) {
@@ -670,7 +670,7 @@ void Rule::applyProfile(GenBuffer::Writable& out, OutputRule*rule_list, Image::S
     Error::sev(Error::NOTICE_DEFER) << "applyProfile: trying OutputRule #" << or_->c << (Error*)0;
     if (sf->setSampleFormat(or_->cache.SampleFormat, or_->cache.WarningOK, /*TryOnly*/true, or_->cache.Transparent)) {
       /* image supports the SampleFormat of OutputRule */
-      Applier *p=first;
+      Applier *p=first_rule;
       while (p!=NULLP) {
         /* ^^^ Try each output Applier for the current candidate OutputRule */
         if (p->check_rule!=0/*NULLP*/ && p->work!=0/*NULLP*/) {

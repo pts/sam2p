@@ -26,9 +26,9 @@
 #define FatalError(conststr) Error::sev(Error::EERROR) << "PCX: " conststr << (Error*)0
 #define return_pcxError(bname, conststr) Error::sev(Error::EERROR) << "PCX: " conststr << (Error*)0
 #define byte unsigned char
-#define size_t slen_t
+#define PCX_SIZE_T slen_t
 #define malloc_byte(n) new byte[n]
-#define free(p) delete p
+#define PCX_FREE(p) delete (p)
 #define DEBUG 1
 /* the following list give indicies into saveColors[] array in xvdir.c */
 #define F_FULLCOLOR 0
@@ -149,7 +149,7 @@ static Image::Sampled *LoadPCX
 #endif
 
   /* read the PCX header */
-  if (fread(hdr, (size_t) 128, (size_t) 1, fp) != 1 ||
+  if (fread(hdr, (PCX_SIZE_T) 128, (PCX_SIZE_T) 1, fp) != 1 ||
       ferror(fp) || feof(fp)) {
     /* fclose(fp); */
     return_pcxError(bname, "EOF reached in PCX header.\n");
@@ -205,7 +205,7 @@ static Image::Sampled *LoadPCX
     memcpy(img->getRowbeg(), pinfo->pic, pinfo->w*pinfo->h*3);
     ret=img;
   }
-  free(pinfo->pic);
+  PCX_FREE(pinfo->pic);
   pinfo->pic=(byte*)NULLP;
 
 
@@ -319,15 +319,15 @@ static int pcxLoadImage8 ___((char *fname, FILE *fp, PICINFO *pinfo, byte *hdr),
   byte *image;
   
   /* note:  overallocation to make life easier... */
-  image = (byte *) malloc_byte((size_t) (pinfo->h + 1) * pinfo->w + 16);
+  image = (byte *) malloc_byte((PCX_SIZE_T) (pinfo->h + 1) * pinfo->w + 16);
   if (!image) FatalError("Can't alloc 'image' in pcxLoadImage8()");
   
-  xvbzero((char *) image, (size_t) ((pinfo->h+1) * pinfo->w + 16));
+  xvbzero((char *) image, (PCX_SIZE_T) ((pinfo->h+1) * pinfo->w + 16));
   
   switch (hdr[PCX_BPP]) {
   case 1: case 2: case 4: case 8: pcxLoadRaster(fp, image, hdr[PCX_BPP], hdr, pinfo->w, pinfo->h);   break;
   default:
-    free(image);
+    PCX_FREE(image);
     return_pcxError(fname, "Unsupported # of bits per plane.");
   }
 
@@ -359,10 +359,10 @@ static int pcxLoadImage24 ___((char *fname, FILE *fp, PICINFO *pinfo, byte *hdr)
   bperlin = hdr[PCX_BPRL] + ((int) hdr[PCX_BPRH]<<8);
   
   /* allocate 24-bit image */
-  pic24 = (byte *) malloc_byte((size_t) w*h*planes);
+  pic24 = (byte *) malloc_byte((PCX_SIZE_T) w*h*planes);
   if (!pic24) FatalError("couldn't malloc 'pic24'");
   
-  xvbzero((char *) pic24, (size_t) w*h*planes);
+  xvbzero((char *) pic24, (PCX_SIZE_T) w*h*planes);
   
 #if 0 /**** pts ****/
   maxv = 0;
