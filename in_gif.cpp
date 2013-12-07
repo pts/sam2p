@@ -15,8 +15,12 @@
 #pragma implementation
 #endif
 
+#ifdef USE_GNU_SOURCE_INSTEAD_OF_POSIX_SOURCE
+#define _GNU_SOURCE 1  /* Implies _POSIX_C_SOURCE and _POSIX_C_SOURCE >= 2. */
+#else
 #define _POSIX_SOURCE 1
 #define _POSIX_C_SOURCE 2
+#endif
 
 #include "config2.h" /* SUXX, ignores features.h */
 

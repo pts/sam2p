@@ -1272,12 +1272,12 @@ GenBuffer::Writable& operator<<(GenBuffer::Writable& gw, Image::Sampled const& i
   return gw;
 }
 
-static Image::Loader *first=(Image::Loader*)NULLP;
+static Image::Loader *first_image_loader=(Image::Loader*)NULLP;
 
 void Image::register0(Image::Loader *anew) {
   param_assert(anew!=NULLP);
-  anew->next=first;
-  first=anew;
+  anew->next=first_image_loader;
+  first_image_loader=anew;
 }
 
 #if 0 /* removed by code refactoring */
@@ -1308,7 +1308,7 @@ Rule::Sampled *Rule::load(char const* filename) {
    || ferror(f))
     Error::sev(Error::EERROR) << "I/O error in image file: " << FNQ(filename) << (Error*)0;
   if (got!=0 && got!=Applier::MAGIC_LEN) memmove(buf+2*Applier::MAGIC_LEN-got, buf+Applier::MAGIC_LEN, got);
-  Applier *p=first;
+  Applier *p=first_image_loader;
   Applier::reader_t reader;
   while (p!=NULLP) {
     if (NULLP!=(reader=p->checker(buf,buf+Applier::MAGIC_LEN))) { return reader(f); }
@@ -1333,7 +1333,7 @@ Image::Sampled *Image::load(Image::Loader::UFD* ufd0, SimBuffer::Flat const& loa
   if (ret<Loader::MAGIC_LEN) memset(buf+ret, '\0', Loader::MAGIC_LEN-ret);
   buf[Loader::MAGIC_LEN]='\0';
   /* Dat: do not read the trailer onto buf+Loader::MAGIC_LEN, because no ->checker() uses it yet. */
-  Loader *p=first;
+  Loader *p=first_image_loader;
   Loader::reader_t reader;
   ufd.unread(buf, ret); /* tries to seek back, on failure calls ufd.getUnget().vi_write() */
   // ^^^ rewind(f); /* checker might have read */
@@ -1388,7 +1388,7 @@ Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHin
    || ferror(f))
     Error::sev(Error::EERROR) << "I/O error pre in image file: " << FNQ(filename) << (Error*)0;
   if (got!=0 && got!=Loader::MAGIC_LEN) memmove(buf+2*Loader::MAGIC_LEN-got, buf+Loader::MAGIC_LEN, got);
-  Loader *p=first;
+  Loader *p=first_image_loader;
   Loader::reader_t reader;
   while (p!=NULLP) {
     if ((format==(char const*)NULLP || 0==strcmp(p->format, format))
@@ -1412,7 +1412,7 @@ Image::Sampled *Image::load(char const* filename, SimBuffer::Flat const& loadHin
 
 unsigned Image::printLoaders(GenBuffer::Writable &out) {
   unsigned num=0;
-  Loader *p=first;
+  Loader *p=first_image_loader;
   while (p!=NULLP) {
     if (p->checker!=(Loader::checker_t)0 && p->format!=(char const*)NULLP) { num++; out << ' ' << p->format; }
     p=p->next;

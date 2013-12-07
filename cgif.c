@@ -258,7 +258,7 @@ void CGIFFF PrintGifError(void)
 
 /* --- gifalloc.c */
 
-#define MAX(x, y)	(((x) > (y)) ? (x) : (y))
+#define MAXGIF(x, y)	(((x) > (y)) ? (x) : (y))
 
 /******************************************************************************
 * Miscellaneous utility functions					      *
@@ -359,7 +359,7 @@ ColorMapObject *CGIFFF UnionColorMap(
      * Allocate table which will hold the result for sure.
      */
     ColorUnion
-	= MakeMapObject(MAX(ColorIn1->ColorCount,ColorIn2->ColorCount)*2,NULL);
+	= MakeMapObject(MAXGIF(ColorIn1->ColorCount,ColorIn2->ColorCount)*2,NULL);
 
     if (ColorUnion == NULL)
 	return(NULL);
