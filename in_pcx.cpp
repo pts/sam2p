@@ -29,7 +29,6 @@
 #define PCX_SIZE_T slen_t
 #define malloc_byte(n) new byte[n]
 #define PCX_FREE(p) delete (p)
-#define DEBUG 1
 /* the following list give indicies into saveColors[] array in xvdir.c */
 #define F_FULLCOLOR 0
 #define F_GREYSCALE 1
@@ -41,6 +40,9 @@
 #define BaseName(x) ((char*)0)
 #define PARM(parm) parm
 /* info structure filled in by the LoadXXX() image reading routines */
+#ifndef USE_PCX_DEBUG_MESSAGES
+#define USE_PCX_DEBUG_MESSAGES 0
+#endif
 
 typedef struct { byte *pic;                  /* image data */
 		 dimen w, h;                 /* pic size */
@@ -171,15 +173,13 @@ static Image::Sampled *LoadPCX
   colors = 1 << (hdr[PCX_BPP] * hdr[PCX_PLANES]);
   fullcolor = (hdr[PCX_BPP] == 8 && hdr[PCX_PLANES] == 3);
 
-#if USE_DEBUG_MESSAGES
-  if (DEBUG) {
-    fprintf(stderr,"PCX: %dx%d image, version=%d, encoding=%d\n", 
-	    pinfo->w, pinfo->h, hdr[PCX_VER], hdr[PCX_ENC]);
-    fprintf(stderr,"   BitsPerPixel=%d, planes=%d, BytePerRow=%d, colors=%d\n",
-	    hdr[PCX_BPP], hdr[PCX_PLANES], 
-	    hdr[PCX_BPRL] + ((int) hdr[PCX_BPRH]<<8),
-	    colors);
-  }
+#if USE_PCX_DEBUG_MESSAGES
+  fprintf(stderr,"PCX: %dx%d image, version=%d, encoding=%d\n", 
+          pinfo->w, pinfo->h, hdr[PCX_VER], hdr[PCX_ENC]);
+  fprintf(stderr,"   BitsPerPixel=%d, planes=%d, BytePerRow=%d, colors=%d\n",
+          hdr[PCX_BPP], hdr[PCX_PLANES], 
+          hdr[PCX_BPRL] + ((int) hdr[PCX_BPRH]<<8),
+          colors);
 #endif
 
   if (colors>256 && !fullcolor) {
@@ -253,8 +253,8 @@ static Image::Sampled *LoadPCX
       /* create cmap */
       PAL_R(pinfo,0) = PAL_G(pinfo,0) = PAL_B(pinfo,0) = 255;
       PAL_R(pinfo,1) = PAL_G(pinfo,1) = PAL_B(pinfo,1) = 0;
-#if USE_DEBUG_MESSAGES
-      if (DEBUG) fprintf(stderr,"PCX: no cmap:  using 0=white,1=black\n");
+#if USE_PCX_DEBUG_MESSAGES
+      fprintf(stderr,"PCX: no cmap:  using 0=white,1=black\n");
 #endif
     }
   }
