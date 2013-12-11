@@ -26,7 +26,7 @@ exit
 /* +++ deflate.c */
 /* deflate.c -- compress data using the deflation algorithm
  * Copyright (C) 1995-1996 Jean-loup Gailly.
- * For conditions of distribution and use, see copyright notice in zlib.h 
+ * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
 /*
@@ -145,7 +145,7 @@ exit
 /*#include <linux/zconf.h>*/
 /* zconf.h -- configuration of the zlib compression library
  * Copyright (C) 1995-1998 Jean-loup Gailly.
- * For conditions of distribution and use, see copyright notice in zlib.h 
+ * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
 /* @(#) $Id: pts_defl.c,v 1.6 2008/08/28 20:16:47 pts Exp $ */
@@ -206,7 +206,7 @@ typedef void     *voidp;
 #define ZLIB_VERSION "1.1.3"
 #endif
 
-/* 
+/*
      The 'zlib' compression library provides in-memory compression and
   decompression functions, including integrity checks of the uncompressed
   data.  This version of the library supports only one compression method
@@ -345,7 +345,7 @@ extern int zlib_deflate_workspacesize (void);
    returned in stream->workspace before calling zlib_deflateInit().
 */
 
-/* 
+/*
 extern int deflateInit (z_streamp strm, int level);
 
      Initializes the internal stream state for compression. The fields
@@ -423,7 +423,7 @@ extern int zlib_deflate (z_streamp strm, int flush);
   more input data, until it returns with Z_STREAM_END or an error. After
   deflate has returned Z_STREAM_END, the only possible operations on the
   stream are deflateReset or deflateEnd.
-  
+
     Z_FINISH can be used immediately after deflateInit if all the compression
   is to be done in a single step. In this case, avail_out must be at least
   0.1% larger than avail_in plus 12 bytes.  If deflate does not return
@@ -467,7 +467,7 @@ extern int zlib_inflate_workspacesize (void);
    returned in stream->workspace before calling zlib_inflateInit().
 */
 
-/* 
+/*
 extern int zlib_inflateInit (z_streamp strm);
 
      Initializes the internal stream state for decompression. The fields
@@ -536,7 +536,7 @@ extern int zlib_inflate (z_streamp strm, int flush);
 
      If a preset dictionary is needed at this point (see inflateSetDictionary
   below), inflate sets strm-adler to the adler32 checksum of the
-  dictionary chosen by the compressor and returns Z_NEED_DICT; otherwise 
+  dictionary chosen by the compressor and returns Z_NEED_DICT; otherwise
   it sets strm->adler to the adler32 checksum of all output produced
   so far (that is, total_out bytes) and returns Z_OK, Z_STREAM_END or
   an error code as described below. At the end of the stream, inflate()
@@ -574,7 +574,7 @@ extern int zlib_inflateEnd (z_streamp strm);
     The following functions are needed only in some special applications.
 */
 
-/*   
+/*
 extern int deflateInit2 (z_streamp strm,
                                      int  level,
                                      int  method,
@@ -617,7 +617,7 @@ extern int deflateInit2 (z_streamp strm,
    method). msg is set to null if there is no error message.  deflateInit2 does
    not perform any compression: this will be done by deflate().
 */
-                            
+
 extern int zlib_deflateSetDictionary (z_streamp strm,
 						     const Byte *dictionary,
 						     uInt  dictLength);
@@ -701,7 +701,7 @@ extern int zlib_deflateParams (z_streamp strm, int level, int strategy);
    if strm->avail_out was zero.
 */
 
-/*   
+/*
 extern int inflateInit2 (z_streamp strm, int  windowBits);
 
      This is another version of inflateInit with an extra parameter. The
@@ -743,7 +743,7 @@ extern int zlib_inflateSetDictionary (z_streamp strm,
 */
 
 extern int zlib_inflateSync (z_streamp strm);
-/* 
+/*
     Skips invalid compressed data until a full flush point (see above the
   description of deflate with Z_FULL_FLUSH) can be found, or until all
   available input is skipped. No output is provided.
@@ -919,13 +919,11 @@ static ZINLINE uLong zlib_adler32(uLong adler,
 
 /* #include "defutil.h" */
 
-#define Assert(err, str) 
-#define Trace(dummy) 
-#define Tracev(dummy) 
-#define Tracecv(err, dummy) 
-#define Tracevv(dummy) 
-
-
+#define Assert(err, str)
+#define Trace(dummy)
+#define Tracev(dummy)
+#define Tracecv(err, dummy)
+#define Tracevv(dummy)
 
 #define LENGTH_CODES 29
 /* number of length codes, not counting the special END_BLOCK code */
@@ -1526,7 +1524,7 @@ int zlib_deflateReset(
 )
 {
     deflate_state *s;
-    
+
     if (strm == NULLP || strm->state == NULLP)
         return Z_STREAM_ERROR;
 
@@ -1602,7 +1600,7 @@ static void putShortMSB(
 {
     put_byte(s, (Byte)(b >> 8));
     put_byte(s, (Byte)(b & 0xff));
-}   
+}
 
 /* =========================================================================
  * Flush as much pending output as possible. All deflate() output goes
@@ -2340,7 +2338,7 @@ static block_state deflate_fast(
                      * always MIN_MATCH bytes ahead.
                      */
                 } while (--s->match_length != 0);
-                s->strstart++; 
+                s->strstart++;
             } else {
                 s->strstart += s->match_length;
                 s->match_length = 0;
@@ -2358,7 +2356,7 @@ static block_state deflate_fast(
             Tracevv((stderr,"%c", s->window[s->strstart]));
             bflush = zlib_tr_tally (s, 0, s->window[s->strstart]);
             s->lookahead--;
-            s->strstart++; 
+            s->strstart++;
         }
         if (bflush) FLUSH_BLOCK(s, 0);
     }
@@ -2496,7 +2494,7 @@ int zlib_deflate_workspacesize(void)
 /* +++ trees.c */
 /* trees.c -- output deflated data using Huffman coding
  * Copyright (C) 1995-1996 Jean-loup Gailly
- * For conditions of distribution and use, see copyright notice in zlib.h 
+ * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
 /*
@@ -3593,7 +3591,7 @@ static void copy_block(
     s->last_eob_len = 8; /* enough lookahead for inflate */
 
     if (header) {
-        put_short(s, (ush)len);   
+        put_short(s, (ush)len);
         put_short(s, (ush)~len);
 #ifdef DEBUG_ZLIB
         s->bits_sent += 2*16;

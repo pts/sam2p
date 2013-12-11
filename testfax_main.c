@@ -75,7 +75,7 @@ static void work(FILE *f, stream_template const*template_, stream_state *state) 
   #endif
 
   template_->init(state);
-  
+
   r.ptr=rlimit=rbuf-1;
   hard=rbuf+sizeof(rbuf)-1;
   assert(hard-r.ptr>=(int)template_->min_in_size);
@@ -156,7 +156,7 @@ int main(int argc, char **argv) {
   #if OBJDEP
   #  warning REQUIRES: pts_faxd
   #endif
-  } else if (argc==2 && 0==strcmp(argv[1], "decode")) { 
+  } else if (argc==2 && 0==strcmp(argv[1], "decode")) {
     stream_CFD_state sCFDs;
     sCFDs.memset_=gsfax_memset;
     sCFDs.xalloc_=gsfax_xalloc;

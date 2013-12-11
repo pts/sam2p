@@ -19,7 +19,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.  
+THE SOFTWARE.
  */
 
 /*The creators of the GIF format require the following
@@ -56,7 +56,7 @@ EXTERN_C FILE *fdopen (int fildes, const char *mode); /* GCC 3.0 SUXX */
 #endif
 
 /* --- gifalloc.c */
- 
+
 /*****************************************************************************
 *   "Gif-Lib" - Yet another gif library.				     *
 *									     *
@@ -345,7 +345,7 @@ ColorMapObject *CGIFFF UnionColorMap(
 			 ColorMapObject *ColorIn2,
 			 GifPixelType ColorTransIn2[])
 /*
- * Compute the union of two given color maps and return it.  If result can't 
+ * Compute the union of two given color maps and return it.  If result can't
  * fit into 256 colors, NULL is returned, the allocated union otherwise.
  * ColorIn1 is copied as is to ColorUnion, while colors from ColorIn2 are
  * copied iff they didn't exist before.  ColorTransIn2 maps the old
@@ -422,7 +422,7 @@ ColorMapObject *CGIFFF UnionColorMap(
 
 	/* perhaps we can shrink the map? */
 	if (RoundUpTo < ColorUnion->ColorCount)
-	    ColorUnion->Colors 
+	    ColorUnion->Colors
 		= (GifColorType *)realloc(Map, sizeof(GifColorType)*RoundUpTo);
     }
 
@@ -500,7 +500,7 @@ void CGIFFF FreeExtension(CGIFFF SavedImage *Image)
 ******************************************************************************/
 CGIFFF SavedImage *CGIFFF MakeSavedImage(CGIFFF GifFileType *GifFile, CGIFFF SavedImage *CopyFrom)
 /*
- * Append an image block to the SavedImages array  
+ * Append an image block to the SavedImages array
  */
 {
     SavedImage	*sp;
@@ -557,7 +557,7 @@ CGIFFF SavedImage *CGIFFF MakeSavedImage(CGIFFF GifFileType *GifFile, CGIFFF Sav
 
 		/*
 		 * For the moment, the actual blocks can take their
-		 * chances with free().  We'll fix this later. 
+		 * chances with free().  We'll fix this later.
 		 */
 	    }
 	}
@@ -859,7 +859,7 @@ int CGIFFF DGifGetImageDesc(CGIFFF GifFileType *GifFile)
 	    FreeMapObject(Image.ColorMap);
 
 	Image.ColorMap = MakeMapObject(1 << BitsPerPixel, NULL);
-    
+
 	/* Get the image local color map: */
 	for (i = 0; i < Image.ColorMap->ColorCount; i++) {
 	    if (fread(Buf, 1, 3, Private->File) != 3) {
@@ -1452,7 +1452,7 @@ int CGIFFF DGifSlurp(CGIFFF GifFileType *GifFile)
     /**** pts: unused vars ****/
     /* int i, j, Error, ImageSize; */
     int ext_code;
-    
+
     GifRecordType RecordType;
     /**** pts ****/
     SavedImage *sp=0; /**** pts: avoid gcc warning */
@@ -1462,7 +1462,7 @@ int CGIFFF DGifSlurp(CGIFFF GifFileType *GifFile)
     SavedImage noext;
 
     GifByteType *ExtData;
-    
+
     /**** pts ****/
     memset(&noext, 0, sizeof(noext));
     noext.delay=0;
