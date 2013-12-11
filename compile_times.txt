@@ -1,0 +1,33 @@
+haxn
+  gcc version 4.6.3
+  clang version 3.0-6ubuntu3
+
+user allcc -O0: gcc=1.76s clang=0.82s
+user allcc -O1: gcc=3.93s clang=2.61s
+user allcc -Os: gcc=5.39s clang=3.16s
+user allcc -O2: gcc=6.45s clang=4.65s
+user allcc -O3: gcc=8.41s clang=4.70s
+
+user separ -O0: gcc=2.58s clang=1.49s
+user separ -O1: gcc=5.50s clang=3.63s
+user separ -Os: gcc=7.01s clang=3.72s
+user separ -O2: gcc=7.75s clang=3.87s
+user separ -O3: gcc=9.09s clang=3.94s (?!)
+
+allcc:
+
+$ time g++ -m32 -c -o allcc.o3 -O3 -s -DNDEBUG -DHAVE_CONFIG2_H -fsigned-char -fno-rtti -fno-exceptions -ansi -pedantic -Wall -W allcc.cc
+8.18s user 0.20s system 99% cpu 8.428 total
+8.77s user 0.07s system 99% cpu 8.876 total
+8.41s user 0.14s system 99% cpu 8.630 total
+
+$ time clang -m32 -c -o allcc.o3 -O3 -DNDEBUG -DHAVE_CONFIG2_H -fsigned-char -fno-rtti -fno-exceptions -ansi -pedantic -Wall -W -Wno-unknown-pragmas allcc.cc
+4.70s user 0.03s system 99% cpu 4.772 total
+4.70s user 0.03s system 99% cpu 4.758 total
+4.69s user 0.04s system 99% cpu 4.758 total
+
+separ:
+
+$ time g++ -m32 -c -O0 -s -DNDEBUG -DHAVE_CONFIG2_H -fsigned-char -fno-rtti -fno-exceptions -ansi -pedantic -Wall -W sam2p_main.cpp appliers.cpp c_lgcc.cpp out_gif.cpp in_ps.cpp in_tga.cpp in_pnm.cpp in_bmp.cpp in_gif.cpp in_lbm.cpp in_xpm.cpp mapping.cpp in_pcx.cpp in_jai.cpp in_png.cpp in_jpeg.cpp in_tiff.cpp rule.cpp minips.cpp encoder.cpp error.cpp image.cpp gensio.cpp gensi.cpp
+
+$ time clang -m32 -c -O0 -DNDEBUG -DHAVE_CONFIG2_H -fsigned-char -fno-rtti -fno-exceptions -ansi -pedantic -Wall -W -Wno-unknown-pragmas sam2p_main.cpp appliers.cpp c_lgcc.cpp out_gif.cpp in_ps.cpp in_tga.cpp in_pnm.cpp in_bmp.cpp in_gif.cpp in_lbm.cpp in_xpm.cpp mapping.cpp in_pcx.cpp in_jai.cpp in_png.cpp in_jpeg.cpp in_tiff.cpp rule.cpp minips.cpp encoder.cpp error.cpp image.cpp gensio.cpp gensi.cpp
