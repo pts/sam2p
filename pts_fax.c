@@ -2389,7 +2389,7 @@ s_CFD_process(stream_state * st, stream_cursor_read * pr,
     int k_left = ss->k_left;
     int rows_left = ss->rows_left;
     int status = 0;
-    
+
     (void)last; /**** pts ****/
 
 #ifdef DEBUG
@@ -3022,7 +3022,6 @@ stream_move(stream_cursor_read * pr, stream_cursor_write * pw)
     #endif
     return status;
 }
-                                                        
 
 #if 1 /**** pts ****/
 /* Stream template */
