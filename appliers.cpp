@@ -1516,10 +1516,13 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
       slen_t writelen;
       char *buf=(char*)NULLP;
       char const*psave=img->getRowbeg(), *p, *ppend=psave+rlenht;
-      char const*r=alpha->getRowbeg(), *rend;
+      char const*r=alpha->getRowbeg();
+#ifndef NDEBUG
+      char const*rend;
+      Image::Sampled::dimen_t rlena=(wd+7)>>3;
+#endif
       char *t;
       register unsigned u;
-      Image::Sampled::dimen_t rlena=(wd+7)>>3;
       assert(rlena==alpha->getRlen());
       // printf("SF=%u\n", cache->SampleFormat);
       if (cache->isGray()) {
@@ -1531,7 +1534,9 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
         assert(rlena*8>=rlen);
         while (psave!=ppend) {
           t=buf;
+#ifndef NDEBUG
           rend=r+rlena;
+#endif
           p=psave; psave+=rlen;
           assert(psave<=ppend);
           u=(1<<16);
@@ -1578,7 +1583,9 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
           p=psave; psave+=rlen;
           assert(psave<=ppend);
           u=(1<<16);
+#ifndef NDEBUG
           rend=r+rlena; /* superfluous */
+#endif
           switch (bpc) {
            case 8:
             while (p<psave) {
@@ -1624,7 +1631,9 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
             }
            break;
           } /* SWITCH RGB bpc */
+#ifndef NDEBUG
           assert(r==rend); // r=rend;
+#endif
           pp->vi_write(buf, writelen);
         }
       }
