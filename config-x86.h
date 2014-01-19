@@ -1,4 +1,4 @@
-/* config-uclibc.h.  config.h replacement for i386 and x86_64 Linux uClibc. */
+/* config-uclibc.h.  config.h replacement for i386 and x86_64 Linux. */
 /* config.h.in.  Generated automatically from configure.in by autoheader.  */
 
 /* Define if using alloca.c.  */
