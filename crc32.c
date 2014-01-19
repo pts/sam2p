@@ -7,7 +7,9 @@
 /* $Id: crc32.c,v 1.2 2002/12/11 14:01:52 pts Exp $ */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 #if OBJDEP
 #  warning PROVIDES: crc32

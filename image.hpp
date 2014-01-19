@@ -5,7 +5,9 @@
 /* Imp: keep future transparency in toIndexed(...) */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma interface
+#endif
 #endif
 
 #ifndef SAMPLED_HPP

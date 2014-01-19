@@ -6,7 +6,9 @@
 /* Imp: use xviff.c */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 
 #include "image.hpp"

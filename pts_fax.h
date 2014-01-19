@@ -33,7 +33,9 @@ Free Software Foundation, Inc., 59 Temple Place Suite 330, Boston, MA
 #  define PTS_FAX_H 1
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma interface
+#endif
 #endif
 
 /* #include "scommon.h" */

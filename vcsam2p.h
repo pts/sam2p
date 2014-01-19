@@ -3,7 +3,9 @@
 #define AFX_VCSAM2P_H__26C24785_06B6_11D7_846E_0004E2009304__INCLUDED_
 
 #if _MSC_VER > 1000
+#ifndef __clang__
 #pragma once
+#endif
 #endif // _MSC_VER > 1000
 
 #include "resource.h"

@@ -46,7 +46,9 @@ exit
  */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 
 #if _MSC_VER > 1000

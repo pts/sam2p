@@ -9,7 +9,9 @@
 /* Imp: add zlib */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 
 
