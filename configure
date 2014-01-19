@@ -1857,6 +1857,24 @@ if test $ac_cv_prog_cxx_apwaw = yes; then CXXFLAGSB="$CXXFLAGSB -ansi -pedantic 
 
 
 
+echo "$as_me:$LINENO: checking whether ${CXX-g++} accepts -Wextra" >&5
+echo $ECHO_N "checking whether ${CXX-g++} accepts -Wextra... $ECHO_C" >&6
+if test "${ac_cv_prog_cxx_wextra+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  echo 'void f(void);void f(void){}' > conftest.cc
+if test -z "`${CXX-g++} -Wextra -c conftest.cc 2>&1`"
+then ac_cv_prog_cxx_wextra=yes;
+else ac_cv_prog_cxx_wextra=no; fi
+rm -f conftest*
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_prog_cxx_wextra" >&5
+echo "${ECHO_T}$ac_cv_prog_cxx_wextra" >&6
+if test $ac_cv_prog_cxx_wextra = yes; then CXXFLAGSB="$CXXFLAGSB -Wextra"; fi
+
+
+
 echo "$as_me:$LINENO: checking whether ${CXX-g++} accepts -felide-constructors -Wstrict-prototypes -Wpointer-arith -Wcast-align -Winline -Wcast-qual -Wmissing-prototypes" >&5
 echo $ECHO_N "checking whether ${CXX-g++} accepts -felide-constructors -Wstrict-prototypes -Wpointer-arith -Wcast-align -Winline -Wcast-qual -Wmissing-prototypes... $ECHO_C" >&6
 if test "${ac_cv_prog_cxx_ptscxxopts+set}" = set; then
