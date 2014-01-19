@@ -1516,11 +1516,16 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
       slen_t writelen;
       char *buf=(char*)NULLP;
       char const*psave=img->getRowbeg(), *p, *ppend=psave+rlenht;
-      char const*r=alpha->getRowbeg(), *rend;
+      char const*r=alpha->getRowbeg();
+#ifndef NDEBUG
+      char const*rend;
+      Image::Sampled::dimen_t rlena=(wd+7)>>3;
+#endif
       char *t;
       register unsigned u;
-      Image::Sampled::dimen_t rlena=(wd+7)>>3;
+#ifndef NDEBUG
       assert(rlena==alpha->getRlen());
+#endif
       // printf("SF=%u\n", cache->SampleFormat);
       if (cache->isGray()) {
         /* works at Mon Dec  9 01:25:59 CET 2002 */
@@ -1528,10 +1533,14 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
         static unsigned char const szor2[16]={85,84,81,80,69,68,65,64,21,20,17,16,5,4,1,0};
         // static unsigned char const szor2[8]={0,1,16,17,64,65,80,81};
         buf=new char[(writelen=((slen_t)wd*bpc+3)>>2)+24];
+#ifndef NDEBUG
         assert(rlena*8>=rlen);
+#endif
         while (psave!=ppend) {
           t=buf;
+#ifndef NDEBUG
           rend=r+rlena;
+#endif
           p=psave; psave+=rlen;
           assert(psave<=ppend);
           u=(1<<16);
@@ -1578,7 +1587,9 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
           p=psave; psave+=rlen;
           assert(psave<=ppend);
           u=(1<<16);
+#ifndef NDEBUG
           rend=r+rlena; /* superfluous */
+#endif
           switch (bpc) {
            case 8:
             while (p<psave) {
@@ -1624,7 +1635,9 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
             }
            break;
           } /* SWITCH RGB bpc */
+#ifndef NDEBUG
           assert(r==rend); // r=rend;
+#endif
           pp->vi_write(buf, writelen);
         }
       }
