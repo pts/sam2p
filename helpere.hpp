@@ -5,7 +5,9 @@
 
 /* Don't use this here, because we don't have helpere.cpp
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma interface
+#endif
 #endif
 */
 

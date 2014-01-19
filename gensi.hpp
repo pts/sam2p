@@ -4,7 +4,9 @@
 /* Imp: get rid of gensio.o (Buffer::Writable::printf requires B...) */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma interface
+#endif
 #endif
 
 #ifndef GENSI_HPP
