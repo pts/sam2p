@@ -757,7 +757,7 @@ Rule::Applier::cons_t out_pnm_work(GenBuffer::Writable& out, Rule::OutputRule*or
   out << Error::banner0;
   Image::Sampled *img=sf->getImg();
   out << '\n' << img->getWd() << ' ' << img->getHt();
-  out << " 255\n"+(sfo==Image::SF_Gray1?4:0);
+  out << &(" 255\n"[sfo==Image::SF_Gray1?4:0]);
   /* ^^^ SF_Gray1 BUGFIX at Tue Jun  4 21:44:17 CEST 2002 */
   register char *p=img->getRowbeg(), *t=(char*)NULLP;
   slen_t len=img->getRlen()*img->getHt();
@@ -1138,7 +1138,7 @@ void TIFFPrinter::aLONG (SimBuffer::B &s, unsigned count, slen_t const*val) {
 void TIFFPrinter::dirSHORT(unsigned short const tag, slen_t const count, unsigned short const*val) {
   slen_t offs;
   aSHORT(dir, 1U, &tag);
-  dir.vi_write("\0\3"+(le?1:0), 2);
+  dir.vi_write(&("\0\3"[le?1:0]), 2);
   aLONG(dir, 1U, &count);
   switch (count) {
     case 0: dir.vi_write("\0\0\0", 4); break;
@@ -1150,7 +1150,7 @@ void TIFFPrinter::dirSHORT(unsigned short const tag, slen_t const count, unsigne
 void TIFFPrinter::dirLONG(unsigned short const tag, slen_t const count, slen_t const*val) {
   slen_t offs;
   aSHORT(dir, 1U, &tag);
-  dir.vi_write("\0\4"+(le?1:0), 2);
+  dir.vi_write(&("\0\4"[le?1:0]), 2);
   aLONG(dir, 1U, &count);
   switch (count) {
     case 0: dir.vi_write("\0\0\0", 4); break;
@@ -1161,7 +1161,7 @@ void TIFFPrinter::dirLONG(unsigned short const tag, slen_t const count, slen_t c
 void TIFFPrinter::dirRATIONAL(unsigned short tag, slen_t count, slen_t const*val) {
   slen_t offs;
   aSHORT(dir, 1U, &tag);
-  dir.vi_write("\0\5"+(le?1:0), 2);
+  dir.vi_write(&("\0\5"[le?1:0]), 2);
   aLONG(dir, 1U, &count);
   switch (count) {
     case 0: dir.vi_write("\0\0\0", 4); break;
@@ -1171,7 +1171,7 @@ void TIFFPrinter::dirRATIONAL(unsigned short tag, slen_t count, slen_t const*val
 void TIFFPrinter::dirUNDEFINED(unsigned short tag, slen_t count, char const*val) {
   slen_t offs;
   aSHORT(dir, 1U, &tag);
-  dir.vi_write("\0\7"+(le?1:0), 2);
+  dir.vi_write(&("\0\7"[le?1:0]), 2);
   aLONG(dir, 1U, &count);
   if (count<=4) {
     dir.vi_write(val, count);
@@ -1183,7 +1183,7 @@ void TIFFPrinter::dirUNDEFINED(unsigned short tag, slen_t count, char const*val)
 void TIFFPrinter::dirUNDEFINED(unsigned short tag, slen_t count, char const*val, slen_t count2, char const*val2) {
   slen_t offs, countx=count+count2;
   aSHORT(dir, 1U, &tag);
-  dir.vi_write("\0\7"+(le?1:0), 2);
+  dir.vi_write(&("\0\7"[le?1:0]), 2);
   aLONG(dir, 1U, &countx);
   if (countx<=4) {
     dir.vi_write(val, count);
