@@ -10,6 +10,7 @@
  */
 #define USE_GNU_SOURCE_INSTEAD_OF_POSIX_SOURCE 1
 
+#if !OBJDEP
 #include "sam2p_main.cpp"
 #include "appliers.cpp"
 #include "c_lgcc.cpp"
@@ -34,3 +35,4 @@
 #include "image.cpp"
 #include "gensio.cpp"
 #include "gensi.cpp"
+#endif
