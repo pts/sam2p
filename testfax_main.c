@@ -14,7 +14,9 @@
 #include <assert.h>
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 
 #if OBJDEP

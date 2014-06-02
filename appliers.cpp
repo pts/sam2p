@@ -6,7 +6,9 @@
  */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 
 #include "rule.hpp"
@@ -757,7 +759,7 @@ Rule::Applier::cons_t out_pnm_work(GenBuffer::Writable& out, Rule::OutputRule*or
   out << Error::banner0;
   Image::Sampled *img=sf->getImg();
   out << '\n' << img->getWd() << ' ' << img->getHt();
-  out << " 255\n"+(sfo==Image::SF_Gray1?4:0);
+  out << &(" 255\n"[sfo==Image::SF_Gray1?4:0]);
   /* ^^^ SF_Gray1 BUGFIX at Tue Jun  4 21:44:17 CEST 2002 */
   register char *p=img->getRowbeg(), *t=(char*)NULLP;
   slen_t len=img->getRlen()*img->getHt();
@@ -1138,7 +1140,7 @@ void TIFFPrinter::aLONG (SimBuffer::B &s, unsigned count, slen_t const*val) {
 void TIFFPrinter::dirSHORT(unsigned short const tag, slen_t const count, unsigned short const*val) {
   slen_t offs;
   aSHORT(dir, 1U, &tag);
-  dir.vi_write("\0\3"+(le?1:0), 2);
+  dir.vi_write(&("\0\3"[le?1:0]), 2);
   aLONG(dir, 1U, &count);
   switch (count) {
     case 0: dir.vi_write("\0\0\0", 4); break;
@@ -1150,7 +1152,7 @@ void TIFFPrinter::dirSHORT(unsigned short const tag, slen_t const count, unsigne
 void TIFFPrinter::dirLONG(unsigned short const tag, slen_t const count, slen_t const*val) {
   slen_t offs;
   aSHORT(dir, 1U, &tag);
-  dir.vi_write("\0\4"+(le?1:0), 2);
+  dir.vi_write(&("\0\4"[le?1:0]), 2);
   aLONG(dir, 1U, &count);
   switch (count) {
     case 0: dir.vi_write("\0\0\0", 4); break;
@@ -1161,7 +1163,7 @@ void TIFFPrinter::dirLONG(unsigned short const tag, slen_t const count, slen_t c
 void TIFFPrinter::dirRATIONAL(unsigned short tag, slen_t count, slen_t const*val) {
   slen_t offs;
   aSHORT(dir, 1U, &tag);
-  dir.vi_write("\0\5"+(le?1:0), 2);
+  dir.vi_write(&("\0\5"[le?1:0]), 2);
   aLONG(dir, 1U, &count);
   switch (count) {
     case 0: dir.vi_write("\0\0\0", 4); break;
@@ -1171,7 +1173,7 @@ void TIFFPrinter::dirRATIONAL(unsigned short tag, slen_t count, slen_t const*val
 void TIFFPrinter::dirUNDEFINED(unsigned short tag, slen_t count, char const*val) {
   slen_t offs;
   aSHORT(dir, 1U, &tag);
-  dir.vi_write("\0\7"+(le?1:0), 2);
+  dir.vi_write(&("\0\7"[le?1:0]), 2);
   aLONG(dir, 1U, &count);
   if (count<=4) {
     dir.vi_write(val, count);
@@ -1183,7 +1185,7 @@ void TIFFPrinter::dirUNDEFINED(unsigned short tag, slen_t count, char const*val)
 void TIFFPrinter::dirUNDEFINED(unsigned short tag, slen_t count, char const*val, slen_t count2, char const*val2) {
   slen_t offs, countx=count+count2;
   aSHORT(dir, 1U, &tag);
-  dir.vi_write("\0\7"+(le?1:0), 2);
+  dir.vi_write(&("\0\7"[le?1:0]), 2);
   aLONG(dir, 1U, &countx);
   if (countx<=4) {
     dir.vi_write(val, count);
@@ -1523,7 +1525,9 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
 #endif
       char *t;
       register unsigned u;
+#ifndef NDEBUG
       assert(rlena==alpha->getRlen());
+#endif
       // printf("SF=%u\n", cache->SampleFormat);
       if (cache->isGray()) {
         /* works at Mon Dec  9 01:25:59 CET 2002 */
@@ -1531,7 +1535,9 @@ Rule::Applier::cons_t out_tiff_work(GenBuffer::Writable& out, Rule::OutputRule*o
         static unsigned char const szor2[16]={85,84,81,80,69,68,65,64,21,20,17,16,5,4,1,0};
         // static unsigned char const szor2[8]={0,1,16,17,64,65,80,81};
         buf=new char[(writelen=((slen_t)wd*bpc+3)>>2)+24];
+#ifndef NDEBUG
         assert(rlena*8>=rlen);
+#endif
         while (psave!=ppend) {
           t=buf;
 #ifndef NDEBUG

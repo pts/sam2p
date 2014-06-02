@@ -5,7 +5,9 @@
 /* Imp: test this code with various JPEG files! */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 
 #include "image.hpp"

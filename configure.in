@@ -96,6 +96,7 @@ AC_PTS_PROG_CXXFLAGS(nrne, -fno-rtti -fno-exceptions)
 dnl ^^^ `g++ -fno-rtti': disables `typeinfo' (??) and run-time type identification
 dnl ^^^ `g++ -fno-exceptions': disables catch and throw
 AC_PTS_PROG_CXXFLAGSB(apwaw, -ansi -pedantic -Wall -W)
+AC_PTS_PROG_CXXFLAGSB(wextra, -Wextra)
 dnl vvv gcc-3.2 gives too many stupid warnings with -Wtraditional
 dnl AC_PTS_PROG_CXXFLAGSB(-Wtraditional)
 AC_PTS_PROG_CXXFLAGSB(ptscxxopts, -felide-constructors -Wstrict-prototypes dnl

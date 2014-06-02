@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>  /* for write(), also available on Windows */
+#include <sys/types.h>  /* size_t */
 
 /* Sat Jul  6 16:39:19 CEST 2002
  * empirical checkerg++ helper routines for gcc version 2.95.2 20000220 (Debian GNU/Linux)
@@ -44,8 +45,8 @@ extern "C" void* emulate_cc_new(unsigned len) { \
 extern "C" void emulate_cc_delete(void* p) {
   if (p!=0) free(p);
 }
-void* operator new  (unsigned len) __attribute__((alias("emulate_cc_new")));
-void* operator new[](unsigned len) __attribute__((alias("emulate_cc_new")));
+void* operator new  (size_t len) __attribute__((alias("emulate_cc_new")));
+void* operator new[](size_t len) __attribute__((alias("emulate_cc_new")));
 void  operator delete  (void* p)   __attribute__((alias("emulate_cc_delete")));
 void  operator delete[](void* p)   __attribute__((alias("emulate_cc_delete")));
 void* __cxa_pure_virtual = 0;

@@ -7,7 +7,9 @@
 #define PTS_LZW_H 1
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma interface
+#endif
 #endif
 
 #include "config2.h"  /* PTS_const */
