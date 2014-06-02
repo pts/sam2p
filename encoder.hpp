@@ -89,10 +89,10 @@ class PSEncoder: public Encoder {
   );
   // static Encoder* newTIFFPredictor2(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
   // static Encoder* newPNGPredictor11(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
-  /** @param type: 1: no predictor, 2: TIFFPredictor2, 10: PNGPredictor0 (None)
-   *         11: PNGPredictor1 (Sub), 12: PNGPredictor2 (Up),
-   *         13: PNGPredictor3 (Average), 14: PNGPredictor4 (Paeth),
-   *         15: PNGPredictor5 (optimum).
+  /** @param type: 1: no predictor, 2: TIFFPredictor2, 10: PNGPredictorNone (None)
+   *         11: PNGPredictorSub (Sub), 12: PNGPredictorUp (Up),
+   *         13: PNGPredictorAverage (Average), 14: PNGPredictorPaeth (Paeth),
+   *         15: PNGPredictorAuto (optimum).
    */
   static Encoder* newPredictor(GenBuffer::Writable &out_, unsigned char type, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
  protected:
