@@ -10,7 +10,9 @@
 /* Imp: get docs about the LBM format, and rewrite this from scratch */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 
 #include "image.hpp"

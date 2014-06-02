@@ -4,7 +4,9 @@
  */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 
 #include "gensi.hpp"
@@ -370,7 +372,7 @@ slen_t SimBuffer::Flat::findFirst(char const* s, slen_t slen) const {
   return len;
 }
 
-int SimBuffer::Flat::cmpflat(SimBuffer::Flat const& s2) const {
+int SimBuffer::Flat::cmpFlat(SimBuffer::Flat const& s2) const {
   return memcmp(beg, s2.beg, len<s2.len?len:s2.len) || (len>s2.len)-(len<s2.len);
 }
 

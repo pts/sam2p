@@ -40,7 +40,9 @@ THE SOFTWARE.
 #define CGIF_H
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma interface
+#endif
 #endif
 
 #include "config2.h"  /* PTS_const */

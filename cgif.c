@@ -30,7 +30,9 @@ THE SOFTWARE.
 */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 
 /**** pts: not an ANSI C function */

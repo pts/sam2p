@@ -4,7 +4,9 @@
 /* Imp: get rid of gensio.o (Buffer::Writable::printf requires B...) */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma interface
+#endif
 #endif
 
 #ifndef GENSI_HPP
@@ -283,7 +285,7 @@ class SimBuffer {
     slen_t findFirst(char const c) const;
     /** @return getLength() if not found, offset otherwise */
     slen_t findFirst(char const* s, slen_t slen) const;
-    virtual int cmpflat(Flat const& s2) const;
+    int cmpFlat(Flat const& s2) const;
     virtual int cmp(char const* s2, slen_t len) const;
     /** @param fallback default: '\0'
      * @return if idx is too large: `fallback', otherwise: the asked char

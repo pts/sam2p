@@ -12,7 +12,9 @@
 */         
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 
 #ifdef USE_GNU_SOURCE_INSTEAD_OF_POSIX_SOURCE

@@ -38,7 +38,9 @@ Free Software Foundation, Inc., 59 Temple Place Suite 330, Boston, MA
 /* #define cxxintern extern */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma implementation
+#endif
 #endif
 
 /* misc_types.h by pts@fazekas.hu at Sat Jul  6 19:20:17 CEST 2002 */

@@ -3,7 +3,9 @@
  */
 
 #ifdef __GNUC__
+#ifndef __clang__
 #pragma interface
+#endif
 #endif
 
 #ifndef ERROR_HPP
