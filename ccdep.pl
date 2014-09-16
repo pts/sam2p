@@ -233,6 +233,9 @@ while ($R=~/\G(.*)\n?/g) {
   } elsif ($S=~/\A([^:]+):\d+:(\d+:)? warning: this is the location of /) {
     # ^^^ gcc-3.1
     undef $included_from;
+  } elsif ($S=~/\A([^:]+):\d+:(\d+:)? warning: .*\bdeprecated\b/) {
+    # Example: /usr/include/features.h:148:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
+    undef $included_from;
   } elsif ($S=~/: No such file or directory$/) {  # Depends on $ENV{LC_ALL}.
     # ^^^ gcc-3.3
     undef $included_from;
