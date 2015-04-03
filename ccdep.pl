@@ -243,6 +243,7 @@ while ($R=~/\G(.*)\n?/g) {
   } elsif ($S=~/^distcc\[/) {  # Useless message, ignore.
   } elsif ($S=~/^ *#/) {  # Useless message from gcc 4.8, ignore.
   } elsif ($S=~/^ *\^/) {  # Useless message from gcc 4.8, ignore.
+  } elsif ($S=~/: warning: treating 'c' input as/) {  # Useless message from clang, ignore.
   } else {
     die "$0: invalid depret: [$S]\n";
   }
