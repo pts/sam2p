@@ -184,8 +184,10 @@ while ($R=~/\G(.*)\n?/g) {
   } elsif ($S=~/\A\s{3,}from ([^:]+)/) {
     # ^^^ gcc-3.2
     $included_from=$1;
-  } elsif ($S=~/\A([^:]+):\d+:(\d+:)? warning: #warning (NULL-PROVIDES|PROVIDES|CONFLICTS|REQUIRES):(.*)\Z/) {
+  } elsif ($S=~/\A([^:]+):\d+:(\d+:)? warning: #warning (NULL-PROVIDES|PROVIDES|CONFLICTS|REQUIRES):(.*)\Z/ or
+           $S=~/\A([^:]+):\d+:(\d+:)? warning: (NULL-PROVIDES|PROVIDES|CONFLICTS|REQUIRES):(.*)\ \[-W/) {
     # ^^^ (\d+:)? added for gcc-3.1
+    # ^^^ clang: appliers.cpp:554:6: warning: REQUIRES: out_gif.o [-W#warnings]
     # print STDERR "[$S]\n";
     my($DS,$B)=($1,$3);
     if (defined $included_from) { $DS=$included_from; undef $included_from }
