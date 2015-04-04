@@ -238,7 +238,8 @@ while ($R=~/\G(.*)\n?/g) {
   } elsif ($S=~/\A([^:]+):\d+:(\d+:)? warning: .*\bdeprecated\b/) {
     # Example: /usr/include/features.h:148:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
     undef $included_from;
-  } elsif ($S=~/: No such file or directory$/) {  # Depends on $ENV{LC_ALL}.
+  } elsif ($S=~/: No such file or directory$/ or  # Depends on $ENV{LC_ALL}.
+           $S=~/: fatal error: .* file not found$/) {  # clang.
     # ^^^ gcc-3.3
     undef $included_from;
   } elsif ($S eq 'compilation terminated.') {  # Useless message, ignore.
