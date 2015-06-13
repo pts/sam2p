@@ -44,6 +44,7 @@ class ASCII85Encode: public PSEncoder {
   virtual void vi_write(char const*buf, slen_t len);
 
  protected:
+  void wencoded(char const *encoded);
   void wout(unsigned PTS_INT32_T buf_);
   unsigned maxcpl;
   /** Number of digits available in this line */
@@ -524,6 +525,21 @@ ASCII85Encode::ASCII85Encode(GenBuffer::Writable &out_, unsigned maxcpl_)
   obufend=(op=obuf=new char[4096])+4096;
 }
 
+void ASCII85Encode::wencoded(char const *cp) {
+  for (; *cp!='\0'; ) {
+    if (op==obufend) out.vi_write(op=obuf, obufend-obuf);
+    // if (*cp<='!') { fprintf(stderr, "e=%d.\n", cp-encoded); }
+    assert(*cp>='!');
+    assert(*cp<='~');
+    *op++=*cp++;
+    if (--ascii85breaklen == 0) {
+      if (op==obufend) out.vi_write(op=obuf, obufend-obuf);
+      *op++='\n';
+      ascii85breaklen = maxcpl;
+    }
+  } /* NEXT */
+}
+
 void ASCII85Encode::vi_write(char const*buf, slen_t len) {
   if (len==0) {
     char encoded[6];
@@ -548,19 +564,7 @@ void ASCII85Encode::vi_write(char const*buf, slen_t len) {
       encoded[3] = (w1 / 85) + '!';
       encoded[4] = (w1 % 85) + '!';
       encoded[5-ascii85left] = '\0';
-      char* cp;
-      for (cp = encoded; *cp!='\0'; ) {
-        if (op==obufend) out.vi_write(op=obuf, obufend-obuf);
-        // if (*cp<='!') { fprintf(stderr, "e=%d.\n", cp-encoded); }
-        assert(*cp>='!');
-        assert(*cp<='~');
-        *op++=*cp++;
-        if (--ascii85breaklen == 0) {
-          if (op==obufend) out.vi_write(op=obuf, obufend-obuf);
-          *op++='\n';
-          ascii85breaklen = maxcpl;
-        }
-      } /* NEXT */
+      wencoded(encoded);
     } /* IF */
     if (op!=obuf) out.vi_write(obuf, op-obuf); /* flush buffer cache */
     out.vi_write("~>",2); out.vi_write(0,0);
@@ -605,18 +609,7 @@ void ASCII85Encode::wout(unsigned PTS_INT32_T buf_) {
   } else {
     encoded[0] = 'z', encoded[1] = '\0';
   }
-  char* cp;
-  for (cp = encoded; *cp!='\0'; ) {
-    if (op==obufend) out.vi_write(op=obuf, obufend-obuf);
-    assert(*cp>='!');
-    assert(*cp<='~');
-    *op++=*cp++;
-    if (--ascii85breaklen == 0) {
-      if (op==obufend) out.vi_write(op=obuf, obufend-obuf);
-      *op++='\n';
-      ascii85breaklen = maxcpl;
-    }
-  }
+  wencoded(encoded);
 }
 
 /* --- */
