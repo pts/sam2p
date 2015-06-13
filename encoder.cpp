@@ -53,6 +53,7 @@ class ASCII85Encode: public PSEncoder {
   unsigned ascii85left;
   unsigned PTS_INT32_T ascii85buf;
   char *obuf, *obufend, *op;
+  char dscst;  /* For converting `%%' to `% %' to avoid DSC parser errors */
 };
 
 /** Doesn't output EOD (end-of-data) marker `>' */
@@ -521,7 +522,8 @@ ASCII85Encode::ASCII85Encode(GenBuffer::Writable &out_, unsigned maxcpl_)
  :maxcpl(maxcpl_)
  ,out(out_)
  ,ascii85breaklen(maxcpl_)
- ,ascii85left(4) {
+ ,ascii85left(4)
+ ,dscst(1) {
   obufend=(op=obuf=new char[4096])+4096;
 }
 
@@ -531,11 +533,29 @@ void ASCII85Encode::wencoded(char const *cp) {
     // if (*cp<='!') { fprintf(stderr, "e=%d.\n", cp-encoded); }
     assert(*cp>='!');
     assert(*cp<='~');
+    if (dscst) {
+      if (dscst == 1) {
+        dscst = (*cp == '%') ? 2 : 0;
+      } else {  /* if (dscst == 2) { */
+        if (*cp == '%') {
+          if (--ascii85breaklen == 0) {
+            *op++ = '\n';
+            ascii85breaklen = maxcpl;
+          } else {
+            /* Add space for `% %' instead of `%%' at BOL. */
+            *op++ = ' ';
+          }
+          if (op==obufend) out.vi_write(op=obuf, obufend-obuf);
+        }
+        dscst = 0;
+      }
+    }
     *op++=*cp++;
     if (--ascii85breaklen == 0) {
       if (op==obufend) out.vi_write(op=obuf, obufend-obuf);
       *op++='\n';
       ascii85breaklen = maxcpl;
+      dscst = 1;
     }
   } /* NEXT */
 }
