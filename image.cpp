@@ -1064,7 +1064,7 @@ Image::Indexed* Image::Gray::toIndexed()/* const*/ {
   } else if (bpc==8) {
     for (i=0,rgb=0;i<256;i++,rgb+=(rgb_t)0x010101L) img->setPal(i,rgb);
   }
-  memcpy(img->getRowbeg(), rowbeg, beg+len-rowbeg);
+  memcpy(img->getRowbeg(), rowbeg, rlen*ht);
   return img;
 }
 bool Image::Gray::canGray() const { return true; }

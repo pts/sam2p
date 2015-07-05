@@ -31,6 +31,7 @@ class Image {
    * ...
    * rowbeg+(h-1)*rlen..rowbeg+h*rlen-1: sample data of the last row
    * trail..beg+len: trailer, ignored. Its length must be >=bpc.
+   * TODO: Remove the trailer, and see what breaks.
    */
   class Sampled: public SimBuffer::Flat {
    public:
