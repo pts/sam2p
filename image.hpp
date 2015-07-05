@@ -171,6 +171,14 @@ class Image {
     void setTransp(unsigned char coloridx);
     /** @return new hasTransp */
     bool setTranspc(rgb_t color);
+    /** Returns like setTranspc, but doesn't change the image.
+     * @return new hasTransp
+     */
+    bool wouldSetTranspc(rgb_t color) const;
+    /** Like setTranspc, but if it makes any changes, then it calls
+     * packPal() and changes back bpc to its old value.
+     */
+    void setTranspcAndRepack(rgb_t color);
     virtual void copyRGBRow(char *to, dimen_t whichrow) const;
     /* virtual bool hasPixelRGB(Image::Sampled::rgb_t rgb) const; */
     /** Packs (compresses) the palette so that it will be continuous in
@@ -359,7 +367,8 @@ class Image {
      * @param Transparent: as part of the conversion, try to make this RGB color
      *        transparent
      * @return true iff the conversion succeeded. Note that img may be the same
-     *         pointer even when true is returned
+     *         pointer even when true is returned. If false is returned, keeps
+     *         the image unchanged.
      */
     bool setSampleFormat(sf_t sf, bool WarningOK, bool TryOnly, Sampled::rgb_t Transparent);
     inline Indexed **getImgs() const { return imgs; }

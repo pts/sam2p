@@ -521,23 +521,56 @@ void Image::Indexed::setTransp(unsigned char color) {
   unsigned char *p=(unsigned char*)headp+3*color;
   transpc=((Image::Sampled::rgb_t)p[0]<<16)+(p[1]<<8)+p[2];
 }
+
 bool Image::Indexed::setTranspc(rgb_t color) {
+  if (color!=0x1000000UL && color!=transpc) {
+    char t[3];
+    t[0]=color>>16; t[1]=color>>8; t[2]=color;
+    char *p=headp, *pend=rowbeg;
+    while (p!=pend) { /* Examine the palette. */
+      if (p[0]==t[0] && p[1]==t[1] && p[2]==t[2]) {
+        transpc=color;
+        transp=(p-headp)/3; /* destroy old transparency */
+      }
+      p+=3;
+    }
+  }
+  return transp!=-1;
+}
+
+bool Image::Indexed::wouldSetTranspc(rgb_t color) const {
+  if (transp!=-1) return true;
+  if (color!=0x1000000UL && color!=transpc) {
+    char t[3];
+    t[0]=color>>16; t[1]=color>>8; t[2]=color;
+    char *p=headp, *pend=rowbeg;
+    while (p!=pend) { /* Examine the palette. */
+      if (p[0]==t[0] && p[1]==t[1] && p[2]==t[2]) return true;
+      p+=3;
+    }
+  }
+  return false;
+}
+
+void Image::Indexed::setTranspcAndRepack(rgb_t color) {
+  if (!(color!=0x1000000UL && color!=transpc)) return;
   char t[3];
-  /** vvv BUGFIX at Sat Jun 15 13:40:30 CEST 2002 */
-  if (color==0x1000000UL) return transp!=-1; /* no effect */
-  if (color==transpc) return transp!=-1; /* would not change */
   t[0]=color>>16; t[1]=color>>8; t[2]=color;
   char *p=headp, *pend=rowbeg;
+  bool need_repack = false;
   while (p!=pend) { /* Examine the palette. */
     if (p[0]==t[0] && p[1]==t[1] && p[2]==t[2]) {
       transpc=color;
       transp=(p-headp)/3; /* destroy old transparency */
-      return true;
+      need_repack = true;
     }
     p+=3;
   }
-  /* No transparency set this time. Maybe there is an old one; unchanged. */
-  return transp!=-1;
+  if (need_repack) {
+    const unsigned char old_bpc = bpc;
+    packPal();  /* May change bpc. */
+    setBpc(old_bpc);
+  }
 }
 
 void Image::Indexed::to8() { to8nomul(); }
@@ -1009,7 +1042,7 @@ Image::Sampled* Image::Indexed::addAlpha(Image::Gray *al) {
       if ((unsigned char)*alq++!=255) p[0]=ncols; /* may set to 0 if ncols==256 */
       p++;
     }
-    if (ncols==256) { /* Try again, probably now we have less colors */
+    if (ncols==256) { /* Try again, probably now we have fewer colors */
       packPal();
       if ((ncols=getNcols())==256) Error::sev(Error::EERROR) << "Indexed::addAlpha: too many colors, transparency impossible" << (Error*)0;
       for (p=rowbeg,alq=al->getRowbeg(); p!=pend; p++) 
@@ -1487,15 +1520,19 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
    case SF_Bbox:
     sf=SF_Bbox; return true;
    case SF_Opaque:
-    if (!hasTransp && nncols==1 && PTS_dynamic_cast(Indexed*,img)->setTranspc(Transparent)) { hasTransp=true; nncols=0; }
+    if (!hasTransp && nncols==1 && PTS_dynamic_cast(Indexed*,img)->wouldSetTranspc(Transparent)) return false;
     if (hasTransp || nncols!=1) return false;
     assert(img->getTy()==img->TY_INDEXED);
     /* The color can be calculated: PTS_dynamic_cast(Indexed*>(img)->getPal(0); */
     /* Conversion is not necessary. */
     sf=SF_Opaque; return true;
    case SF_Transparent:
-    if (!hasTransp && nncols==1 && PTS_dynamic_cast(Indexed*,img)->setTranspc(Transparent)) { hasTransp=true; nncols=0; }
-    if (!hasTransp || nncols!=0) return false;
+    if (!hasTransp && nncols==1 && PTS_dynamic_cast(Indexed*,img)->setTranspc(Transparent)) {
+      /* Must return true eventually, because setTranspc has modified the image. */
+      hasTransp=true; nncols=0;
+    } else if (!hasTransp || nncols!=0) {
+      return false;
+    }
     assert(img->getTy()==img->TY_INDEXED);
     /* Conversion is not necessary. */
     sf=SF_Transparent; return true;
@@ -1535,11 +1572,12 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     // assert(img!=NULLP); if (bak!=img) delete bak;
     { iimg=PTS_dynamic_cast(Indexed*,img);
       iimg->setBpc(1);
-      if (iimg->setTranspc(Transparent)) return false; /* Dat: false if must be changed to become transparent; Imp: undo changes */
+      if (iimg->wouldSetTranspc(Transparent)) return false; /* Dat: false if must be changed to become transparent. */
+      iimg->setTranspcAndRepack(Transparent);
     }
     sf=SF_Indexed1; return true;
    case SF_Mask:
-    if (!hasTransp && nncols==2 && PTS_dynamic_cast(Indexed*,img)->setTranspc(Transparent)) { hasTransp=true; nncols=1; }
+    if (!hasTransp && nncols==2 && PTS_dynamic_cast(Indexed*,img)->wouldSetTranspc(Transparent)) { hasTransp=true; --nncols; }
     if (nncols>1 || zero) return false;
     if (TryOnly) return WarningOK || nncols+(hasTransp?1:0)==2;
     if (nncols==1 && !hasTransp) {
@@ -1553,8 +1591,8 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img->getTy()==img->TY_INDEXED);
     { iimg=PTS_dynamic_cast(Indexed*,img);
       iimg->setBpc(1);
-      if (!iimg->setTranspc(Transparent)) return false;
-      iimg->packPal();
+      if (!iimg->wouldSetTranspc(Transparent)) return false;
+      iimg->setTranspcAndRepack(Transparent);
     }
     /* printf("gett=%d\n", PTS_dynamic_cast(Indexed*,img)->getTransp()); */
     /* vvv BUGFIX: <1U -> <2U */
@@ -1564,10 +1602,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
      */
     sf=SF_Mask; return true;
    case SF_Transparent2:
-    if (nncols==4) {
-      (iimg=PTS_dynamic_cast(Indexed*,img))->setTranspc(Transparent); /* Imp: are we Indexed*?? */
-      hasTransp=iimg->hasTransp();
-    }
+    if (!hasTransp && nncols==4 && PTS_dynamic_cast(Indexed*,img)->wouldSetTranspc(Transparent)) { hasTransp=true; --nncols; }
     if (nncols>3 || zero) return false;
     if (TryOnly) return WarningOK || (hasTransp && nncols>=2);
     Error::sev(Error::NOTICE) << "SampleFormat: Transparent2 separates colors" << (Error*)0;
@@ -1582,7 +1617,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img->getTy()==img->TY_INDEXED);
     { iimg=PTS_dynamic_cast(Indexed*,img);
       iimg->setBpc(2); /* BUGFIX at Sat Jun 15 13:55:25 CEST 2002 */
-      iimg->setTranspc(Transparent);
+      iimg->setTranspcAndRepack(Transparent);
       // imgs=iimg->separate(); /* postponed because of GIF89a output */
     }
     sf=SF_Transparent2; return true;
@@ -1616,11 +1651,12 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img->getTy()==img->TY_INDEXED);
     { iimg=PTS_dynamic_cast(Indexed*,img);
       iimg->setBpc(2);
-      if (iimg->setTranspc(Transparent)) return false;
+      if (iimg->wouldSetTranspc(Transparent)) return false;
+      iimg->setTranspcAndRepack(Transparent);
     }
     sf=SF_Indexed2; return true;
    case SF_Transparent4:
-    if (nncols==16) PTS_dynamic_cast(Indexed*,img)->setTranspc(Transparent);
+    if (!hasTransp && nncols==16 && PTS_dynamic_cast(Indexed*,img)->wouldSetTranspc(Transparent)) { hasTransp=true; --nncols; }
     if (nncols>15 || zero) return false;
     if (TryOnly) return WarningOK || (hasTransp && nncols>=4);
     Error::sev(Error::NOTICE) << "SampleFormat: Transparent4 separates colors" << (Error*)0;
@@ -1635,7 +1671,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img->getTy()==img->TY_INDEXED);
     { iimg=PTS_dynamic_cast(Indexed*,img);
       iimg->setBpc(4);
-      iimg->setTranspc(Transparent);
+      iimg->setTranspcAndRepack(Transparent);
       // imgs=iimg->separate(); /* postponed because of GIF89a output */
     }
     sf=SF_Transparent4; return true;
@@ -1695,11 +1731,12 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img->getTy()==img->TY_INDEXED);
     { iimg=PTS_dynamic_cast(Indexed*,img);
       iimg->setBpc(4);
-      if (iimg->setTranspc(Transparent)) return false;
+      if (iimg->wouldSetTranspc(Transparent)) return false;
+      iimg->setTranspcAndRepack(Transparent);
     }
     sf=SF_Indexed4; return true;
    case SF_Transparent8:
-    if (nncols==256) PTS_dynamic_cast(Indexed*,img)->setTranspc(Transparent);
+    if (!hasTransp && nncols==256 && PTS_dynamic_cast(Indexed*,img)->wouldSetTranspc(Transparent)) { hasTransp=true; --nncols; }
     if (nncols>255 || zero) return false;
     if (!WarningOK) return false;
     if (TryOnly) return true;
@@ -1713,7 +1750,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img->getTy()==img->TY_INDEXED);
     { iimg=PTS_dynamic_cast(Indexed*,img);
       iimg->setBpc(8); /* should be a no-op */
-      iimg->setTranspc(Transparent);
+      iimg->setTranspcAndRepack(Transparent);
       // imgs=iimg->separate(); /* postponed because of GIF89a output */
     }
     sf=SF_Transparent8; return true;
@@ -1775,7 +1812,8 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     assert(img->getTy()==img->TY_INDEXED);
     { iimg=PTS_dynamic_cast(Indexed*,img);
       iimg->setBpc(8); /* should be a no-op */
-      if (iimg->setTranspc(Transparent)) return false;
+      if (iimg->wouldSetTranspc(Transparent)) return false;
+      iimg->setTranspcAndRepack(Transparent);
     }
     sf=SF_Indexed8; return true;
    case SF_Rgb4:
