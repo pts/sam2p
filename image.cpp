@@ -487,7 +487,7 @@ void Image::Indexed::setNcolsMove(unsigned short ncols_) {
   unsigned ncols=getNcols();
   if (ncols_==ncols) return;
   if (ncols_<ncols || (slen_t)(headp-beg)>=(ncols_-ncols)*3) {
-    memmove(rowbeg-ncols_*3, headp, ncols_*3);
+    memmove(rowbeg-ncols_*3, headp, (ncols_<ncols ? ncols_ : ncols)*3);
     /* ^^^ *3 BUGFIX at Sun Apr 14 00:50:34 CEST 2002 */
   } else { /* Imp: test this routine */
     /* Tue Jun 11 16:22:52 CEST 2002 */
