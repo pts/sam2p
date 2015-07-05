@@ -450,11 +450,13 @@ bool Image::Gray::hasPixelRGB(Image::Sampled::rgb_t rgb) const {
 }
 
 Image::Indexed* Image::Sampled::addAlpha0(Image::Indexed *iimg, Image::Gray *al) {
-  unsigned ncols=0;
   if (iimg==NULLP) Error::sev(Error::EERROR) << "addAlpha: too many colors, transparency impossible" << (Error*)0;
   iimg->to8();
-  iimg->packPal();
-  if ((ncols=iimg->getNcols())==256) Error::sev(Error::EERROR) << "addAlpha: too many colors, transparency impossible" << (Error*)0;
+  unsigned ncols;
+  if ((ncols=iimg->getNcols()) == 256) {
+    iimg->packPal();  // TODO: Do a more lightweight palette packing if there are only 2 colors (such as PNG import through PNM).
+    if ((ncols=iimg->getNcols())==256) Error::sev(Error::EERROR) << "addAlpha: too many colors, transparency impossible" << (Error*)0;
+  }
   iimg->setNcolsMove(ncols+1);
   /* fprintf(stderr,"old ncols=%u\n", ncols); */
   iimg->setPal(ncols,0); /* black */
