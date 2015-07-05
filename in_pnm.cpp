@@ -60,6 +60,7 @@ static Image::Sampled *in_pnm_reader(Image::Loader::UFD* ufd, SimBuffer::Flat co
     } else {
       Error::sev(Error::NOTICE) << "PNM: loaded alpha, but no transparent pixels" << (Error*)0;
     }
+    delete img;
   }
   /* fclose(f); */
   return ret;
