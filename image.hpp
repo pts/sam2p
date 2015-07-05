@@ -148,7 +148,7 @@ class Image {
      */
     virtual Sampled* addAlpha(/*Image::*/Gray *al) =0;
     /** assert(al.bpp=8) etc. Imp: document this */
-    static Indexed* addAlpha0(Sampled *img, Gray *al);
+    static Indexed* addAlpha0(Indexed *iimg, Gray *al);
   };
 
   class Indexed: public Sampled {

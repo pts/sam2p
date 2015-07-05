@@ -449,10 +449,9 @@ bool Image::Gray::hasPixelRGB(Image::Sampled::rgb_t rgb) const {
   return false;
 }
 
-Image::Indexed* Image::Sampled::addAlpha0(Image::Sampled *img, Image::Gray *al) {
-  Image::Indexed *iimg=(Image::Indexed*)img;
+Image::Indexed* Image::Sampled::addAlpha0(Image::Indexed *iimg, Image::Gray *al) {
   unsigned ncols=0;
-  if (img==NULLP) Error::sev(Error::EERROR) << "addAlpha: too many colors, transparency impossible" << (Error*)0;
+  if (iimg==NULLP) Error::sev(Error::EERROR) << "addAlpha: too many colors, transparency impossible" << (Error*)0;
   iimg->to8();
   iimg->packPal();
   if ((ncols=iimg->getNcols())==256) Error::sev(Error::EERROR) << "addAlpha: too many colors, transparency impossible" << (Error*)0;
