@@ -684,7 +684,7 @@ void Rule::applyProfile(GenBuffer::Writable& out, OutputRule*rule_list, Image::S
            case Applier::OK:
             // if (or_->c!=0) {
             delete Error::getRecorded(); Error::popPolicy();
-            Error::sev(Error::NOTICE) << "applyProfile: applied OutputRule #" << or_->c << (Error*)0;
+            Error::sev(Error::NOTICE) << "applyProfile: applied OutputRule #" << or_->c << " using applier " << p->format << (Error*)0;
             return;
            /* case Applier::MAYBE: impossible */
            // case p->DONT_KNOW: ;
