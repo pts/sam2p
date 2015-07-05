@@ -111,7 +111,6 @@ char const *Image::Sampled::cs2devcs(unsigned char cs) {
 void Image::Sampled::init(slen_t l_comment, slen_t l_header, dimen_t wd_, dimen_t ht_,
   /* ^^^ 24 is required for /Transparent in out_tiff_work */
   unsigned char bpc_, unsigned char ty_, unsigned char cpp_) {
-  static const slen_t PADDING=24;
   bpc=bpc_;
   ty=ty_;
   wd=wd_;
@@ -120,9 +119,10 @@ void Image::Sampled::init(slen_t l_comment, slen_t l_header, dimen_t wd_, dimen_
   // pred=1;
   transpc=0x1000000UL; /* Dat: this means: no transparent color */
   rlen=(((rlen_t)bpc_)*cpp_*wd_+7)>>3;
-  beg=new char[len=l_comment+l_header+rlen*ht_+PADDING];
+  beg=new char[len=l_comment+l_header+rlen*ht_+bpc];
   rowbeg=(headp=const_cast<char*>(beg)+l_comment)+l_header;
   trail=const_cast<char*>(beg)+len-bpc;
+  memset(trail, 0, bpc);
 }
 
 Image::Gray*    Image::Sampled::toGray0(unsigned char bpc_) {
@@ -917,6 +917,7 @@ void Image::Indexed::setBpc(unsigned char bpc_) {
   unsigned int i;
   Image::Sampled::dimen_t htc;
   if (bpc_==1) {
+    // This reads bytes from trail.
     htc=ht; while (htc--!=0) {
       toend=to+((wdcpp+7)>>3);
       while (to!=toend) {
@@ -927,6 +928,7 @@ void Image::Indexed::setBpc(unsigned char bpc_) {
       if (0!=(wdcpp&7)) p+=(wdcpp&7)-8; /* negative */
     }
   } else if (bpc_==2) {
+    // This reads bytes from trail.
     htc=ht; while (htc--!=0) {
       toend=to+((wdcpp+3)>>2);
       while (to!=toend) {
@@ -936,6 +938,7 @@ void Image::Indexed::setBpc(unsigned char bpc_) {
       if (0!=(wdcpp&3)) p+=(wdcpp&3)-4;
     }
   } else if (bpc_==4) {
+    // This reads bytes from trail.
     htc=ht; while (htc--!=0) {
       toend=to+((wdcpp+1)>>1);
       while (to!=toend) {
