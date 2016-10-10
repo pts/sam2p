@@ -1,3 +1,11 @@
+sam2p (0.49.3) lucid; urgency=low
+
+  * Added 36 changes in total.
+  * Fixed dozens of bugs.
+  * Improved GCC and Clang compatibility: fixed warnings, extended ccdep.pl .
+
+ -- Peter Szabo <pts@fazekas.hu>  Fri, 10 Oct 2016 17:01:57 +0200
+
 sam2p (0.49.2) lucid; urgency=low
 
   * Fixed GCC 4.8 incompatibilities in ccdep.pl (the dependency generator
