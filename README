@@ -11,7 +11,7 @@ conversion program. This file contains a 5-minute turbo tutorial for new and
 impatient users (search for the phrase `Turbo tutorial' in your text editor).
 As of now, this README file is the only, and definitive, documentation of sam2p.
 
-sam2p is a UNIX command line utility written in ANSI C++ that converts many
+sam2p is a UNIX command line utility written in C++ (C++98) that converts many
 raster (bitmap) image formats into Adobe PostScript or PDF files and several
 other formats. The images are not vectorized. sam2p gives full control to
 the user to specify standards-compliance, compression, and bit depths. In
