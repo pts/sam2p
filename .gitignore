@@ -3,6 +3,9 @@ core
 *.pyc
 *~
 sam2p
+sam2p.exe
+sam2p.xstatic
+sam2p.xstatic.uncompressed
 *.o
 *.tmp.h
 *.tmp.i
@@ -18,9 +21,3 @@ ps_tiny
 *.pst
 sam2p_version.h
 allcc.*
-
-
-
-
-
-
