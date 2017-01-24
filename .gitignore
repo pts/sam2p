@@ -4,6 +4,7 @@ core
 *~
 sam2p
 sam2p.exe
+sam2p.uncompressed.exe
 sam2p.xstatic
 sam2p.xstatic.uncompressed
 *.o
