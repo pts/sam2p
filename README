@@ -19,6 +19,9 @@ some cases sam2p can compress an image 100 times smaller than the PostScript
 output of many other common image converters. sam2p provides ZIP, RLE and
 LZW (de)compression filters even on Level1 PostScript devices. 
 
+Send donations to the author of sam2p:
+https://flattr.com/submit/auto?user_id=pts&url=https://github.com/pts/sam2p
+
 A testimonial from Grant Ingram, UK: Anyway this is just a quick note to say
 thanks for writing the sam2p utility which I am using to create EPS figures
 of photographs for my thesis -- it works very well producing image sizes
