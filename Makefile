@@ -71,10 +71,10 @@ sam2p_version.h: debian/changelog
 sam2p_main.o: sam2p_version.h
 
 xpmc.h: cols2.pl
-	perl -x cols2.pl >xpmc.h
+	perl -x ./cols2.pl >xpmc.h
 
 #HQ=perl -e'$$_=join"",<STDIN>; s@([^\w\.\/\-])@sprintf"\\%03o",ord$$1@ge; print "\"$$_\"\n"'
-HQ=perl -x hq.pl
+HQ=perl -x ./hq.pl
 #%.tth: %.tte
 #	<$< >$@	$(HQ)
 #%.tth: %.ttm
