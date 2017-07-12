@@ -2943,25 +2943,6 @@ Compilation problems
    I've integrated his #ifndef __APPLE__ patch. There should be a better way
    to handle this situation, though.
 
--- How to compile with i386-uclibc-gcc on Debian Etch:
-
-   by pts@fazekas.hu at Sun Apr  5 00:28:53 CEST 2009
-
-   $ i386-uclibc-gcc -v
-   Invoked as i386-uclibc-gcc
-   arg[ 0] = gcc
-   arg[ 1] = -v
-   Using built-in specs.
-   Target: i486-linux-gnu
-   Configured with: ../src/configure -v --enable-languages=c,c++,fortran,objc,obj-c++,treelang --prefix=/usr --enable-shared --with-system-zlib --libexecdir=/usr/lib --without-included-gettext --enable-threads=posix --enable-nls --program-suffix=-4.1 --enable-__cxa_atexit --enable-clocale=gnu --enable-libstdcxx-debug --enable-mpfr --with-tune=i686 --enable-checking=release i486-linux-gnu
-   Thread model: posix
-   gcc version 4.1.2 20061115 (prerelease) (Debian 4.1.1-21)
-   $ CXX='i386-uclibc-gcc -static' CC=i386-uclibc-gcc ./configure --enable-gif --enable-lzw
-   # change LDXX=... to LDXX=$(CXX) in Makehelp
-   $ make
-   # (Unfortunately, the executable is large, 410KB)
-
-
 Revision history, changes
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 See in the file debian/changelog.
