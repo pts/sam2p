@@ -12,16 +12,12 @@
 
 #if _MSC_VER > 1000
 #  include "config-vc6.h"
+#elif USE_CONFIG_MINGW_H
+#  include "config-mingw.h"
+#elif USE_CONFIG_UCLIBC_H
+#  include "config-uclibc.h"
 #else
-#  if USE_CONFIG_MINGW_H
-#    include "config-mingw.h"
-#  else
-#    if USE_CONFIG_UCLIBC_H
-#      include "config-uclibc.h"
-#    else
-#      include "config.h"
-#    endif
-#  endif
+#  include "config.h"
 #endif
 
 #if 0
@@ -346,6 +342,8 @@ typedef int bool;
 #  endif
 #endif
 
-
+#ifndef USE_ATTRIBUTE_ALIAS
+#define USE_ATTRIBUTE_ALIAS 1
+#endif
 
 #endif /* config2.h */

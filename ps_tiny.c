@@ -38,7 +38,7 @@ exit
   #endif
   typedef char sbool;
   #if ';'!=59 || 'a'!=97
-  #  error ASCII system is required to compile this program
+  #  error ASCII system is required to compile this program.
   #endif
 #else
   #include "config2.h" /* by sam2p... */

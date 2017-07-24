@@ -22,3 +22,9 @@ ps_tiny
 *.pst
 sam2p_version.h
 allcc.*
+sam2p.yes
+sam2p.no
+darwin_libgcc/
+packaging/
+sam2p.darwinc32
+sam2p.darwinc64

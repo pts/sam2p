@@ -31,7 +31,7 @@ extern "C" void __pure_virtual(); void __pure_virtual() { abort(); }
  *   works for g++-4.2.1 and g++-4.4.1 as well
  *   removed dependency on stdio, so we get more reliable OOM reporting
  */
-extern "C" void* emulate_cc_new(unsigned len) { \
+static void* emulate_cc_new(unsigned len) { \
   void *p = malloc(len);
   if (p == 0) {
     /* Don't use stdio (e.g. fputs), because that may want to allocate more
@@ -42,13 +42,25 @@ extern "C" void* emulate_cc_new(unsigned len) { \
   }
   return p;
 }
-extern "C" void emulate_cc_delete(void* p) {
+static void emulate_cc_delete(void* p) {
   if (p!=0) free(p);
 }
+#if USE_ATTRIBUTE_ALIAS
 void* operator new  (size_t len) __attribute__((alias("emulate_cc_new")));
 void* operator new[](size_t len) __attribute__((alias("emulate_cc_new")));
 void  operator delete  (void* p)   __attribute__((alias("emulate_cc_delete")));
 void  operator delete[](void* p)   __attribute__((alias("emulate_cc_delete")));
+#else  /* Darwin o32-clang doesn't have it. */
+void* operator new  (size_t len) { return emulate_cc_new(len); }
+void* operator new[](size_t len) { return emulate_cc_new(len); }
+void  operator delete  (void* p) { return emulate_cc_delete(p); }
+void  operator delete[](void* p) { return emulate_cc_delete(p); }
+#endif
+
 void* __cxa_pure_virtual = 0;
+#if 0  /* Needed only if this is not used: -fno-use-cxa-atexit */
+extern "C" void __dso_handle();
+void __dso_handle() {}  /* Defined in crtbeginT.o for xstatic. */
+#endif
 
 #endif

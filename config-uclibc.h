@@ -1,4 +1,4 @@
-/* config-uclibc.h.  config.h replacement for i386 and x86_64 Linux uClibc. */
+/* config-uclibc.h.  config.h replacement for i386 and x86_64 Linux uClibc; xstatic; Darwin (macOS) */
 /* config.h.in.  Generated automatically from configure.in by autoheader.  */
 
 /* Define if using alloca.c.  */
@@ -213,6 +213,8 @@
     __SIZE_WIDTH__ == 64
 #  undef  PTS_INTP_T
 #  define PTS_INTP_T long
+#  undef  PTS_INT64_T
+#  define PTS_INT64_T long
 #  undef  PTS_size_t
 #  define PTS_size_t unsigned long
 #  undef  SIZEOF_CHAR_P

@@ -144,14 +144,18 @@ bts2.ttt: bts1.ttt ps_tiny
 	./ps_tiny --copy <$< >$@
 
 clean:
-	rm -f *~ a.out DEADJOE core *.o *.tth .rgd *.rgd *.tmp.pin *.tmp.i *.tmp.ps0 *.tmp.h *.tmp.pst autom4te.cache/* sam2p_version.h
+	rm -f *~ a.out DEADJOE core *.o *.tth *.tmp.pin *.tmp.i *.tmp.ps0 *.tmp.h *.tmp.pst autom4te.cache/* sam2p_version.h
+	rm -f sam2p.yes sam2p.no
 	rm -f debian/changelog.dch debian/*~ 
 	rm -f $(ALL) $(ALL:=.yes) $(ALL:=.no) $(ALL:=.assert) $(ALL:=.checker)
 	test ! -d autom4te.cache || rmdir autom4te.cache
 allclean: clean
-	rm -f configure config.h Makehelp config.cache config.log \
-	  config.status test.eps test.pdf build build-stamp
+	rm -f config.h Makehelp config.cache config.log \
+	    config.status test.eps test.pdf build build-stamp \
+	    bts2.tth bts1.ttt bts2.ttt *.pst.tmp.* *.pst
+
 distclean: allclean
+	rm -f configure
 	-autoconf
 dist: distclean dist-noautoconf
 dist-noautoconf:
