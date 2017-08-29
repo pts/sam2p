@@ -1,6 +1,6 @@
 // StdAfx.cpp : source file that includes just the standard includes
 //	vcsam2p.pch will be the pre-compiled header
-//	stdafx.obj will contain the pre-compiled type information
+//	StdAfx.obj will contain the pre-compiled type information
 
 #include "StdAfx.h"
 

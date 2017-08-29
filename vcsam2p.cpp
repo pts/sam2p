@@ -5,7 +5,7 @@
 #include "image.hpp"
 #include "error.hpp"
 #include "main.hpp" /* init_loader(), init_applier() */
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "resource.h"
 
 #define MAX_LOADSTRING 100
