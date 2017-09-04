@@ -144,9 +144,10 @@ my $DIAG = "";
 my $Q="$GCCP -DOBJDEP$DIAG -M -MG -E 2>&1 @DSQ";
 my $R=backtick($Q);
 
-if ($R!~/: warning: #warning\b/) {
+if ($R!~/#\s*warning\s/) {
   # config2.h:314:4: warning: #warning REQUIRES: c_lgcc3.o
   # Dat: g++-3.3 ignores #warning with -M -MG -E
+  #      g++-4.8 and clang++-3.4 don't ignore it, no need for rerun.
   $R.="\n".backtick("$GCCP -DOBJDEP$DIAG -E 2>&1 >/dev/null @DSQ");
 }
 
@@ -164,21 +165,22 @@ my @instructions;
 
 while ($R=~/\G(.*)\n?/g) {
   my $S=$1;
-  print "!!(($1))\n";
 
   if (!length$S) {
-  } elsif ($S=~/\AIn file included from ([^:]+)/) {
+  } elsif ($S=~/\AIn file included from (?:[.]\/)*([^:]+)/) {
     $included_from=$1;  # Bottommost includer.
-  } elsif ($S=~/\A\s{3,}from ([^:]+)/) {  # From gcc-3.2.
+  } elsif ($S=~/\A\s{3,}from (?:[.]\/)*([^:]+)/) {  # From gcc-3.2.
     $included_from=$1;  # Higher includer, we override the previous one, because we need the topmost one.
   } elsif ($S=~/\A([^:]+):\d+:(\d+:)? warning: #warning (NULL-PROVIDES|PROVIDES|CONFLICTS|REQUIRES):(.*)\Z/ or
-           $S=~/\A([^:]+):\d+:(\d+:)? warning: (NULL-PROVIDES|PROVIDES|CONFLICTS|REQUIRES):(.*)\ \[-W/) {
+           $S=~/\A([^:]+):\d+:(\d+:)? warning: (NULL-PROVIDES|PROVIDES|CONFLICTS|REQUIRES):(.*)/) {
     # ^^^ (\d+:)? added for gcc-3.1
     # ^^^ clang: appliers.cpp:554:6: warning: REQUIRES: out_gif.o [-W#warnings]
     my($DS,$B)=($1,$3);  # $B is e.g. 'PROVIDES'.
     if (defined $included_from) { $DS=$included_from; undef $included_from }
     for my $feature (split ' ',$4) {
-      push @instructions, [$DS, $B, $feature];
+      if ($feature !~ m@\A\[-W@) {  # g++-4.8 generates extra [-Wcpp] lines.
+        push @instructions, [$DS, $B, $feature];
+      }
     }
   } elsif ($S=~/\A([^: ]+)\.o:( ([^: ]+?)\.([^ \n]+).*)\Z/s and $1 eq $3) {
     # Dependency output of `gcc -M -MG'.
