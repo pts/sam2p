@@ -1,0 +1,81 @@
+Missing feature list of sam2p
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+(Don't have too high hopes, probably they won't get implemented, unless
+explicit motivaton arises.)
+
+Please also see pending bugs on https://github.com/pts/sam2p/issues
+
+All of these old bugs had a follow-up elsewhere, or they don't need one:
+https://code.google.com/archive/p/sam2p/issues
+
+TODO items:
+
+* out-of-source build, discussion on:
+  https://code.google.com/archive/p/sam2p/issues/15
+  3. mkdir build 4. cd build 5. ../configure
+* make mkdist-noautoconf create .tar.gz w/o leading directory part
+* cannot read t.pnm "P4 1 1 1" doesn't end with \S
+* ./sam2p ../pts.ppm t.gif -> sam2p: out_gif.cpp:260: void out_gif_write(GenBuffer::Writable&, Image::Indexed*): Assertion `bits_per_pixel<=8' failed.
+* why so large PNG? sam2p examples/chessboard_ascii.pnm t.png
+* easy seek back to 0 in in_*.cpp
+* rxvt_bug.png -> useful Win98 .bmp
+* --invert option, for tif22pnm users
+* complete turbo tutorial
+* MIFF input, _output_
+* full BMP output compressed
+* faster GIF input (?? isn't it fast enough?)
+* make install, .deb (debhelper?), .rpm
+* normal `image' instead of `colorimage'
+* CUPS raster input and output
+* /Background option (-bg) to change transparent pixels -> bg color
+* LZW and ZIP compressed for indexed etc.
+* parse bts2.ttt just after generating (balance of [ << ... >> ])
+* command line option for /Transparent
+* avoid 3 warnings in: ./sam2p examples/pts2.pbm t.ppm
+* check for fixed bugs new zlib
+* one-liner eliminate automatically invalid BMP SampleFormats with compression
+* eliminate long line (>120) from l1fa85g.tte
+* one-liner -s gray|indexed|rgb|transparent
+* in-memory dump when scanf_dict Error
+* optimal, non-mem-hungry RLE compression filter (hardly possible...)
+* possibility to write RGB (non-YCbCr) JPEG with /Compression/IJG etc.
+* ability to load .gz and .zip compressed input files. Example: .pbm.gz
+* no return DONT_KNOW from *_work()
+* Meta output
+* PSL1 auto fallback to grayscale `image' in absence of `colorimage'
+* full support for ZIP compression in PSL1 (similar to RLE)
+* implement as a library (throw/catch exceptions, memory management, reentrance)
+* check for proper inner dict usage in l1fa85g.tte
+* add /Transparent2, /Transparent4, /Transparent8 for PDF
+* add all #warning REQUIRES:
+* show binary/ASCII in PDF and PS header comments
+* `available loaders: (TIFF)' if tifftopnm not found (run-time)
+* make LZW-unsupported not an Error, but a Warning
+* create output profile
+* GIF reader is too slow (maybe LZW reading? ?). Change to xvgif.c??
+* run-time detect the absence of external progs
+* make install
+* make .deb, .rpm
+* (Not going to happen.) NDEBUG by default
+* substitute char (1) for bool (8) on Digital UNIX
+* run-time choice from FlateEncode filter implemenetations etc.
+* convert bilevel indexed image to grayscale more quickly
+* (Not going to happen.) read external .tte files (runtime) instead of built-in .tth
+* possibility to store several profiles in the same .jib file
+* real, PDF-style dates into Created, Produced
+* enforce magic numbers for .job and .jib files
+* (early check, special handler) make everything work when wd==0 || ht==0; especially encoding filters
+* better Job option for specifying and removing transparent color (better than /Transparent)
+* log date(now)
+* support LargeBBox
+* support Comment
+* support PDF metadata: Title Subject Author Creator Producer
+* support PDF dates: Created Produced
+* support Comment
+* add PAM file format support from NetPBM
+* pre-transformation: making grayscale
+* pre-transformation: down-bit-sampling
+* pre-transformation: down-palette-sampling (``generate optimal palette'')
+* tif22pnm warning - non-square pixels; to fix do a 'pnmscale -yscale nan'  P6 2840 2138 255
+
+__END__

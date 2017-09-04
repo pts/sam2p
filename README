@@ -1,3 +1,5 @@
+-*- coding: UTF-8 -*-
+
 README for sam2p
 by pts@fazekas.hu
 at Sun Dec 30 19:30:17 CET 2001 -- Fri Mar 22 19:25:03 CET 2002
@@ -259,7 +261,7 @@ There are three modes sam2p can operate in:
    Please don't use GUI mode, use one-liner mode instead! The flexability
    of a one-liner (or job) mode is nearly imposible to encompas in a GUI.
    No more documentation is provided for GUI mode.
-  
+
    There might be a Micro$oft Windoze version of sam2p available in the near
    future, but very probably you won't get real GUI with radio boxes, lists
    and file selection dialogs. You'll have to start sam2p from the DOS
@@ -458,6 +460,22 @@ features of sam2p in job mode, you have to:
    command-line argument (or `-' if the Job file is fed on STDIN).
 7. Read warning and error messages (printed to STDOUT and STDERR), and retry
    if necessary.
+
+Revision history, changes
+~~~~~~~~~~~~~~~~~~~~~~~~~
+See in the file debian/changelog.
+
+Known bugs and issues
+~~~~~~~~~~~~~~~~~~~~~
+Please see pending bugs on https://github.com/pts/sam2p/issues .
+Feel free to report any issue there if you encounter one! Your
+bug reports and contributions are very welcome.
+
+All of these old bugs had a follow-up elsewhere, or they don't need one:
+https://code.google.com/archive/p/sam2p/issues .
+
+If you are interested in fixed or closed bugs, please see them on
+https://github.com/pts/sam2p/issues?q=is%3Aissue%20is%3Aclosed .
 
 Requirements
 ~~~~~~~~~~~~
@@ -805,15 +823,15 @@ Please report and fix bugs in vcsam2p.exe
 
 Copyright
 ~~~~~~~~~
-sam2p is written and owned by Szabó Péter <pts@fazekas.hu>. sam2p contains
+sam2p is written and owned by SzabÃ³ PÃ©ter <pts@fazekas.hu>. sam2p contains
 code from various people.
 
 sam2p may be used, modified and redistributed only under the terms of the
 GNU General Public License, found in the file COPYING in the distribution,
 or at
-                                                                               
+
 	http://www.fsf.org/licenses/gpl.html
-                                          
+
 Supported input formats
 ~~~~~~~~~~~~~~~~~~~~~~~
 -- PNM, PBM, PGM, PPM (preferred formats for non-transparent images)
@@ -1069,7 +1087,7 @@ graph was created according to the descriptions above.
 
 	EarlierFormat LaterFormat
 
-	transparent mask                                     
+	transparent mask
 	opaque mask
 	opaque indexed-1
 	indexed-1 indexed-2
@@ -1084,21 +1102,21 @@ graph was created according to the descriptions above.
 	gray-1 indexed-1
 	gray-2 indexed-2
 	gray-4 indexed-4
-	gray-8 indexed-8 
-	rgb-1 indexed-4  
-	rgb-2 indexed-8  
+	gray-8 indexed-8
+	rgb-1 indexed-4
+	rgb-2 indexed-8
 	mask transparent-2
 	transparent-2 transparent-4
 	transparent-4 transparent-8
-	opaque gray-1  
+	opaque gray-1
 	indexed-1 gray-2
 	indexed-2 gray-4
 	indexed-4 gray-8
-	opaque rgb-1  
+	opaque rgb-1
 	gray-1 rgb-1
-	gray-2 rgb-2   
-	gray-4 rgb-4   
-	gray-8 rgb-8   
+	gray-2 rgb-2
+	gray-4 rgb-4
+	gray-8 rgb-8
 	indexed-2 rgb-1
 	indexed-4 rgb-2
 	indexed-8 rgb-4
@@ -2016,14 +2034,14 @@ A19. /Compression/Fax is intended to be used with images with 1 bit per
 	sam2p -s:Indexed8 -c:fax test.gif test.pdf   # OK
 	sam2p -s:Indexed8 -c:fax test.gif test.eps   # OK
 	sam2p -s:Indexed8 -c:fax test.gif test.tiff  # forbidden by TIFF std
-    
+
      See {FAQ question Q12} for more information.
 
 Q20. Can sam2p convert images with transparency to PDF?
 
 A20. Only if the image has at most 1 non-transprent color
      (/SampleFormat/Mask). See {FAQ question Q6} for details.
-    
+
      Although PDF-1.3 supports transparency masks for arbitrary PDF images,
      sam2p 0.39 doesn't. That's because the author of sam2p hasn't
      implemented it yet.
@@ -2651,33 +2669,6 @@ A60. Please download the newest sam2p:
      Work is being done to make ccdep.pl more resilient
      (https://github.com/pts/sam2p/issues/5).
 
-Upsampling
-~~~~~~~~~~
-Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
-
-	0 -> 00			0
-	1 -> 11			3
-
-	00 -> 0000		0
-	01 -> 0101		5
-	10 -> 1010		10
-	11 -> 1111		15
-
-	0000 -> 0000 0000	0
-	0001 -> 0001 0001	17
-	0010 -> 0010 0010	34
-	...
-	1110 -> 1110 1110	238
-	1111 -> 1111 1111	255
-
-A 1-bit image has a palette of 2 colors: #00 and #ff.
-
-A 2-bit image has a palette of 4 colors: #00, #55, #aa and #ff.
-
-A 4-bit image has a palette of 16 colors: #00, #11, #22, ... #ff.
-
-An 8-bit image has a palette of 256 colors: #00, #01, #02, ... #ff.
-
 Standards
 ~~~~~~~~~
 -- PSL1 is PostScript LanguageLevel1, as defined by Adobe's PostScript
@@ -2714,55 +2705,6 @@ Standards
    Expert Group.
 -- PNG is Portable Network Graphics file format v1.0, as defined by
    RFC 2083.
-
-
-Obsolete: Image metadata
-~~~~~~~~~~~~~~~~~~~~~~~~
--- Width: uint
--- Height: uint
--- ColorSpace: enum (see later), determines PixBits
--- PixBits: 1..24
--- Origin: coord
--- Comment: string
--- FileFormat:
--- Predictor: enum (see later), same as PSLanguageLevel1 filter
-   /Predictor
-   1 -- no predictor
-   2 -- TIFF predictor 2 (horizontal differencing)
-   10 -- PNG predictor, None function
-   11 -- PNG predictor, Sub function
-   12 -- PNG predictor, Up function
-   13 -- PNG predictor, Average function
-   14 -- PNG predictor, Paeth function
-   15 -- PNG predcitor, individually chosen for each line
--- PredictorColumns: uint
--- PredictorColors: 1..3
--- PredictorBitsPerComponent: 1, 2, 4, 8
--- CompressionEffort: -1..9 (ZIP)
--- CompressionRecordSize: uint (RLE, Fax: K)
--- Compression: enum
-   0 -- None
-   1 -- LZW (PSL2 PDF1.0 LZWEncode filter EarlyChange=true, UnitLength=8
-        LowBitFirst=false)
-   2 -- ZIP (PSL3 PDF1.2 FlateEncode filter without options)
-   3 -- RLE (PSL2 PDF1.0 RunLengthEncode filter, similar to TIFF PackBits)
-   4 -- Fax (PSL2 PDF1.0 CCITTFaxEncode filter, Uncompressed=true!, K=-1,0,1,
-        EndOfLine=false, EncodedByteAlign=false, Columns=..., Rows=0,
-        EndOfBlock=true, BlackIs1=false, DamagedRowsBeforeError=0)
-   5 -- DCT (PSL2 PDF1.0 DCTEncode, options in JPEG stream)
-   6 -- IJG (PSL2 PDF1.0 DCTEncode, options in JPEG stream; the IJG libjpeg
-        library is used for compression, respecting the quality value 0..100)
-   7 -- JAI (PSL2 PDF1.0 DCTEncode, options in JPEG stream; JPEG-as-is: the
-        input file must be a JPEG file -- its contents are transferred
-        unmodified into the /DCTDecode JPEG stream)
--- TransferEncoding: enum
-   0 -- Binary (RawBits, see pbm(5), pgm(5), ppm(5))
-   1 -- ASCII (text, chars: 9,10,13,32..126)
-   2 -- Hex ((PSL1), PDF1.0, PSL2 ASCIIHexEncode filter)
-   3 -- 85 (PSL2 PDF1.0, ASCII85Encode filter)
-   4 -- base64, _not_ implemented
-   5 -- quoted-printable, _not_ implemented
-   6 -- URLencode, _not_ implemented
 
 Compatibility notes
 ~~~~~~~~~~~~~~~~~~~
@@ -2876,513 +2818,5 @@ Fri Feb  7 11:15:39 CET 2003
 	<hue> <saturation> <brightness> sethsbcolor % PSL1
 	<red> <green> <blue> setrgbcolor % PSL1
 	<cyan> <magenta> <yellow> <black> setcmykcolor % PSL2; not in PSL1
-
-Algorithms, code comments
-~~~~~~~~~~~~~~~~~~~~~~~~~
-RGB -> Gray
-"""""""""""
-   gray = 0.299*red + 0.587*green + 0.114*blue (NTSC video std)
-   gray = (306.176*red + 601.088*green + 116.736*blue) >> 10
-   perl -e 'no integer;for(@ARGV){y/#//d;$N=hex($_);$R=0.299*($N>>16)+0.587*(($N>>8)&255)+0.114*($N&255);print $R/255," ",sprintf("#%02x",int($R+0.5)),"\n"}' '#0f0f0f'
-
-Rgb2 -> Gray
-""""""""""""
-   perl -e 'no integer;for(@ARGV){print"$_
-   ";y/#//d;$N=hex($_);$R=0.299*($N>>16)+0.587*(($N>>8)&255)+0.114*($N&255);
-   print "",$R/255," ",sprintf("#%02x",int($R+0.5)),"\n"}' 000000 000055 0000aa
-   0000ff  005500 005555 0055aa 0055ff  00aa00 00aa55 00aaaa 00aaff  00ff00
-   00ff55 00ffaa 00ffff  550000 550055 5500aa 5500ff  555500 555555 5555aa
-   5555ff  55aa00 55aa55 55aaaa 55aaff  55ff00 55ff55 55ffaa 55ffff  aa0000
-   aa0055 aa00aa aa00ff  aa5500 aa5555 aa55aa aa55ff  aaaa00 aaaa55 aaaaaa
-   aaaaff  aaff00 aaff55 aaffaa aaffff  ff0000 ff0055 ff00aa ff00ff  ff5500
-   ff5555 ff55aa ff55ff  ffaa00 ffaa55 ffaaaa ffaaff  ffff00 ffff55 ffffaa
-   ffffff
-
-000000 0 #00
-000055 0.038 #0a
-0000aa 0.076 #13
-0000ff 0.114 #1d
-005500 0.195666666666667 #32
-005555 0.233666666666667 #3c
-0055aa 0.271666666666667 #45
-0055ff 0.309666666666667 #4f
-00aa00 0.391333333333333 #64
-00aa55 0.429333333333333 #6d
-00aaaa 0.467333333333333 #77
-00aaff 0.505333333333333 #81
-00ff00 0.587 #96
-00ff55 0.625 #9f
-00ffaa 0.663 #a9
-00ffff 0.701 #b3
-550000 0.0996666666666667 #19
-550055 0.137666666666667 #23
-5500aa 0.175666666666667 #2d
-5500ff 0.213666666666667 #36
-555500 0.295333333333333 #4b
-555555 0.333333333333333 #55
-5555aa 0.371333333333333 #5f
-5555ff 0.409333333333333 #68
-55aa00 0.491 #7d
-55aa55 0.529 #87
-55aaaa 0.567 #91
-55aaff 0.605 #9a
-55ff00 0.686666666666667 #af
-55ff55 0.724666666666667 #b9
-55ffaa 0.762666666666667 #c2
-55ffff 0.800666666666667 #cc
-aa0000 0.199333333333333 #33
-aa0055 0.237333333333333 #3d
-aa00aa 0.275333333333333 #46
-aa00ff 0.313333333333333 #50
-aa5500 0.395 #65
-aa5555 0.433 #6e
-aa55aa 0.471 #78
-aa55ff 0.509 #82
-aaaa00 0.590666666666667 #97
-aaaa55 0.628666666666667 #a0
-aaaaaa 0.666666666666667 #aa
-aaaaff 0.704666666666667 #b4
-aaff00 0.786333333333333 #c9
-aaff55 0.824333333333333 #d2
-aaffaa 0.862333333333333 #dc
-aaffff 0.900333333333333 #e6
-ff0000 0.299 #4c
-ff0055 0.337 #56
-ff00aa 0.375 #60
-ff00ff 0.413 #69
-ff5500 0.494666666666667 #7e
-ff5555 0.532666666666667 #88
-ff55aa 0.570666666666667 #92
-ff55ff 0.608666666666667 #9b
-ffaa00 0.690333333333333 #b0
-ffaa55 0.728333333333333 #ba
-ffaaaa 0.766333333333333 #c3
-ffaaff 0.804333333333333 #cd
-ffff00 0.886 #e2
-ffff55 0.924 #ec
-ffffaa 0.962 #f5
-ffffff 1 #ff
-
-Building the palette for Paletted image -> PSLC colorimage
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-{ Buf3 0 0 currentfile Bufx readstring pop
-  % /i 0 def
-  % Stack: Buf3 0 0 Bufx
-  { % Stack: Buf3 <Buf3-dst-i> <0-1-2> <byte-read>
-    exch
-    { { % Stack: Buf3 <Buf3-dst-i> <byte-read>
-        dup -2 bitshift Pal exch get
-	% Stack: Buf3 <Buf3-dst-i> <byte-read> <byte-to-write>
-        exch 4 bitshift /Carry exch def
-	% Stack: Buf3 <Buf3-dst-i> <byte-to-write>
-	3 copy put  pop 1 add  1
-	% Stack: Buf3 <Buf3-dst-i+1> 1
-      }{dup -4 bitshift Carry add Pal exch get
-        exch 15 and 2 bitshift /Carry exch def
-	3 copy put  pop 1 add  2
-      }{dup -6 bitshift Carry add Pal exch get
-	% Stack: Buf3 <Buf3-dst-i> <byte-read> <byte-to-write-first>
-	exch 4 copy
-	% Stack: Buf3 <Buf3-dst-i> <byte-to-write-first> <byte-read>  Buf3 <Buf3-dst-i> <byte-to-write-first> <byte-read>
-        pop put
-	% Stack: Buf3 <Buf3-dst-i> <byte-to-write-first> <byte-read>
-        63 and Pal exch get  pop
-	% Stack: Buf3 <Buf3-dst-i> <byte-to-write-second>
-	exch 1 add exch
-	3 copy put  pop 1 add  0
-	% Stack: Buf3 <Buf3-dst-i+2> 0
-      }
-    } exch
-    % Stack: Buf3 <Buf3-dst-i> <byte-read> {code3} <0-1-2>
-    get exec
-    % Stack: Buf3 <Buf3-dst-i++> <1-2-0>
-  } forall
-  % Stack: Buf3 <i>
-  pop pop
-  Bufr
-}
-
-Color space conversion: (unfinished)
-""""""""""""""""""""""""""""""""""""
--- Ripped from jccolor.c from libjpeg:
-
-   * YCbCr is defined per CCIR 601-1, except that Cb and Cr are
-   * normalized to the range 0..MAXJSAMPLE rather than -0.5 .. 0.5.
-   * The conversion equations to be implemented are therefore
-   *      Y  =  0.29900 * R + 0.58700 * G + 0.11400 * B
-   *      Cb = -0.16874 * R - 0.33126 * G + 0.50000 * B  + CENTERJSAMPLE
-   *      Cr =  0.50000 * R - 0.41869 * G - 0.08131 * B  + CENTERJSAMPLE
-   * (These numbers are derived from TIFF 6.0 section 21, dated 3-June-92.)
-
-
-
-   -- RGB -> YCbCr:
-          Y  =  0.29900 * R + 0.58700 * G + 0.11400 * B
-          Cb = -0.16874 * R - 0.33126 * G + 0.50000 * B  + CENTERJSAMPLE
-          Cr =  0.50000 * R - 0.41869 * G - 0.08131 * B  + CENTERJSAMPLE
-   -- CMYK -> YCCK:
-          R=1-C, G=1-M, B=1-Y, K=K, RGB -> YCbCr
-   -- YCbCr -> RGB: (Cb < CENTERJSAMPLE, Cr < CENTERJSAMPLE)
-          R = Y                + 1.40200 * Cr
-          G = Y - 0.34414 * Cb - 0.71414 * Cr
-          B = Y + 1.77200 * Cb
-   -- YCCK -> CMYK:
-          YCbCr -> RGB, C=1-R, M=1-G, Y=1-B, K=K.
-   -- (YCbCrK == YCCK)
-   -- Gray -> RGB: red = gray, green = gray, blue = gray
-   -- RGB -> Gray: gray = 0.299*red + 0.587*green + 0.114*blue (NTSC video std)
-                 : gray = (306.176*red + 601.088*green + 116.736*blue) >> 10
-                 : gray = (19595.264*red + 38469.632*green + 7471.104*blue) >> 16
-   -- Obsolete: RGB -> YCbCr: (YCbCr == YUV)
-        y:luminance = 0.299*red + 0.587*green + 0.114*blue (0..1)
-	cb:chrominance-b = blue - y = - 0.299*red - 0.587*green + 0.886*blue  (-0.886 .. 0.886)
-	cr:chrominance-r = red - y = 0.701*red - 0.587*green - 0.114*blue (-0.701 .. 0.701)
-      Chrominance components can be represented less accurately since the
-      human eye is around twice as sensitive to luminance as to chrominance.
-   -- RGB <-> HSB: quite obfuscated. See gshsb.c in Aladdin Ghostscript's
-      source.
-
-Word frequency counting in PostScript source
-""""""""""""""""""""""""""""""""""""""""""""
-perl -e '$C=0; $X=join"",<STDIN>; for (split" ",$X) { print "$_.\n";
-$C+=length($_)-1 if /[0-9]/ }; print STDERR "C=$C\n"'
-
-</tmp/t perl -e '$C=0; $X=join"",<STDIN>; $X=~s@([{}])@ $1 @g; $X=~s@/@ /@g;
-for (split" ",$X) { print "$_.\n" if length>=2; $C++ if length($_)>=2 };
-print STDERR "C=$C\n"' | sort | uniq
-
-</tmp/t perl -e '$C=0; $X=join"",<STDIN>; $X=~s@([{}])@ $1 @g; $X=~s@/@ /@g;
-$Y=""; for (split" ",$X) { $_=" $_ " if length($_)>=2; $Y.=$_ }; $Y=~s@
-/@/@g; print $Y' >t
-
-How tiff2ps displays a gray version of a PSLC Rgb8 image on PSL1
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-gsave
-100 dict begin
-1495.000000 935.000000 scale
-/bwproc {
-    rgbproc
-    dup length 3 idiv string 0 3 0
-    5 -1 roll {
-	add 2 1 roll 1 sub dup 0 eq {
-	    pop 3 idiv
-	    3 -1 roll
-	    dup 4 -1 roll
-	    dup 3 1 roll
-	    5 -1 roll put
-	    1 add 3 0
-	} { 2 1 roll } ifelse
-    } forall
-    pop pop pop
-} def
-/colorimage where {pop} {
-    /colorimage {pop pop /rgbproc exch def {bwproc} image} bind def
-} ifelse
-%ImageData: 1495 935 8 3 0 1 2 "false 3 colorimage"
-/line 4485 string def
-1495 935 8
-[1495 0 0 -935 0 935]
-{currentfile line readhexstring pop} bind
-false 3 colorimage
-
-pts_defl.c which function calls which function
-""""""""""""""""""""""""""""""""""""""""""""""
-send_bits
-  rengeteg
-flush_outbuf
-  send_bits
-  flush_block 2*
-build_tree
-  flush_block 3*
-flush_block
-  deflate2 5*
-ct_tally
-  deflate2 sok*
-longest_match
-  deflate2 2*
-fill_window
-  deflate2 4*
-
-gen_codes
-  2, reentrant
-deflate2
-  1..
-pts_deflate_init
-  1
-
-Answers from Taco
-"""""""""""""""""
-Are the problems I'm concerned about already solved?
-
-   -- Is there a pixel image converter that can create small and compatible
-      EPS documents with all the RunLength, CCITTFax, LZW and Flate
-      compression types?
-
-   -- Is there a PDF version of psfrag.sty? Is there a utility for splitting
-      and assebling PDF files? Is there a utility for changing text labels
-      inside a PDF file?
-
-   -- Is there a utility for creating (semi-)transparent EPS or PDF files
-      from pixel images?
-
-Compilation problems
-""""""""""""""""""""
--- Mårten Svantesson wrote:
-
-  > Another problem was that the configure script didn't realise that it
-  > couldn't use the forte CC-compiler. This lead to several errors. For
-  > example it doesn't accept the option -ansi, so several tests fail for
-  > this reason.
-
-  I don't have access to the a forte CC-compiler. The configure script has
-  been designed for use with GCC and G++.
-
--- Peter Dyballa wrote (unquoted):
-
-    > > leads to PTS_lstat being #define'd as lstat -- while stat would be correct.
-    >
-    > Why do you think that stat would be correct?
-
-    Because /usr/include/sys/stat.h contains this:
-
-            __BEGIN_DECLS
-            int     chmod __P((const char *, mode_t));
-            int     fstat __P((int, struct stat *));
-            int     mkdir __P((const char *, mode_t));
-            int     mkfifo __P((const char *, mode_t));
-            int     stat __P((const char *, struct stat *));
-            mode_t  umask __P((mode_t));
-            #ifndef _POSIX_SOURCE
-            int     chflags __P((const char *, u_long));
-            int     fchflags __P((int, u_long));
-            int     fchmod __P((int, mode_t));
-            int     lstat __P((const char *, struct stat *));
-            #endif
-            __END_DECLS
-
-    and gensio.cpp #define's _POSIX_SOURCE.
-
-    >  I think that that PTS_lstat is defined as it should, but configure should generate the poper condition for #if. Please submit a patch to configure.
-    >
-
-    This makes it compile in Mac OS X 10.3.9 (Panther):
-
-    diff -Naur gensio.cpp~ gensio.cpp
-    --- gensio.cpp~ Thu Mar  3 23:00:06 2005
-    +++ gensio.cpp  Mon Oct 31 15:07:53 2005
-    @@ -16,7 +16,9 @@
-     #else
-     #undef __STRICT_ANSI__ /* for __MINGW32__ */
-     #define _BSD_SOURCE 1 /* vsnprintf(); may be emulated with fixup_vsnprintf() */
-    +#ifndef __APPLE__
-     #define _POSIX_SOURCE 1 /* also popen() */
-    +#endif
-     #define _POSIX_C_SOURCE 2 /* also popen() */
-     #define _XOPEN_SOURCE_EXTENDED 1 /* Digital UNIX lstat */
-     #ifndef _XPG4_2
-
-   ---
-
-   I've integrated his #ifndef __APPLE__ patch. There should be a better way
-   to handle this situation, though.
-
-Revision history, changes
-~~~~~~~~~~~~~~~~~~~~~~~~~
-See in the file debian/changelog.
-
-Missing feature list
-~~~~~~~~~~~~~~~~~~~~
-!! make mkdist-noautoconf creates .tar.gz w/o leading directory part
-!! cannot read t.pnm "P4 1 1 1" doesn't end with \S
-!! ./sam2p ../pts.ppm t.gif -> sam2p: out_gif.cpp:260: void out_gif_write(GenBuffer::Writable&, Image::Indexed*): Assertion `bits_per_pixel<=8' failed.
-!! why so large PNG? sam2p examples/chessboard_ascii.pnm t.png
-!! easy seek back to 0 in in_*.cpp
-!! rxvt_bug.png -> useful Win98 .bmp
-??
-     (expected) !!
-     --invert option, for tif22pnm users
-     complete turbo tutorial,
-     MIFF input, _output_
-     full BMP output compressed,
-     faster GIF input??, make install, .deb (debhelper?), .rpm,
-     normal `image' instead of `colorimage'
-     CUPS raster input and output,
-     /Background option (-bg) to change transparent pixels -> bg color
-     LZW and ZIP compressed for indexed etc.
-/* OK : PS and PDF input */
-/* Imp: parse bts2.ttt just after generating (balance of [ << ... >> ])
-/* Imp: command line option for /Transparent */
-/* Imp: avoid 3 warnings in: ./sam2p examples/pts2.pbm t.ppm */
-/* OK : margins for all PS, EPS and PDF (Sat Sep  7 16:17:58 CEST 2002 */
-/* Imp: howto in pts_defl.h */
-/* Imp: check for fixed bugs new zlib */
-/* OK : built-in CCITTFaxEncode */
-/* Imp: one-liner eliminate automatically invalid BMP SampleFormats with compression */
-/* OK : more transferencodings for l1fa85g.tte */
-/* Imp: eliminate long line (>120) from l1fa85g.tte */
-/* Imp: one-liner -s gray|indexed|rgb|transparent */
-/* OK : read bad.txt, and move it to section {Fixed bugs} */
-/* OK : verify /Compression/Fax /K 1|2 with gs 5.50|7.04 */
-/* Imp: in-memory dump when scanf_dict Error */
-/* Imp: optimal, non-mem-hungry RLE compression filter (hardly possible...) */
-/* Imp: possibility to write RGB (non-YCbCr) JPEG with /Compression/IJG etc. */
-/* Imp: ability to load .gz and .zip compressed input files. Example:
- * .pbm.gz
- */
-/* Imp: no return DONT_KNOW from *_work() */
-/* Imp: Meta output */
-/* Imp: PSL1 auto fallback to grayscale `image' in absence of `colorimage' */
-/* Imp: full support for ZIP compression in PSL1 (similar to RLE) */
-/* OK:  TIFF output */
-/* Imp: implement as a library (throw/catch exceptions, memory management, reentrance) */
-/* Imp: check for proper inner dict usage in l1fa85g.tte */
-/* Imp: add /Transparent2, /Transparent4, /Transparent8 for PDF */
-/* Imp: add all #warning REQUIRES: */
-/* OK : ccdep.pl, --enable-debug (Sat Jun  1 16:27:58 CEST 2002) */
-/* Imp: show binary/ASCII in PDF and PS header comments */
-/* Imp: `available loaders: (TIFF)' if tifftopnm not found (run-time) */
-/* Imp: make LZW-unsupported not an Error, but a Warning */
-/* Imp: create output profile */
-/* OK:  a real string hashing lib */
-/* Imp: GIF reader is too slow (maybe LZW reading? ?). Change to xvgif.c?? */
-/* OK : XPM reader (>=256 colors) is too slow */
-/* OK : specify transparent color in the Job file */
-/* Imp: run-time detect the absence of external progs */
-/* Imp: make install */
-/* Imp: make .deb, .rpm */
-/* No : NDEBUG by default */
-/* Imp: substitute char (1) for bool (8) on Digital UNIX */
-/* OK : real replacement of vsnprintf() (Digital UNIX, Solaris) -- Tue Jun 11 15:20:22 CEST 2002 */
-/* OK : close both filters in l23.tte, but _never_ close currentfile */
-/* Imp: run-time choice from FlateEncode filter implemenetations etc. */
-/* Imp: convert bilevel indexed image to grayscale more quickly */
-/* OK : add quick and effective command line interface (one-liner mode) */
-/* No : read external .tte files (runtime) instead of built-in .tth */
-/* Imp: possibility to store several profiles in the same .jib file */
-/* Imp: real, PDF-style dates into Created, Produced */
-/* OK : real hashing in MiniPS::Dict */
-/* Imp: enforce magic numbers for .job and .jib files */
-/* OK : /TransferEncoding: * -> ascii if ... */
-/* Imp: (early check, special handler) make everything work when wd==0 || ht==0; especially encoding filters */
-/* Imp: better Job option for specifying and removing transparent color (better than /Transparent) */
-/* Imp: log date(now) */
-/* OK : DCT options in Output Rule */
-/* OK : implement JAI */
-/* Imp: support LargeBBox */
-/* Imp: support Comment */
-/* Imp: support PDF metadata: Title Subject Author Creator Producer */
-/* Imp: support PDF dates: Created Produced */
-/* Imp: support Comment */
-/* Imp: add PAM file format support from NetPBM */
-/* OK : verify ADSC EPSF-3.0 compatibility */
-/* Imp: pre-transformation: making grayscale */
-/* Imp: pre-transformation: down-bit-sampling */
-/* Imp: pre-transformation: down-palette-sampling (``generate optimal palette'') */
-/* Imp: tif22pnm warning - non-square pixels; to fix do a 'pnmscale -yscale nan'P6 2840 2138 255 */
-==6750==
-==6750== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
-==6750== malloc/free: in use at exit: 3741 bytes in 102 blocks.
-==6750== malloc/free: 2296 allocs, 2194 frees, 170451 bytes allocated.
-==6750== For counts of detected errors, rerun with: -v
-==6750== searching for pointers to 102 not-freed blocks.
-==6750== checked 4227304 bytes.
-==6750==
-==6750== 12 bytes in 1 blocks are definitely lost in loss record 3 of 15
-==6750==    at 0x400254FF: __builtin_new (vg_replace_malloc.c:172)
-==6750==    by 0x806ABC3: MiniPS::Parser::parse1(int, int) (minips.cpp:789)
-==6750==    by 0x806B378: MiniPS::Parser::parse1(int, int) (minips.cpp:856)
-==6750==    by 0x804DBD5: run_sam2p_engine(Files::FILEW &, Files::FILEW &, char const *const *, bool) (sam2p_main.cpp:923)
-==6750==
-==6750==
-==6750== 808 bytes in 81 blocks are possibly lost in loss record 14 of 15
-==6750==    at 0x400255E9: __builtin_vec_new (vg_replace_malloc.c:197)
-==6750==    by 0x8060C94: Mapping::DoubleHash::set(char const *, unsigned int, char const *) (mapping.cpp:43)
-==6750==    by 0x806A18B: MiniPS::Dict::put(char const *, unsigned int, int) (minips.cpp:461)
-==6750==    by 0x8069FF1: MiniPS::Dict::put(char const *, int) (minips.cpp:431)
-==6750==
-==6750== LEAK SUMMARY:
-==6750==    definitely lost: 12 bytes in 1 blocks.
-==6750==    possibly lost:   808 bytes in 81 blocks.
-==6750==    still reachable: 2921 bytes in 20 blocks.
-==6750==         suppressed: 0 bytes in 0 blocks.
-
-Known bugs
-~~~~~~~~~~
-(reported by Stefan Fritsch)
-
-> I got a bug report [1] about sam2p 0.44-10 not including a length
-> after the %%BeginData: line. As I understand it, the length is not
-> optional (see [2] p.44 (and gsview output?)). Sam2p 0.44-11 adds a
-> ";" after to this line. What does this ";" do? Is this supposed to be
-> conforming to the postscript standard? If not, are you planning to
-> write a real fix?
->
-> [1] http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=315046
-> [2] http://partners.adobe.com/public/developer/en/ps/5001.DSC_Spec.pdf
-
-Fixing it would require a major rewrite.
-However, I don't have free time for that right now. If you really care about
-standards, remove the %%BeginData...%%EndData pair from the
-PostScript file or remove it altogether from the sam2p sources. The `;' is
-there so GSView won't complain.
-
-!! compiling on Debian SID with uclibc-toolchain
-   i386-uclibc-linux-g++, the statically linked sam2p executable becomes
-   quite biiiig: 668268 bytes.
-   for configure: export CXX='i386-uclibc-linux-gcc -x c++ -static'
-   Also, Makehelp has to be modified after running configure:
-   LDXX=i386-uclibc-linux-g++ -static
-
-!! .eps import bad shift of BBX (LLX,LLY) with never Ghostscript
-
-Fixed bugs
-~~~~~~~~~~
-(this section was formerly bad.txt)
-
-./sam2p -j examples/ptsbanner2.jpg test.pdf
-  discover at Sun Sep 22 14:38:39 CEST 2002
-  BUGFIX at Sun Sep 22 15:03:33 CEST 2002
-
-./sam2p -1 -s:rgb1 -c:none examples/pts2.pbm test.eps
-  discover at Sun Sep 22 14:29:59 CEST 2002
-  BUGFIX (add -s:...:stopq) at Sun Sep 22 16:20:41 CEST 2002
-  (behaviour correct, specifying -s:rgb1:stop gives more error messages)
-
-./sam2p -c:fax:2 examples/shot.gif y.pdf
-  BUGFIX /EndOfLine true is forced
-  old gs: /ioerror in --%image_file_continue--
-  old acroread: `read less image data' (PDFB1.0: `expected EI')
-./sam2p -c:fax:1 examples/shot.gif y.pdf
-  BUGFIX /EndOfLine true is forced
-  gs: OK
-  old acroread: `read less image data' (PDFB1.0: `problem 115')
-./sam2p -c:fax:0 examples/shot.gif y.pdf
-  gs, acroread: OK
-./sam2p -c:fax:-1 examples/shot.gif y.pdf
-  gs, acroread: OK
-
-./sam2p -c:fax examples/pts2.pbm y.tiff
-  BUGFIX black-white inversion
-./sam2p -c:fax examples/shot.gif y.tiff
-  BUGFIX black-white inversion
-
-./sam2p -j -c jpeg examples/pts2.pbm y.tiff
-  seems to be OK now
-./sam2p -j -c jpeg examples/pts2.pbm y.tiff
-  seems to be OK now
-
-./sam2p -j -c fax examples/ptsbanner.gif y.eps
-  BUGFIX guard against applying /Compression/Fax to non-1-bit data
-./sam2p -j -c fax -s:Indexed8 examples/ptsbanner.gif y.eps
-  OK, no guard
-./sam2p -j -c fax -c none examples/ptsbanner.gif y.eps
-  OK, no guard
-./sam2p -j -c fax examples/ptsbanner.gif y.tiff
-  BUGFIX forbidden applying /Compression/Fax to non-1-bit data
-
-./sam2p -c fax csanyi_torok_old.png csanyi_torok.eps
-./sam2p -c fax examples/ptsbanner.gif csanyi_torok.eps
-  error: Impossible combination
-  OK, the user should specify `-s Indexed8' for unexpected use of  `-c fax'
 
 __END__

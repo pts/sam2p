@@ -1,0 +1,308 @@
+Technical information for developers, algorithms, code comments for sam2p
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Upsampling
+""""""""""
+Here is a figure about upsampling samples bits 1 -> 2 -> 4 -> 8:
+
+	0 -> 00			0
+	1 -> 11			3
+
+	00 -> 0000		0
+	01 -> 0101		5
+	10 -> 1010		10
+	11 -> 1111		15
+
+	0000 -> 0000 0000	0
+	0001 -> 0001 0001	17
+	0010 -> 0010 0010	34
+	...
+	1110 -> 1110 1110	238
+	1111 -> 1111 1111	255
+
+A 1-bit image has a palette of 2 colors: #00 and #ff.
+
+A 2-bit image has a palette of 4 colors: #00, #55, #aa and #ff.
+
+A 4-bit image has a palette of 16 colors: #00, #11, #22, ... #ff.
+
+An 8-bit image has a palette of 256 colors: #00, #01, #02, ... #ff.
+
+Obsolete: Image metadata
+""""""""""""""""""""""""
+-- Width: uint
+-- Height: uint
+-- ColorSpace: enum (see later), determines PixBits
+-- PixBits: 1..24
+-- Origin: coord
+-- Comment: string
+-- FileFormat:
+-- Predictor: enum (see later), same as PSLanguageLevel1 filter
+   /Predictor
+   1 -- no predictor
+   2 -- TIFF predictor 2 (horizontal differencing)
+   10 -- PNG predictor, None function
+   11 -- PNG predictor, Sub function
+   12 -- PNG predictor, Up function
+   13 -- PNG predictor, Average function
+   14 -- PNG predictor, Paeth function
+   15 -- PNG predcitor, individually chosen for each line
+-- PredictorColumns: uint
+-- PredictorColors: 1..3
+-- PredictorBitsPerComponent: 1, 2, 4, 8
+-- CompressionEffort: -1..9 (ZIP)
+-- CompressionRecordSize: uint (RLE, Fax: K)
+-- Compression: enum
+   0 -- None
+   1 -- LZW (PSL2 PDF1.0 LZWEncode filter EarlyChange=true, UnitLength=8
+        LowBitFirst=false)
+   2 -- ZIP (PSL3 PDF1.2 FlateEncode filter without options)
+   3 -- RLE (PSL2 PDF1.0 RunLengthEncode filter, similar to TIFF PackBits)
+   4 -- Fax (PSL2 PDF1.0 CCITTFaxEncode filter, Uncompressed=true!, K=-1,0,1,
+        EndOfLine=false, EncodedByteAlign=false, Columns=..., Rows=0,
+        EndOfBlock=true, BlackIs1=false, DamagedRowsBeforeError=0)
+   5 -- DCT (PSL2 PDF1.0 DCTEncode, options in JPEG stream)
+   6 -- IJG (PSL2 PDF1.0 DCTEncode, options in JPEG stream; the IJG libjpeg
+        library is used for compression, respecting the quality value 0..100)
+   7 -- JAI (PSL2 PDF1.0 DCTEncode, options in JPEG stream; JPEG-as-is: the
+        input file must be a JPEG file -- its contents are transferred
+        unmodified into the /DCTDecode JPEG stream)
+-- TransferEncoding: enum
+   0 -- Binary (RawBits, see pbm(5), pgm(5), ppm(5))
+   1 -- ASCII (text, chars: 9,10,13,32..126)
+   2 -- Hex ((PSL1), PDF1.0, PSL2 ASCIIHexEncode filter)
+   3 -- 85 (PSL2 PDF1.0, ASCII85Encode filter)
+   4 -- base64, _not_ implemented
+   5 -- quoted-printable, _not_ implemented
+   6 -- URLencode, _not_ implemented
+
+RGB -> Gray
+"""""""""""
+   gray = 0.299*red + 0.587*green + 0.114*blue (NTSC video std)
+   gray = (306.176*red + 601.088*green + 116.736*blue) >> 10
+   perl -e 'no integer;for(@ARGV){y/#//d;$N=hex($_);$R=0.299*($N>>16)+0.587*(($N>>8)&255)+0.114*($N&255);print $R/255," ",sprintf("#%02x",int($R+0.5)),"\n"}' '#0f0f0f'
+
+Rgb2 -> Gray
+""""""""""""
+   perl -e 'no integer;for(@ARGV){print"$_
+   ";y/#//d;$N=hex($_);$R=0.299*($N>>16)+0.587*(($N>>8)&255)+0.114*($N&255);
+   print "",$R/255," ",sprintf("#%02x",int($R+0.5)),"\n"}' 000000 000055 0000aa
+   0000ff  005500 005555 0055aa 0055ff  00aa00 00aa55 00aaaa 00aaff  00ff00
+   00ff55 00ffaa 00ffff  550000 550055 5500aa 5500ff  555500 555555 5555aa
+   5555ff  55aa00 55aa55 55aaaa 55aaff  55ff00 55ff55 55ffaa 55ffff  aa0000
+   aa0055 aa00aa aa00ff  aa5500 aa5555 aa55aa aa55ff  aaaa00 aaaa55 aaaaaa
+   aaaaff  aaff00 aaff55 aaffaa aaffff  ff0000 ff0055 ff00aa ff00ff  ff5500
+   ff5555 ff55aa ff55ff  ffaa00 ffaa55 ffaaaa ffaaff  ffff00 ffff55 ffffaa
+   ffffff
+
+000000 0 #00
+000055 0.038 #0a
+0000aa 0.076 #13
+0000ff 0.114 #1d
+005500 0.195666666666667 #32
+005555 0.233666666666667 #3c
+0055aa 0.271666666666667 #45
+0055ff 0.309666666666667 #4f
+00aa00 0.391333333333333 #64
+00aa55 0.429333333333333 #6d
+00aaaa 0.467333333333333 #77
+00aaff 0.505333333333333 #81
+00ff00 0.587 #96
+00ff55 0.625 #9f
+00ffaa 0.663 #a9
+00ffff 0.701 #b3
+550000 0.0996666666666667 #19
+550055 0.137666666666667 #23
+5500aa 0.175666666666667 #2d
+5500ff 0.213666666666667 #36
+555500 0.295333333333333 #4b
+555555 0.333333333333333 #55
+5555aa 0.371333333333333 #5f
+5555ff 0.409333333333333 #68
+55aa00 0.491 #7d
+55aa55 0.529 #87
+55aaaa 0.567 #91
+55aaff 0.605 #9a
+55ff00 0.686666666666667 #af
+55ff55 0.724666666666667 #b9
+55ffaa 0.762666666666667 #c2
+55ffff 0.800666666666667 #cc
+aa0000 0.199333333333333 #33
+aa0055 0.237333333333333 #3d
+aa00aa 0.275333333333333 #46
+aa00ff 0.313333333333333 #50
+aa5500 0.395 #65
+aa5555 0.433 #6e
+aa55aa 0.471 #78
+aa55ff 0.509 #82
+aaaa00 0.590666666666667 #97
+aaaa55 0.628666666666667 #a0
+aaaaaa 0.666666666666667 #aa
+aaaaff 0.704666666666667 #b4
+aaff00 0.786333333333333 #c9
+aaff55 0.824333333333333 #d2
+aaffaa 0.862333333333333 #dc
+aaffff 0.900333333333333 #e6
+ff0000 0.299 #4c
+ff0055 0.337 #56
+ff00aa 0.375 #60
+ff00ff 0.413 #69
+ff5500 0.494666666666667 #7e
+ff5555 0.532666666666667 #88
+ff55aa 0.570666666666667 #92
+ff55ff 0.608666666666667 #9b
+ffaa00 0.690333333333333 #b0
+ffaa55 0.728333333333333 #ba
+ffaaaa 0.766333333333333 #c3
+ffaaff 0.804333333333333 #cd
+ffff00 0.886 #e2
+ffff55 0.924 #ec
+ffffaa 0.962 #f5
+ffffff 1 #ff
+
+Building the palette for Paletted image -> PSLC colorimage
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+{ Buf3 0 0 currentfile Bufx readstring pop
+  % /i 0 def
+  % Stack: Buf3 0 0 Bufx
+  { % Stack: Buf3 <Buf3-dst-i> <0-1-2> <byte-read>
+    exch
+    { { % Stack: Buf3 <Buf3-dst-i> <byte-read>
+        dup -2 bitshift Pal exch get
+	% Stack: Buf3 <Buf3-dst-i> <byte-read> <byte-to-write>
+        exch 4 bitshift /Carry exch def
+	% Stack: Buf3 <Buf3-dst-i> <byte-to-write>
+	3 copy put  pop 1 add  1
+	% Stack: Buf3 <Buf3-dst-i+1> 1
+      }{dup -4 bitshift Carry add Pal exch get
+        exch 15 and 2 bitshift /Carry exch def
+	3 copy put  pop 1 add  2
+      }{dup -6 bitshift Carry add Pal exch get
+	% Stack: Buf3 <Buf3-dst-i> <byte-read> <byte-to-write-first>
+	exch 4 copy
+	% Stack: Buf3 <Buf3-dst-i> <byte-to-write-first> <byte-read>  Buf3 <Buf3-dst-i> <byte-to-write-first> <byte-read>
+        pop put
+	% Stack: Buf3 <Buf3-dst-i> <byte-to-write-first> <byte-read>
+        63 and Pal exch get  pop
+	% Stack: Buf3 <Buf3-dst-i> <byte-to-write-second>
+	exch 1 add exch
+	3 copy put  pop 1 add  0
+	% Stack: Buf3 <Buf3-dst-i+2> 0
+      }
+    } exch
+    % Stack: Buf3 <Buf3-dst-i> <byte-read> {code3} <0-1-2>
+    get exec
+    % Stack: Buf3 <Buf3-dst-i++> <1-2-0>
+  } forall
+  % Stack: Buf3 <i>
+  pop pop
+  Bufr
+}
+
+Color space conversion: (unfinished)
+""""""""""""""""""""""""""""""""""""
+-- Ripped from jccolor.c from libjpeg:
+
+   * YCbCr is defined per CCIR 601-1, except that Cb and Cr are
+   * normalized to the range 0..MAXJSAMPLE rather than -0.5 .. 0.5.
+   * The conversion equations to be implemented are therefore
+   *      Y  =  0.29900 * R + 0.58700 * G + 0.11400 * B
+   *      Cb = -0.16874 * R - 0.33126 * G + 0.50000 * B  + CENTERJSAMPLE
+   *      Cr =  0.50000 * R - 0.41869 * G - 0.08131 * B  + CENTERJSAMPLE
+   * (These numbers are derived from TIFF 6.0 section 21, dated 3-June-92.)
+
+
+
+   -- RGB -> YCbCr:
+          Y  =  0.29900 * R + 0.58700 * G + 0.11400 * B
+          Cb = -0.16874 * R - 0.33126 * G + 0.50000 * B  + CENTERJSAMPLE
+          Cr =  0.50000 * R - 0.41869 * G - 0.08131 * B  + CENTERJSAMPLE
+   -- CMYK -> YCCK:
+          R=1-C, G=1-M, B=1-Y, K=K, RGB -> YCbCr
+   -- YCbCr -> RGB: (Cb < CENTERJSAMPLE, Cr < CENTERJSAMPLE)
+          R = Y                + 1.40200 * Cr
+          G = Y - 0.34414 * Cb - 0.71414 * Cr
+          B = Y + 1.77200 * Cb
+   -- YCCK -> CMYK:
+          YCbCr -> RGB, C=1-R, M=1-G, Y=1-B, K=K.
+   -- (YCbCrK == YCCK)
+   -- Gray -> RGB: red = gray, green = gray, blue = gray
+   -- RGB -> Gray: gray = 0.299*red + 0.587*green + 0.114*blue (NTSC video std)
+                 : gray = (306.176*red + 601.088*green + 116.736*blue) >> 10
+                 : gray = (19595.264*red + 38469.632*green + 7471.104*blue) >> 16
+   -- Obsolete: RGB -> YCbCr: (YCbCr == YUV)
+        y:luminance = 0.299*red + 0.587*green + 0.114*blue (0..1)
+	cb:chrominance-b = blue - y = - 0.299*red - 0.587*green + 0.886*blue  (-0.886 .. 0.886)
+	cr:chrominance-r = red - y = 0.701*red - 0.587*green - 0.114*blue (-0.701 .. 0.701)
+      Chrominance components can be represented less accurately since the
+      human eye is around twice as sensitive to luminance as to chrominance.
+   -- RGB <-> HSB: quite obfuscated. See gshsb.c in Aladdin Ghostscript's
+      source.
+
+Word frequency counting in PostScript source
+""""""""""""""""""""""""""""""""""""""""""""
+perl -e '$C=0; $X=join"",<STDIN>; for (split" ",$X) { print "$_.\n";
+$C+=length($_)-1 if /[0-9]/ }; print STDERR "C=$C\n"'
+
+</tmp/t perl -e '$C=0; $X=join"",<STDIN>; $X=~s@([{}])@ $1 @g; $X=~s@/@ /@g;
+for (split" ",$X) { print "$_.\n" if length>=2; $C++ if length($_)>=2 };
+print STDERR "C=$C\n"' | sort | uniq
+
+</tmp/t perl -e '$C=0; $X=join"",<STDIN>; $X=~s@([{}])@ $1 @g; $X=~s@/@ /@g;
+$Y=""; for (split" ",$X) { $_=" $_ " if length($_)>=2; $Y.=$_ }; $Y=~s@
+/@/@g; print $Y' >t
+
+How tiff2ps displays a gray version of a PSLC Rgb8 image on PSL1
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+gsave
+100 dict begin
+1495.000000 935.000000 scale
+/bwproc {
+    rgbproc
+    dup length 3 idiv string 0 3 0
+    5 -1 roll {
+	add 2 1 roll 1 sub dup 0 eq {
+	    pop 3 idiv
+	    3 -1 roll
+	    dup 4 -1 roll
+	    dup 3 1 roll
+	    5 -1 roll put
+	    1 add 3 0
+	} { 2 1 roll } ifelse
+    } forall
+    pop pop pop
+} def
+/colorimage where {pop} {
+    /colorimage {pop pop /rgbproc exch def {bwproc} image} bind def
+} ifelse
+%ImageData: 1495 935 8 3 0 1 2 "false 3 colorimage"
+/line 4485 string def
+1495 935 8
+[1495 0 0 -935 0 935]
+{currentfile line readhexstring pop} bind
+false 3 colorimage
+
+pts_defl.c which function calls which function
+""""""""""""""""""""""""""""""""""""""""""""""
+send_bits
+  rengeteg
+flush_outbuf
+  send_bits
+  flush_block 2*
+build_tree
+  flush_block 3*
+flush_block
+  deflate2 5*
+ct_tally
+  deflate2 sok*
+longest_match
+  deflate2 2*
+fill_window
+  deflate2 4*
+
+gen_codes
+  2, reentrant
+deflate2
+  1..
+pts_deflate_init
+  1
+
