@@ -457,10 +457,10 @@ ReadImage (FILE   *fd,
 			     }
            }
         }
-      free (temp);
+      XFREE (temp);
   }
 
-  free (buffer);
+  XFREE (buffer);
   return image;
 }
 
