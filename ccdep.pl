@@ -92,7 +92,7 @@ sub unix_shq($) {
 sub shq($) {
   my $S=$_[0];
   return $S if $S!~/[^\w.-]/;
-  if ($^O eq 'MSWin32') {
+  if ($^O =~ /(?:win32|win64|windows)/i) {  # $^O eq 'MSWin32'
     # assume the called program is CygWin/Ming32; see later
     # Arguments are delimited by white space, which is either a space or a tab.
     # .       A string surrounded by double quotation marks is interpreted as a
@@ -112,11 +112,13 @@ sub shq($) {
     # of backslashes (\\) and the double quotation mark is interpreted as an
     # escape sequence by the remaining backslash, causing a literal double
     # quotation mark (") to be placed in argv.
+    $S =~ s@(\\+)(?="|\Z(?!\n))@$1$1@;
     $S=~s@"@\\"@g; return qq{"$S"}
   } else {
     $S=~s@'@'\\''@g; return qq{'$S'}
   }
 }
+#die shq(q{foo\b"ar\\}) eq q{"foo\b\"ar\\\\"};  # For Win32.
 
 sub backtick(@) {
   my $S=$_[0];
