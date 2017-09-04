@@ -153,8 +153,8 @@ my $R=backtick($Q);
 
 if ($R!~/#\s*warning\s/) {
   # config2.h:314:4: warning: #warning REQUIRES: c_lgcc3.o
-  # Dat: g++-3.3 ignores #warning with -M -MG -E
-  #      g++-4.8 and clang++-3.4 don't ignore it, no need for rerun.
+  # Dat: g++-3.3 and g++-4.8 omit #warning (implicit -w) with -M -MG -E.
+  #      clang++-3.4 still emits warnings, so no need to rerun here.
   $R.="\n".backtick("$GCCP -DOBJDEP$DIAG -E 2>&1 >/dev/null @DSQ");
 }
 
