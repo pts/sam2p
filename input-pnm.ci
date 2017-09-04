@@ -211,7 +211,7 @@ bitmap_type pnm_load_image (at_string filename)
 
   /* allocate the necessary structures */
   /* pnminfo = (PNMInfo *) malloc (sizeof (PNMInfo)); */
-  XMALLOCTU(pnminfo, PNMInfo);
+  XMALLOCT(pnminfo, PNMInfo*, sizeof(PNMInfo));
 
   scan = NULL;
   /* set error handling */
@@ -436,7 +436,7 @@ pnmscanner_create (PNMFILE *fd)
 {
   PNMScanner *s;
 
-  XMALLOCTU (s, PNMScanner);
+  XMALLOCT (s, PNMScanner*, sizeof(PNMScanner));
   s->fd = fd;
   s->eof = !fread_PNMFILE(&(s->cur), 1, s->fd);
   return s;
