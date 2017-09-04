@@ -171,8 +171,7 @@ my @instructions;
 while ($R=~/\G(.*)\n?/g) {
   my $S=$1;
 
-  if (!length$S) {
-  } elsif ($S=~/\AIn file included from (?:[.]\/)*([^:]+)/) {
+  if ($S=~/\AIn file included from (?:[.]\/)*([^:]+)/) {
     # If foo.cpp includes foo.hpp, which includes bar.hpp, then
     # clang++-3.4 emits these in a row: foo.cpp, ./foo.hpp, and no bar.hpp.
     # We want to keep only foo.cpp, hence we check
@@ -181,15 +180,18 @@ while ($R=~/\G(.*)\n?/g) {
       # Bottommost includer.
   } elsif ($S=~/\A\s{3,}from (?:[.]\/)*([^:]+)/) {  # From gcc-3.2.
     $included_from=$1;  # Higher includer, we override the previous one, because we need the topmost one.
-  } elsif ($S=~/\A(?:[.]\/)*([^:]+):\d+:(\d+:)? warning: (?:#warning )?(NULL-PROVIDES|PROVIDES|CONFLICTS|REQUIRES):(.*)\Z/) {
+  } elsif ($S=~/\A(?:[.]\/)*([^:]+):\d+:(\d+:)? warning: (?:#warning )?([A-Z][-A-Z]{2,}):(.*)\Z/) {
     # ^^^ (\d+:)? added for gcc-3.1
     # ^^^ clang: appliers.cpp:554:6: warning: REQUIRES: out_gif.o [-W#warnings]
-    my($DS,$B)=($1,$3);  # $B is e.g. 'PROVIDES'.
+    my($DS,$B,$features)=($1, $3, $4);  # $B is e.g. 'PROVIDES'.
     if (defined $included_from) { $DS=$included_from; undef $included_from }
-    die "$0: #include detection broken: expected non-header source file, got: $DS\n" if
+    die "$0: #include detection broken: expected non-header source file, got $DS in line: $S\n" if
         not is_ds($DS);
-    for my $feature (split ' ',$4) {
+    die "$0: unknown dependency verb $B in line: $S\n" if
+        $B !~ m@\A(NULL-PROVIDES|PROVIDES|CONFLICTS|REQUIRES)\Z(?!\n)@;
+    for my $feature (split ' ',$features) {
       if ($feature !~ m@\A\[-W@) {  # g++-4.8 generates extra [-Wcpp] lines.
+        #print "INSTR $DS $B $feature\n";
         push @instructions, [$DS, $B, $feature];
       }
     }
@@ -213,31 +215,12 @@ while ($R=~/\G(.*)\n?/g) {
     $idep{$DS}=$B;
     push @instructions, [$DS, 'PROVIDES', $O];
     undef $included_from;
-  } elsif ($S=~/\A([^:]+):\d+: .*\Z/) {
-    print "# $S\n";
+  } elsif ($S=~/: (?:warning|error|fatal error|fatal):/) {
     undef $included_from;
-  } elsif ($S=~/\A([^:]+):\d+:(\d+:)? warning: ".*?" redefined\Z/) {
-    # ^^^ gcc-3.1
-    undef $included_from;
-  } elsif ($S=~/\A([^:]+):\d+:(\d+:)? warning: this is the location of /) {
-    # ^^^ gcc-3.1
-    undef $included_from;
-  } elsif ($S=~/\A([^:]+):\d+:(\d+:)? warning: .*\bdeprecated\b/) {
-    # Example: /usr/include/features.h:148:3: warning: #warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-Wcpp]
-    undef $included_from;
-  } elsif ($S=~/: No such file or directory$/ or  # Depends on $ENV{LC_ALL}.
-           $S=~/: fatal error: .* file not found$/) {  # clang.
-    # ^^^ gcc-3.3
-    undef $included_from;
-  } elsif ($S eq 'compilation terminated.') {  # Useless message, ignore.
-  } elsif ($S=~/^distcc\[/) {  # Useless message, ignore.
-  } elsif ($S=~/^ *#/) {  # Useless message from gcc 4.8, ignore.
-  } elsif ($S=~/^ *\^/) {  # Useless message from gcc 4.8, ignore.
-  } elsif ($S=~/: warning: treating 'c' input as/) {  # Useless message from clang, ignore.
-  } elsif ($S=~/^\d+ warnings?(?: and \d+ errors?)? generated[.]$/) {  # Useless message from clang, ignore.
-  } elsif ($S=~/^\d+ errors? generated[.]$/) {  # Useless message from clang, ignore.
   } else {
-    die "$0: invalid depret: [$S]\n";
+    # Be resilient, and just ignore every other possible message here. This is
+    # for future compatibility with compilers. The infamous `invalid depret'
+    # error by ccdep.pl used to be here, but now it's gone.
   }
 }
 undef $included_from;  # Save memory.
