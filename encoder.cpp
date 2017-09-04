@@ -94,7 +94,7 @@ class FlateEncode: public PSEncoder {
   // static bool locked;
   /** Writable that this filter writes to */
   GenBuffer::Writable &out;
-  char workspace[ZLIB_DEFLATE_WORKSPACESIZE_MIN]; /* big, about 300k */
+  char workspace[ZLIB_DEFLATE_WORKSPACESIZE_MIN]; /* big, about 270k */
   char obuf[4096];
   /*struct*/ z_stream zs;
 #else /* old, ripped from Info-ZIP 2.2 */
