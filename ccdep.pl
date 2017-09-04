@@ -139,15 +139,10 @@ sub backtick(@) {
 
 my @DS=find_ds();
 my @DSQ=map{shq$_}@DS;
-my $DIAG=" -fno-diagnostics-show-caret";
+# g++-4.6 has it, clang++-3.4 doesn't but we don't care to rerun.
+my $DIAG = "";
 my $Q="$GCCP -DOBJDEP$DIAG -M -MG -E 2>&1 @DSQ";
 my $R=backtick($Q);
-if ($R=~/\berror: .*-fno-diagnostics-show-caret\b/) {
-  # gcc-4.6 and earlier don't have this flag, and they fail.
-  $Q=~s@ -fno-diagnostics-show-caret(?=\s)@@;
-  $DIAG="";
-  $R=backtick($Q);
-}
 
 if ($R!~/: warning: #warning\b/) {
   # config2.h:314:4: warning: #warning REQUIRES: c_lgcc3.o
