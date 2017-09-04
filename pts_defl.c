@@ -1453,6 +1453,7 @@ int zlib_deflateInit2_(
     s->hash_shift =  ((s->hash_bits+MIN_MATCH-1)/MIN_MATCH);
 
     s->window = (Byte *) mem->window_memory;
+    memset(mem->window_memory, 0, s->w_size << 1);  /* BUGFIX at Mon Sep  4 17:12:23 CEST 2017, otherwise valgrind reports uninitialized errors */
     s->prev   = (Pos *)  mem->prev_memory;
     s->head   = (Pos *)  mem->head_memory;
 
