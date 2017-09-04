@@ -155,6 +155,8 @@ if ($R!~/: warning: #warning\b/) {
   $R.="\n".backtick("$GCCP -DOBJDEP$DIAG -E 2>&1 >/dev/null @DSQ");
 }
 
+$R =~ s@\\\n@@g;  # Merge line continuations emitted by `gcc -M -MG'.
+
 ## die $R;
 
 #** $pro{"x.ds"} is the list of features provided by "x.ds"; multiplicity
