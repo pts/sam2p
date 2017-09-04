@@ -275,12 +275,20 @@ slen_t Filter::UngetFILED::vi_read(char *buf, slen_t len) {
   }
 }
 void Filter::UngetFILED::close() {
-  /* !! TODO(pts): What if close() is called twice? */
-  if (0!=(closeMode&CM_closep)) { fclose(f); f=(FILE*)NULLP; closeMode&=~CM_closep; }
-  unget.forgetAll(); ofs=0;
+  /* Since close() may be closed twice (e.g. once manually, and once from the
+   * the destructor), everything below must be idempotent.
+   */
+
+  if (0!=(closeMode&CM_closep)) {
+    fclose(f); f=(FILE*)NULLP;
+    closeMode&=~CM_closep;  /* Make it idempotent. */
+  }
+  unget.forgetAll();  /* Idempotent. */
+  ofs=0;  /* Idempotent. */
   if (filename!=NULLP) {
     if (0!=(closeMode&CM_unlinkp)) { remove(filename); }
     delete [] filename;
+    filename=(const char*)NULLP;  /* Make it idempotent. */
   }
 }
 
