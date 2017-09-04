@@ -659,6 +659,7 @@ Rule::Applier::cons_t out_xpm_work(GenBuffer::Writable& out, Rule::OutputRule*or
       while (p!=phend) { *++op=xpms[*p>>2]; *++op=xpms[*p++&3]; }
       out.vi_write(obuf, 2*wd+4);
     }
+    delete [] obuf;
   } else {
     coline3[1]='"';
     while (p!=pend) {
@@ -690,6 +691,7 @@ Rule::Applier::cons_t out_xpm_work(GenBuffer::Writable& out, Rule::OutputRule*or
       while (p!=phend) *++op=xpms[0U+*p++];
       out.vi_write(obuf, wd+4);
     }
+    delete [] obuf;
   }
   assert(p==pend);
   out << "};\n";

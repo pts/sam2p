@@ -169,6 +169,7 @@ Image::Gray*    Image::Sampled::toGray0(unsigned char bpc_) {
       }
     }
   } else assert(0);
+  delete [] crow;
   return img;
 }
 Image::RGB*     Image::Sampled::toRGB0(unsigned char bpc_) {
@@ -212,6 +213,7 @@ Image::RGB*     Image::Sampled::toRGB0(unsigned char bpc_) {
       outp+=wd*3;
     }
   } else assert(0);
+  delete [] crow;
   return img;
 }
 

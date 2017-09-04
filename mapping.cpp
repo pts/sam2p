@@ -42,6 +42,10 @@ bool Mapping::DoubleHash::set     (char const*  key, slen_t  keylen, char const*
   Ary *p=ary+h1;
   if (p->keylen==NEVER_USED) { added:
     /* Dat: we shouldn't stop on p->keylen==DELETED */
+    /* This will be deleted by `delete [] (pp->keydata-datalen);' called from
+     * Mapping::DoubleHash::clear() called from the destructor of
+     * Mapping::DoubleHash15, also known as Mapping::H.
+     */
     memcpy(p->keydata=new char[keylen+datalen], data, datalen);
     memcpy(p->keydata+=datalen, key, p->keylen=keylen); len++;
     //if (p->keylen==NEVER_USED && used++==maxused) { p->keylen=keylen; rehash(); }

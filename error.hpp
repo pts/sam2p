@@ -110,27 +110,52 @@ class Error {
   
   /** The Cleanup mechanism is similar to atexit(3) and on_exit(3). This is
    * just a simple struct with no destructors, virtual methods or inheritance.
+   *
+   * Additional data (char[] buffer) can be allocated and stored right
+   * after the object (this+1), it can be retrieved with getBuf(), and it will
+   * be deleted when the object is deleted by runCleanups().
    */
   struct Cleanup {
-    /** Must _not_ cause any Errors
+    /** Must _not_ cause any Errors.
      * @return an exit code. If larger than the current one, replaces it
      */
     typedef int (*handler_t)(Cleanup*);
+    /** Owned externally. */
     handler_t handler;
-    /** size of extra data allocated */
-    slen_t size;
-    /** arbitrary data */
+    /** size of extra data allocated at getBuf(). */
+    slen_t bufSize;
+    /** Arbitrary data, owned by `handler': handler' must delete `data'
+     * when called.
+     */
     void *data;
     /** NULLP: no next, end of chain */
     Cleanup *next;
     inline char *getBuf()   { return (char*)(this+1); }
-    inline slen_t getSize() { return size; }
+    inline slen_t getSize() { return bufSize; }
   };
-  /** Creates and registers a new Cleanup, and puts it before old ones. */
-  static Cleanup* newCleanup(Cleanup::handler_t handler, void *data, slen_t size);
-  static Cleanup* newCleanup(Cleanup::handler_t handler, void *data, char const*cstr);
+  /** Creates and returns a new Cleanup, and registers it in front of the
+   * existing ones. Copies `handler' and `data' to it. Also allocates `bufSize' bytes
+   * of char[] buffer (at result->getBuf()) owned by the cleanup, but doesn't
+   * initialize the buffer.
+   *
+   * Doesn't take ownership of `handler', takes ownership of `data'.
+   * `handler' must delete `data' or pass on ownership when called,
+   * typically by runCleanups().
+   */
+  static Cleanup* newCleanup(Cleanup::handler_t handler, void *data, slen_t bufSize);
+  /** Creates and returns a new Cleanup, and registers it in front of the
+   * existing ones. Copies `handler' and `data' to it. Also allocates
+   * strlen(bufCstr)+1 bytes of char[] buffer (at result->getBuf()) owned by
+   * the cleanup, and initializes it from bufCstr.
+   *
+   * Doesn't take ownership of `handler', takes ownership of `data'.
+   * `handler' must delete `data' or pass on ownership when called,
+   * typically by runCleanups().
+   */
+  static Cleanup* newCleanup(Cleanup::handler_t handler, void *data, char const*bufCstr);
   /** Reverts to the default logging policy,
-   * executes the cleanups (in reverse-registration order), and returns the
+   * executes the cleanup handlers (in reverse-registration order),
+   * unregisters and deletes all the cleanups, and returns the
    * new exit code, which is at least exitCode.
    */
   static int runCleanups(int exitCode);

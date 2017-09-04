@@ -275,6 +275,7 @@ slen_t Filter::UngetFILED::vi_read(char *buf, slen_t len) {
   }
 }
 void Filter::UngetFILED::close() {
+  /* !! TODO(pts): What if close() is called twice? */
   if (0!=(closeMode&CM_closep)) { fclose(f); f=(FILE*)NULLP; closeMode&=~CM_closep; }
   unget.forgetAll(); ofs=0;
   if (filename!=NULLP) {
@@ -341,7 +342,12 @@ FILE* Filter::UngetFILED::getFILE(bool seekable_p) {
       if (0!=(closeMode&CM_unlinkp)) { remove(filename); }
       delete [] filename;
     }
+    /* This is the object data member char const* filename' in
+     * Filter::UngetFILED, owned by `this', deleted in the close() method
+     * called from the Filter::UngetFILED destructor.
+     */
     strcpy(const_cast<char*>(filename=new char[tmpnam.getLength()+1]), tmpnam());
+    /* Also makes a copy of the filename array, good */
     Files::tmpRemoveCleanup(filename);
     if (unget.getLength()-ofs==fwrite(unget()+ofs, 1, unget.getLength()-ofs, tf)) {
       static const slen_t BUFSIZE=4096; /* BUGFIX at Sat Apr 19 15:43:59 CEST 2003 */
@@ -819,6 +825,7 @@ static int cleanup_remove(Error::Cleanup *cleanup) {
 }
 
 void Files::tmpRemoveCleanup(char const* filename) {
+  /* Copies the filename array. */
   Error::newCleanup(cleanup_remove, 0, filename);
 }
 

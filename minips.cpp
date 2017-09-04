@@ -285,7 +285,7 @@ char const* const MiniPS::Real::me_psfactor[MiniPS::Real::ME_COUNT]={
 };
 MiniPS::Real::Real(double d_, char const*ptr_, ii_t len_): d(d_), metric(0), dumpPS(false) {
   ty=T_REAL;
-  char *p=new char[len_+1];
+  char *p=new char[len_+1];  /* Will be freed by MiniPS::delete0(). */
   memcpy(ptr=p, ptr_, len=len_);
   p[len_]='\0';
 }
@@ -320,13 +320,13 @@ bool MiniPS::Real::isDimen(char const *str) {
 }
 
 MiniPS::String::String(char const*ptr_, ii_t len_) {
-  char *p=new char[len_+1];
+  char *p=new char[len_+1];  /* Will be freed by MiniPS::delete0(). */
   memcpy(ptr=p, ptr_, len=len_);
   p[len_]='\0';
   ty=T_STRING;
 }
 void MiniPS::String::replace(char const*ap, slen_t alen, char const*bp, slen_t blen) {
-  char *p=new char[alen+blen+1];
+  char *p=new char[alen+blen+1];  /* Will be freed by MiniPS::delete0(). */
   memcpy(p,      ap, alen);
   memcpy(p+alen, bp, blen);
   p[alen+blen]='\0';
@@ -336,7 +336,7 @@ void MiniPS::String::replace(char const*ap, slen_t alen, char const*bp, slen_t b
 
 MiniPS::Sname::Sname(char const*ptr_, ii_t len_) {
   param_assert(len_>=1 && ptr_[0]=='/');
-  char *p=new char[len_+1];
+  char *p=new char[len_+1];  /* Will be freed by MiniPS::delete0(). */
   memcpy(ptr=p, ptr_, len=len_);
   p[len_]='\0';
   ty=T_SNAME;
@@ -350,7 +350,7 @@ bool MiniPS::Sname::equals(char const*other) {
 
 MiniPS::Ename::Ename(char const*ptr_, ii_t len_) {
   param_assert(len_>=1 && ptr_[0]!='/');
-  char *p=new char[len_+1];
+  char *p=new char[len_+1];  /* Will be freed by MiniPS::delete0(). */
   memcpy(ptr=p, ptr_, len=len_);
   p[len_]='\0';
   ty=T_ENAME;
@@ -373,7 +373,7 @@ MiniPS::Array::Array() {
 }
 void MiniPS::Array::free() {
   VALUE *p=(VALUE*)ptr, *pend=p+len;
-  while (p!=pend) delete0(*p++);
+  while (p!=pend) MiniPS::delete0(*p++);
   delete [] (VALUE*)ptr;
 }
 void MiniPS::Array::push(VALUE v) {
@@ -410,6 +410,7 @@ void MiniPS::Array::dump(GenBuffer::Writable &out_, unsigned indent) {
     }
     out_.vi_write(spaces, indent-=2);
     out_ << "]";
+    delete [] spaces;
   }
   dumping=false;
 }
@@ -462,7 +463,7 @@ MiniPS::VALUE MiniPS::Dict::push(char const*keys, slen_t keylen, VALUE val) {
   if (has!=(char const*)NULLP) {
     memcpy(&ret, has, sizeof(VALUE));
     // printf("found=/%s.\n", keys);
-    /* No delete0(); deliberately. */
+    /* No MiniPS::delete0(); deliberately. */
     memcpy(has, &val, sizeof(VALUE)); has[sizeof(VALUE)]=0;
   } else {
     char tmp[sizeof(VALUE)+1];
@@ -543,6 +544,7 @@ void MiniPS::Dict::dump(GenBuffer::Writable &out_, unsigned indent, bool dump_de
       getNext(keyy, keylen, val, touched);
     }
     if (dump_delimiters) { out_.vi_write(spaces, indent-=2); out_ << ">>"; }
+    delete [] spaces;
   }
   dumping=false;
 }
@@ -557,7 +559,7 @@ MiniPS::Dict::Dict() {
 }
 void MiniPS::Dict::free() {
   VALUE *p=(VALUE*)ptr, *pend=p+len;
-  while (p!=pend) delete0(*p++);
+  while (p!=pend) MiniPS::delete0(*p++);
   delete [] (VALUE*)ptr;
 }
 void MiniPS::Dict::put(char const*key, VALUE val) {
@@ -681,6 +683,7 @@ void MiniPS::Dict::dump(GenBuffer::Writable &out_, unsigned indent, bool dump_de
       /*if(p!=pend)*/ out_.vi_putcc('\n'); // out_ << "\n";
     }
     if (dump_delimiters) { out_.vi_write(spaces, indent-=2); out_ << ">>"; }
+    delete [] spaces;
   }
 }
 void MiniPS::Dict::extend(ii_t newlen) {
@@ -764,7 +767,7 @@ MiniPS::Parser::~Parser() {
   if (free_level>=2) delete tok;
   if (free_level>=3) delete rd;
   if (free_level>=4) fclose(PTS_align_cast(FILE*,f));
-  if (specRunsDelete) delete0((VALUE)specRuns);
+  if (specRunsDelete) MiniPS::delete0((VALUE)specRuns);
 }
 void MiniPS::Parser::addSpecRun(char const* filename_, GenBuffer::Readable *rd_) {
   if (specRuns==NULLP) {
@@ -775,7 +778,7 @@ void MiniPS::Parser::addSpecRun(char const* filename_, GenBuffer::Readable *rd_)
 }
 void MiniPS::Parser::setSpecRuns(MiniPS::Dict *newSpecRuns) {
   if (newSpecRuns!=specRuns) {
-    if (specRunsDelete) delete0((VALUE)specRuns);
+    if (specRunsDelete) MiniPS::delete0((VALUE)specRuns);
     specRunsDelete=false;
     specRuns=newSpecRuns;
   }
@@ -792,7 +795,7 @@ MiniPS::VALUE MiniPS::Parser::parse1(int closer, int sev) {
    from_master:
     /* vvv EOF_ALLOWED means: the master cannot close our open '>' or ']' */
     if ((v=master->parse1(EOF_ALLOWED, sev))!=Qundef) return v;
-    delete0(v);
+    MiniPS::delete0(v);
     delete master;
     master=(Parser*)NULLP;
     // fprintf(stderr, "closed master\n");
@@ -814,7 +817,7 @@ MiniPS::VALUE MiniPS::Parser::parse1(int closer, int sev) {
     return Qerror; /* parse error */
    case '(': {
      beg=tok->lastTokVal().bb->begin_(); len=tok->lastTokVal().bb->getLength();
-     VALUE v=(VALUE)new String(beg, len); /* Imp: resolve memory leak here */
+     VALUE v=(VALUE)new String(beg, len);
      i=tok->yylex();
      beg=tok->lastTokVal().bb->begin_(); len=tok->lastTokVal().bb->getLength();
      if (i!='E' || len!=3 || 0!=memcmp(beg,"run",3)) { unread=i; return v; }
@@ -826,7 +829,7 @@ MiniPS::VALUE MiniPS::Parser::parse1(int closer, int sev) {
      } else {
        master=new Parser(RSTRING(v)->getCstr());  /* Open external file. */
      }
-     delete0(v);
+     MiniPS::delete0(v);
      master->setDepth(depth+1);
      master->setSpecRuns(specRuns);
      goto from_master;

@@ -262,7 +262,7 @@ WinImageRGB::WinImageRGB(CopyableImage const& other) {
     while (x--!=0) { p[2]=*ppm8_data++; p[1]=*ppm8_data++; p[0]=*ppm8_data++; p+=3; }
     p+=pad;
   }
-  delete buf;
+  delete [] buf;
 }
 
 WinImageRGB::~WinImageRGB() {
@@ -349,7 +349,9 @@ static WinFastImage *imgf=NULL;
 static HWND hwnd_main;
 /** Changed since last save? */
 static bool dirty=false;
-/** File loaded. NULL if no/new; begins with "* " for a dirty file, ": " for a normal file */
+/** File loaded. NULL if no/new; begins with "* " for a dirty file, ": " for a normal file.
+ * TODO(pts): Do `delete [] filename2;' on exit, also for other global variables.
+ */
 static char *filename2=NULL;
 static bool first_paint_p=true;
 // static char szHello[MAX_LOADSTRING];

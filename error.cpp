@@ -156,7 +156,10 @@ int Error::runCleanups(int exitCode) {
     // fprintf(stderr, "hand %p\n", first_cleanup);
     if (exitCode<(exit2=first_cleanup->handler(first_cleanup))) exitCode=exit2;
     next=first_cleanup->next;
-    delete [] (char*)first_cleanup; /* Allocated from as an array, but has no destructors. */
+    /* Allocated from as an array of char (to make space for
+     * first_cleanup->getBuf()), but has no destructors.
+     */
+    delete [] (char*)first_cleanup;
     first_cleanup=next;
   }
   return exitCode;
@@ -170,25 +173,25 @@ void Error::cexit(int exitCode) {
   #endif
 }
 
-Error::Cleanup* Error::newCleanup(Error::Cleanup::handler_t handler, void *data, slen_t size) {
+Error::Cleanup* Error::newCleanup(Error::Cleanup::handler_t handler, void *data, slen_t bufSize) {
   param_assert(handler!=0);
-  // slen_t num_packets=(size+sizeof(Cleanup)-1)/sizeof(Cleanup);
-  Cleanup *new_=(Cleanup*)new char[size+sizeof(Cleanup)]; /* new Cleanup[1+num_packets]; */
-  /* ^^^ should be a new Cleanup + new char[size]; now we can avoid alignment
+  // slen_t num_packets=(bufSize+sizeof(Cleanup)-1)/sizeof(Cleanup);
+  Cleanup *new_=(Cleanup*)new char[bufSize+sizeof(Cleanup)]; /* new Cleanup[1+num_packets]; */
+  /* ^^^ should be a new Cleanup + new char[bufSize]; now we can avoid alignment
    *     problems
    */
   new_->handler=handler;
-  new_->size=size;
+  new_->bufSize=bufSize;
   new_->data=data;
   new_->next=first_cleanup;
   first_cleanup=new_;
   return new_;
 }
 
-Error::Cleanup* Error::newCleanup(Error::Cleanup::handler_t handler, void *data, char const*cstr) {
-  slen_t slen1=strlen(cstr)+1;
-  Cleanup *new_=newCleanup(handler, data, slen1+1);
-  memcpy(new_->getBuf(), cstr, slen1);
+Error::Cleanup* Error::newCleanup(Error::Cleanup::handler_t handler, void *data, char const*bufCstr) {
+  const slen_t bufSize=strlen(bufCstr)+1;
+  Cleanup *new_=newCleanup(handler, data, bufSize);
+  memcpy(new_->getBuf(), bufCstr, bufSize);
   return new_;
 }
 

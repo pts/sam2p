@@ -1,7 +1,6 @@
 /* image.hpp -- classes for sampled (indexed, gray and rgb) images
  * by pts@fazekas.hu Wed Feb 27 09:24:47 CET 2002
  */
-/* Imp: find memory leaks */
 /* Imp: keep future transparency in toIndexed(...) */
 
 #ifdef __GNUC__

@@ -362,7 +362,8 @@ class Files {
    */
   static slen_t statSize(char const* filename);
   /** Ensures that file will be removed (if possible...) when the process
-   * terminates. Copies the string filename.
+   * terminates. Makes a copy of the filename array, it won't use filename
+   * after returning.
    */
   static void tmpRemoveCleanup(char const* filename);
   /** Ensures that file will be removed (if possible...) when the process
