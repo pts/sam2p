@@ -39,12 +39,19 @@ $ENV{LC_ALL} = "C";
 
 # ---
 
+# Returns true iff the passed filename is a C or C++ source file (and not .o
+# or .h or anything else).
+sub is_ds($) {
+  my $FN = $_[0];
+  return $FN =~ /\.(c(|c|xx|pp|[+][+])|C)\Z(?!\n)/;
+}
+
 sub find_ds() {
   #** @return a list of .ds file in the current directory
   my @L;  my $E;
   die unless opendir DIR, '.';
   while (defined($E=readdir DIR)) {
-    push @L, $E if $E=~/\.(c(|c|xx|pp|[+][+])|C)\Z(?!\n)/ and -f $E;
+    push @L, $E if is_ds($E) and -f $E;
   }
   @L
 }
@@ -153,8 +160,6 @@ if ($R!~/#\s*warning\s/) {
 
 $R =~ s@\\\n@@g;  # Merge line continuations emitted by `gcc -M -MG'.
 
-## die $R;
-
 #** $idep{"x.ds"} contains the the dependency line for x.ds
 my %idep;
 #** $odep{"x.o"} is "x.ds"
@@ -168,15 +173,21 @@ while ($R=~/\G(.*)\n?/g) {
 
   if (!length$S) {
   } elsif ($S=~/\AIn file included from (?:[.]\/)*([^:]+)/) {
-    $included_from=$1;  # Bottommost includer.
+    # If foo.cpp includes foo.hpp, which includes bar.hpp, then
+    # clang++-3.4 emits these in a row: foo.cpp, ./foo.hpp, and no bar.hpp.
+    # We want to keep only foo.cpp, hence we check
+    # `if !defined($included_from)'.
+    $included_from=$1 if !defined($included_from);
+      # Bottommost includer.
   } elsif ($S=~/\A\s{3,}from (?:[.]\/)*([^:]+)/) {  # From gcc-3.2.
     $included_from=$1;  # Higher includer, we override the previous one, because we need the topmost one.
-  } elsif ($S=~/\A([^:]+):\d+:(\d+:)? warning: #warning (NULL-PROVIDES|PROVIDES|CONFLICTS|REQUIRES):(.*)\Z/ or
-           $S=~/\A([^:]+):\d+:(\d+:)? warning: (NULL-PROVIDES|PROVIDES|CONFLICTS|REQUIRES):(.*)/) {
+  } elsif ($S=~/\A(?:[.]\/)*([^:]+):\d+:(\d+:)? warning: (?:#warning )?(NULL-PROVIDES|PROVIDES|CONFLICTS|REQUIRES):(.*)\Z/) {
     # ^^^ (\d+:)? added for gcc-3.1
     # ^^^ clang: appliers.cpp:554:6: warning: REQUIRES: out_gif.o [-W#warnings]
     my($DS,$B)=($1,$3);  # $B is e.g. 'PROVIDES'.
     if (defined $included_from) { $DS=$included_from; undef $included_from }
+    die "$0: #include detection broken: expected non-header source file, got: $DS\n" if
+        not is_ds($DS);
     for my $feature (split ' ',$4) {
       if ($feature !~ m@\A\[-W@) {  # g++-4.8 generates extra [-Wcpp] lines.
         push @instructions, [$DS, $B, $feature];
