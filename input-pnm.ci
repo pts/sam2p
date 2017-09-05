@@ -207,7 +207,7 @@ bitmap_type pnm_load_image (at_string filename)
       return (bitmap);
     }
   #endif
-    
+
 
   /* allocate the necessary structures */
   /* pnminfo = (PNMInfo *) malloc (sizeof (PNMInfo)); */
@@ -219,7 +219,7 @@ bitmap_type pnm_load_image (at_string filename)
   scan = pnmscanner_create(fd);
 
   /* Get magic number */
-  pnmscanner_gettoken (scan, (unsigned char *)buf, PNM_BUFLEN); 
+  pnmscanner_gettoken (scan, (unsigned char *)buf, PNM_BUFLEN);
   if (pnmscanner_eof(scan))
     FATALP ("PNM: premature end of file");
   if (buf[0] != 'P' || buf[2])
@@ -237,14 +237,14 @@ bitmap_type pnm_load_image (at_string filename)
   if (!pnminfo->loader)
       FATALP ("PNM: file not in a supported format");
 
-  pnmscanner_gettoken(scan, (unsigned char *)buf, PNM_BUFLEN); 
+  pnmscanner_gettoken(scan, (unsigned char *)buf, PNM_BUFLEN);
   if (pnmscanner_eof(scan))
     FATALP ("PNM: premature end of file");
   pnminfo->xres = isdigit(*buf)?atoi(buf):0;
   if (pnminfo->xres<=0)
     FATALP ("PNM: invalid xres while loading");
 
-  pnmscanner_gettoken(scan, (unsigned char *)buf, PNM_BUFLEN); 
+  pnmscanner_gettoken(scan, (unsigned char *)buf, PNM_BUFLEN);
   if (pnmscanner_eof(scan))
     FATALP ("PNM: premature end of file");
   pnminfo->yres = isdigit(*buf)?atoi(buf):0;
@@ -283,7 +283,7 @@ bitmap_type pnm_load_image (at_string filename)
 
   /* close the file */
   /* xfclose (fd, filename); */
-  
+
   return (bitmap);
 }
 
@@ -450,7 +450,7 @@ pnmscanner_destroy (PNMScanner *s)
 {
   XFREE(s);
 }
-	    
+
 #if 0 /**** pts ****/
 /* pnmscanner_createbuffer ---
  *    Creates a buffer so we can do buffered reads.

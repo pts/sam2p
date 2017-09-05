@@ -97,7 +97,7 @@ int MiniPS::Tokenizer::yylex() {
   double d;
   Real::metric_t metric;
   char saved;
-  
+
   if (ungot==EOFF) return EOFF;
   if (ungot!=NO_UNGOT) { c=ungot; ungot=NO_UNGOT; goto again; }
  again_getcc:
@@ -159,7 +159,7 @@ int MiniPS::Tokenizer::yylex() {
         if (c<'0' || c>'7') { b << (char)hv; goto redo; }
         b << (char)(8*hv+(c-'0'));
       } /* SWITCH */
-    } /* WHILE */    
+    } /* WHILE */
     uf_str: Error::sev(Error::EERROR) << "miniPS: unfinished str" << (Error*)0;
    case '/':
     /* fall-through, b will begin with '/' */
@@ -179,7 +179,7 @@ int MiniPS::Tokenizer::yylex() {
     if (!toReal(b, d)) { /* tv.bb is also valid */
       tv.r=new Real(d, b(), len);
       return '.';
-    } 
+    }
     if (len>2 && (metric=Real::str2metric(b()+len-2))!=Real::ME_COUNT) {
       saved=b[len-2];
       b[len-2]='\0';
@@ -403,7 +403,7 @@ void MiniPS::Array::dump(GenBuffer::Writable &out_, unsigned indent) {
     // spaces[indent]='\n';
     out_ << "[ % " << len << " elements\n";
     VALUE *p=(VALUE*)ptr, *pend=p+len;
-    while (p!=pend) { 
+    while (p!=pend) {
       out_.vi_write(spaces, indent);
       MiniPS::dump(out_, *p++, indent);
       /*if(p!=pend)*/ out_ << "\n";
@@ -675,7 +675,7 @@ void MiniPS::Dict::dump(GenBuffer::Writable &out_, unsigned indent, bool dump_de
     // spaces[indent]='\n';
     if (dump_delimiters) out_ << "<< % " << (len/2) << " key(s)\n";
     VALUE *p=(VALUE*)ptr, *pend=p+len;
-    while (p!=pend) { 
+    while (p!=pend) {
       out_.vi_write(spaces, indent);
       MiniPS::dump(out_, *p++, indent);
       out_ << "  ";
@@ -807,7 +807,7 @@ MiniPS::VALUE MiniPS::Parser::parse1(int closer, int sev) {
     i=unread;
     unread=Tokenizer::NO_UNGOT;
   } else i=tok->yylex();
-  
+
   // fprintf(stderr, "i=%d i='%c'\n", i, i);
 
   switch (i) {

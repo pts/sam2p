@@ -528,7 +528,7 @@ T closefile
         ASSERT_STACK(-str -str -str -int,(20b))
         exit % exit(W1)
       }if
-      
+
       dup mEOD INT_GT{
         /* Process normal data code (either literal or above-mEOD) in `code` */
         % Stack: len++ code
@@ -596,7 +596,7 @@ T closefile
         ASSERT_STACK(-str -str -int -int,(14))
         exit % exit(W1)
       }if
-      
+
       ASSERT_TRUE(dup mClear INT_EQ,(code==mClear))
       pop Fclear
       % Stack: len++

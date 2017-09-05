@@ -1,5 +1,5 @@
 /*
- * in_jai.cpp -- read a JPEG file as-is 
+ * in_jai.cpp -- read a JPEG file as-is
  * by pts@math.bme.hu at Sun Mar 17 20:15:25 CET 2002
  */
 /* Imp: test this code with various JPEG files! */
@@ -96,7 +96,7 @@ Image::Gray   * JAI::toGray(unsigned char) { assert(0); return 0; }
 #define M_SOF13 0xCD
 #define M_SOF14 0xCE
 #define M_SOF15 0xCF
-#define M_SOI   0xD8  
+#define M_SOI   0xD8
 #define M_EOI   0xD9			/* End Of Image (end of datastream) */
 #define M_SOS   0xDA			/* Start Of Scan (begins compressed data) */
 #define M_APP0  0xe0
@@ -126,14 +126,14 @@ static unsigned int jai_next_marker(FILE *fp)
 #if 0 /**** pts ****/
   /* skip unimportant stuff */
   c = MACRO_GETC(fp);
-  while (c != 0xff) { 
+  while (c != 0xff) {
     if ((c = MACRO_GETC(fp)) == EOF)
       return M_EOI; /* we hit EOF */
   }
 #else
   if (0xff!=(c=MACRO_GETC(fp))) return M_EOI;
 #endif
-    
+
 
   /* get marker byte, swallowing possible padding */
   do {
@@ -175,7 +175,7 @@ void jai_parse_jpeg(struct jai_gfxinfo *result, DecoderTeller *fp, bool must_be_
   int c;
   unsigned int length;
   unsigned char had_adobe;
-  
+
   result->bad=9; /* signal invalid return value */
   result->id_rgb=0;
   result->had_jfif=0;
@@ -189,7 +189,7 @@ void jai_parse_jpeg(struct jai_gfxinfo *result, DecoderTeller *fp, bool must_be_
   if (c!=M_SOI) return;
 
   result->bad=1;
-  // fprintf(stderr, "welcome ofs=%ld\n", fp->vi_tell()); 
+  // fprintf(stderr, "welcome ofs=%ld\n", fp->vi_tell());
   while (1) {
    if ((c=fp->vi_getcc())!=0xFF) { result->bad=8; return; }
    while ((c=fp->vi_getcc())==0xFF) ;
@@ -298,7 +298,7 @@ void jai_parse_jpeg(struct jai_gfxinfo *result, DecoderTeller *fp, bool must_be_
       length -= 2;        /* length includes itself */
       #if 0 /**** pts: fseek would disturb later ftell()s and feof()s */
         fseek(fp, (long) length, SEEK_CUR);  /* skip the header */
-      #else 
+      #else
         while (length--!=0) fp->vi_getcc(); /* make feof(fp) correct */
       #endif
     }

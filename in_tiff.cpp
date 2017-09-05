@@ -55,7 +55,7 @@ static Image::Sampled *in_tiff_reader(Image::Loader::UFD *ufd, SimBuffer::Flat c
 static Image::Loader::reader_t in_tiff_checker(char buf[Image::Loader::MAGIC_LEN], char [Image::Loader::MAGIC_LEN], SimBuffer::Flat const&, Image::Loader::UFD*) {
   /* MM\x00\x2a: TIFF image data, big-endian
    * II\x2a\x00: TIFF image data, little-endian
-   * The second word of TIFF files is the TIFF version number, 42, which has 
+   * The second word of TIFF files is the TIFF version number, 42, which has
    * never changed.  The TIFF specification recommends testing for it.
    */
   return (0==memcmp(buf,"MM\x00\x2a",4) || 0==memcmp(buf,"II\x2a\x00",4)) ? in_tiff_reader : 0;

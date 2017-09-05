@@ -49,7 +49,7 @@ static const unsigned char
 #define M_SOF13 0xCD
 #define M_SOF14 0xCE
 #define M_SOF15 0xCF
-#define M_SOI   0xD8  
+#define M_SOI   0xD8
 #define M_EOI   0xD9			/* End Of Image (end of datastream) */
 #define M_SOS   0xDA			/* Start Of Scan (begins compressed data) */
 #define M_COM   0xFE                    /* comment */
@@ -91,7 +91,7 @@ static unsigned int jai_next_marker(FILE *fp)
 
   c = MACRO_GETC(fp);
 
-  while (c != 0xff) { 
+  while (c != 0xff) {
     if ((c = MACRO_GETC(fp)) == EOF)
       return M_EOI; /* we hit EOF */
   }
@@ -110,7 +110,7 @@ static void jai_skip_variable(FILE *fp)
    /* skip over a variable-length block; assumes proper length marker */
 {
   unsigned short length;
-  
+
   printf("%lu: skip variable\n", ftell(fp));
 
   length = jai_read2(fp);
@@ -138,7 +138,7 @@ struct gfxinfo {
 static void jai_handle_jpeg(struct gfxinfo *result, FILE *fp) {
   unsigned int length, marker;
   unsigned char had_adobe, id, hvs, qtn;
-  
+
   result->bad=1; /* signal invalid return value */
   result->id_rgb=0;
   result->had_jfif=0;

@@ -188,12 +188,12 @@ static size_t dopr(char *buffer, size_t maxlen, P_CONST char *format, va_list ar
 	int flags;
 	int cflags;
 	size_t currlen;
-	
+
 	state = DP_S_DEFAULT;
 	currlen = flags = cflags = min = 0;
 	max = -1;
 	ch = *format++;
-	
+
 	while (state != DP_S_DONE) {
 		if (ch == '\0')
 			state = DP_S_DONE;
@@ -430,7 +430,7 @@ static size_t dopr(char *buffer, size_t maxlen, P_CONST char *format, va_list ar
 		else if (maxlen > 0)
 			buffer[maxlen - 1] = '\0';
 	}
-	
+
 	return currlen;
 }
 
@@ -453,7 +453,7 @@ static void fmtstr(char *buffer, size_t *currlen, size_t maxlen,
 		padlen = 0;
 	if (flags & DP_F_MINUS)
 		padlen = -padlen; /* Left Justify */
-	
+
 	while ((padlen > 0) && (cnt < max)) {
 		dopr_outch (buffer, currlen, maxlen, ' ');
 		--padlen;
@@ -482,12 +482,12 @@ static void fmtint(char *buffer, size_t *currlen, size_t maxlen,
 	int spadlen = 0; /* amount to space pad */
 	int zpadlen = 0; /* amount to zero pad */
 	int caps = 0;
-	
+
 	if (max < 0)
 		max = 0;
-	
+
 	uvalue = value;
-	
+
 	if(!(flags & DP_F_UNSIGNED)) {
 		if( value < 0 ) {
 			signvalue = '-';
@@ -562,14 +562,14 @@ static LDOUBLE abs_val(LDOUBLE value)
 
 	if (value < 0)
 		result = -value;
-	
+
 	return result;
 }
 
 static LDOUBLE POW10(int exp)
 {
 	LDOUBLE result = 1;
-	
+
 	while (exp) {
 		result *= 10;
 		exp--;
@@ -585,7 +585,7 @@ static LLONG ROUND(LDOUBLE value)
 	intpart = (LLONG)value;
 	value = value - intpart;
 	if (value >= 0.5) intpart++;
-	
+
 	return intpart;
 }
 
@@ -685,7 +685,7 @@ static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 	my_modf(temp, &intpart);
 
 	fracpart = ROUND((POW10(max)) * (ufvalue - intpart));
-	
+
 	if (fracpart >= POW10(max)) {
 		intpart++;
 		fracpart -= POW10(max);
@@ -731,7 +731,7 @@ static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 		padlen = 0;
 	if (flags & DP_F_MINUS)
 		padlen = -padlen; /* Left Justifty */
-	
+
 	if ((flags & DP_F_ZERO) && (padlen > 0)) {
 		if (signvalue) {
 			dopr_outch (buffer, currlen, maxlen, (char)signvalue);
@@ -749,7 +749,7 @@ static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 	}
 	if (signvalue)
 		dopr_outch (buffer, currlen, maxlen, (char)signvalue);
-	
+
 	while (iplace > 0)
 		dopr_outch (buffer, currlen, maxlen, iconvert[--iplace]);
 
@@ -763,11 +763,11 @@ static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 	 */
 	if (max > 0) {
 		dopr_outch (buffer, currlen, maxlen, '.');
-		
+
 		while (fplace > 0)
 			dopr_outch (buffer, currlen, maxlen, fconvert[--fplace]);
 	}
-	
+
 	while (zpadlen > 0) {
 		dopr_outch (buffer, currlen, maxlen, '0');
 		--zpadlen;
@@ -813,7 +813,7 @@ static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c)
  sizeret_t vasprintf(char **ptr, P_CONST char *format, va_list ap)
 {
 	size_t ret;
-	
+
 	ret = vsnprintf((char*)NULL, 0, format, ap);
 	if (ret+1 <= 1) return ret; /* pts: bit of old unsigned trick... */
 
@@ -830,7 +830,7 @@ static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c)
 {
 	va_list ap;
 	sizeret_t ret;
-	
+
 	PTS_va_start(ap, format);
 	ret = vasprintf(ptr, format, ap);
 	va_end(ap);
@@ -845,7 +845,7 @@ static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c)
 {
 	va_list ap;
 	sizeret_t ret;
-	
+
 	PTS_va_start(ap, format);
 #if 0
 	ret = vsnprintf(NULL, 0, format, ap);
@@ -853,7 +853,7 @@ static void dopr_outch(char *buffer, size_t *currlen, size_t maxlen, char c)
 	ret = vsnprintf(ptr, ret, format, ap);
 #else
 	ret = vsnprintf(ptr, (slen_t)-1, format, ap);
-#endif	
+#endif
 	va_end(ap);
 
 	return ret;

@@ -957,7 +957,7 @@ indexed-2:
 	-- users with a PSL1 printer without PSLC should use transparent-*
 indexed-4:
 	PSL2, PDF1.0??
-	PSLC	
+	PSLC
 	5..16 non-transparent colors or 1..4 non-transparent colors
 	-- display a Warning if only 1..4 non-transparent colors, because
 	   opaque, indexed-1 or indexed-2 would be a better choice

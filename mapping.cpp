@@ -211,7 +211,7 @@ static slen_t const d15_primes[]= {
   3672593UL, 5508913UL, 8263373UL, 12395069UL, 18592631UL, 27888947UL, 41833427UL,
   62750147UL, 94125247UL, 141187901UL, 211781873UL, 317672813UL, 476509223UL,
   714763843UL, 1072145771UL, 1608218669UL, 2412328031UL, 3618492049UL,
-#if SIZEOF_SLEN_T>=8  
+#if SIZEOF_SLEN_T>=8
   5427738097UL, 8141607167UL, 12212410753UL, 18318616157UL, 27477924239UL,
   41216886467UL, 61825329719UL, 92737994593UL, 139106991917UL, 208660487887UL,
   312990731839UL, 469486097807UL, 704229146717UL, 1056343720093UL,
@@ -267,7 +267,7 @@ void Mapping::DoubleHash15::vi_scale() {
 
   /* Dat: we respect only `len', not used. */
   /* Imp: make calculation of scale relative to previous one */
-  
+
   scale=0; while (1) {
     // printf("xscale=%u\n", scale);
     if (0==(alloced=(d15_primes+2)[scale])) { assert(0); abort(); } /* Imp: better overflow reporting */

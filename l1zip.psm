@@ -567,7 +567,7 @@ SLOCAL_VAR0(WORD,past)
 /** Reads an uint16 from the ZIP file */
 #define fxRead16z fxRead16
 
-/** 
+/**
  * Allocates a new node and initializes it with empty content. This function
  * lets us get rid of the global variable F (which was buggily uninitialized
  * in the original scm.c).
@@ -923,7 +923,7 @@ SLOCAL_VAR0(NODEN,h)
     -1 exit % don''t return yet
   }loop
   % Stack: retval||-1
-    
+
   { % big-big MODE_MOB||MODE_BOB||MODE_BOS loop
    #ifndef NDEBUG
     % mode ===only ( big-big\n) print
@@ -943,7 +943,7 @@ SLOCAL_VAR0(NODEN,h)
        * arbitrary length (terminated by an entry of 256).
        */
       % /* vvv reads 0..15 bits, see subsubsection 3.2.7 of RFC 1951 */
-      { 
+      {
         % Dat: most of the time is spent inside fvDescend, fvRead and
         %      inside this loop
         v fvDescend dup 256 INT_EQ{pop -1 exit}if  % WHILE(NE(oo, 256))
@@ -1028,7 +1028,7 @@ SLOCAL_VAR0(NODEN,h)
       exit}if  pop
 
     DEBUG2((;)===)
-    
+
     mode MODE_BOB INT_EQ{  % WHILE(EQ(mode,MODE_BOB)); mode_bob:
       DEBUG(counttomark 42 string cvs)
       DEBUG(( kope\n))
@@ -1206,7 +1206,7 @@ SLOCAL_VAR0(NODEN,h)
         % N 3 NULL put  N 4 NULL put  N 5 0 put  % ASET(N,3,NULL); ASET(N,4,NULL); ASET(N,5,0); /* the Sentinel node is initially empty */
         constZ19 N copy pop % eliminate-NULLs trick: overwrites 1st >=6 elements of N
         /Dvar 6 def  % SET(Dvar,6); /* first free node is 6. `0' is NULL, `3' is Sentinel */
-        6{  % SET(o,Dvar); 
+        6{  % SET(o,Dvar);
           dup NODESIZE ge{pop exit}if  % WHILE (LT(o,NODESIZE))
           dup N exch dup 3 add put  1 add  % ASET(N,o,o+3);  INCR(o); /* next free node is next node */
           dup N exch NULL      put  1 add  % ASET(N,o,NULL); INCR(o); /* empty RIGHT */
@@ -1244,7 +1244,7 @@ SLOCAL_VAR0(NODEN,h)
                 /f   fxRead16z def  % SET(f,  fxRead16z());  /* lower compressed file size */
                 /oP fxRead16z def  % SET(oP,fxRead16z()); /* higher compressed file size */
                 4 fxIgnore8 % fxRead16 pop  fxRead16 pop % IGNORE fxRead16(); IGNORE fxRead16(); /* uncompressed file size */
-                fxRead16z      % SET(oO,fxRead16z()); /* length of filename */      
+                fxRead16z      % SET(oO,fxRead16z()); /* length of filename */
                 fxRead16z add  % SET(q,fxRead16z()); /* length of extra field */
                 % WHILE(NZ(oO)) IGNORE fxRead8(); DECR(oO); ENDWHILE /* file name */
                 % WHILE(NZ(q)) IGNORE fxRead8(); DECR(q); ENDWHILE /* extra field */
@@ -1270,7 +1270,7 @@ SLOCAL_VAR0(NODEN,h)
                       fxRead16z      % SET(f,fxRead16z()); /* LEN: length of file name */
                       fxRead16z add  % SET(o,fxRead16z()); /* XLN: length of extra field */
                       fxRead16z add  % SET(q,fxRead16z()); /* CML: length of file comment */
-                      % fxRead16 pop  fxRead16 pop  fxRead16 pop 
+                      % fxRead16 pop  fxRead16 pop  fxRead16 pop
                       % fxRead16 pop  fxRead16 pop  fxRead16 pop
                       % ^^^ SET(oO,0); WHILE(LT(oO,12)) IGNORE fxRead8(); INCR(oO); ENDWHILE
                       12 fxIgnore8
@@ -1280,7 +1280,7 @@ SLOCAL_VAR0(NODEN,h)
                       %     WHILE(NZ(q)) IGNORE fxRead8(); DECR(q); ENDWHILE /* file comment */
                     }if % o==1
                   }ifelse % o==5
-                }ifelse % o==7 
+                }ifelse % o==7
               }ifelse % o==3   % ENDIF /* IF ZIP structure sub-type */
               % Stack: tY_old o
               pop
@@ -1288,7 +1288,7 @@ SLOCAL_VAR0(NODEN,h)
               dup 31 INT_EQ{  % ELSE_IF(EQ(tY,31)) /* gzip/RFC 1952 format */
                 /* fprintf(stderr,"gzip!\n"); */
                 /* SET(tY,FMT_GZIP); */
-                /* The most simple gzip header (10 bytes): 
+                /* The most simple gzip header (10 bytes):
                  * ID1   hex 0x1f == dec 31 == FMT_GZIP
                  * ID2   hex 0x8b
                  * CM    hex 0x08
@@ -1323,7 +1323,7 @@ SLOCAL_VAR0(NODEN,h)
                   {fxRead8 0 INT_EQ{exit}if}loop  % WHILE(NZ(fxRead8())); PASS; ENDWHILE
                 }if  % ENDIF /* ignore FCOMMENT */
                 dup 32 and 0 INT_NE{  % IF(TAND_P(o,32)) /* skip encryption header */
-                  % fxRead16 pop  fxRead16 pop  fxRead16 pop 
+                  % fxRead16 pop  fxRead16 pop  fxRead16 pop
                   % fxRead16 pop  fxRead16 pop  fxRead16 pop
                   % SET(f,0); WHILE(LT(f,12)) IGNORE fxRead8(); INCR(f); ENDWHILE
                   12 fxIgnore8

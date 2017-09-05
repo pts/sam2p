@@ -80,7 +80,7 @@ static unsigned int GIFEncodeImage(GenBuffer::Writable& out, char const*ppbeg, r
   register int
     displacement,
     k;
-    
+
   register char const*pp;
 
   short
@@ -245,14 +245,14 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
   unsigned i, c, bits_per_pixel;
   signed transp;
   char hd[19];
-  
+
   assert(img->getBpc()==8); /* 1 palette entry == 8 bits */
-  
+
   transp=img->getTransp();
   memcpy(hd, transp!=-1 ? "GIF89a" : "GIF87a", 6);
   i=img->getWd(); hd[6]=i; hd[7]=i>>8;
   i=img->getHt(); hd[8]=i; hd[9]=i>>8;
-  
+
   // transp=-1; /* With this, transparency will be ignored */
   c=img->getNcols();
   bits_per_pixel=1; while (((c-1)>>bits_per_pixel)!=0) bits_per_pixel++;
@@ -260,10 +260,10 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
   /* 63 -> 6, 64 -> 6, 65 -> 7 */
   // if (bits_per_pixel>1) bits_per_pixel--; /* BUGFIX at Wed Apr 30 15:55:27 CEST 2003 */ /* BUGFIX at Mon Oct 20 15:18:14 CEST 2003 */
   // fprintf(stderr, "GIF89 write transp=%d ncols=%d bpp=%d\n", transp, c, bits_per_pixel);
-  assert(1<=bits_per_pixel && bits_per_pixel<=8); 
+  assert(1<=bits_per_pixel && bits_per_pixel<=8);
   c=3*((1<<bits_per_pixel)-c);
   /* Now: c is the number of padding bytes */
-  
+
   hd[10]= 0x80 /* have global colormap */
         | ((8-1) << 4) /* color resolution: bpc==8 */
         | (bits_per_pixel-1); /* size of global colormap */
@@ -272,7 +272,7 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
   out.vi_write(hd, 13);
 
   // out.vi_write("\xFF\x00\x00" "\x00\xFF\x00" "\x00\x00\xFF", 9);
-  
+
   out.vi_write(img->getHeadp(), img->getRowbeg()-img->getHeadp()); /* write colormap */
   if (c!=0) {
     char *padding=new char[(unsigned char)c]; /* BUGFIX at Fri Oct 17 18:05:09 CEST 2003 */
@@ -290,7 +290,7 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
     hd[7]=0;
     out.vi_write(hd, 8);
   }
-  
+
   /* Write image header */
   hd[8]=',';
   hd[ 9]=hd[10]=0;   /* left */
@@ -298,7 +298,7 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
   i=img->getWd(); hd[13]=i; hd[14]=i>>8;
   i=img->getHt(); hd[15]=i; hd[16]=i>>8;
   hd[17]=0; /* no interlace, no local colormap, no bits in local colormap */
-  
+
   if ((c=bits_per_pixel)<2) c=4;
   hd[18]=c; /* compression bits_per_pixel */
   out.vi_write(hd+8, 11);
@@ -315,7 +315,7 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
     putc(p[2],f);
   }
 #endif
-  
+
   i=GIFEncodeImage(out, img->getRowbeg(), img->getRowbeg()+img->getRlen()*img->getHt(), c+1);
 #if 0
   { char buf[500000];
@@ -327,7 +327,7 @@ void out_gif_write(GenBuffer::Writable& out, Image::Indexed *img) {
   }
 #endif
   assert(i!=0);
-  
+
   /* Write trailer */
   hd[0]=0; hd[1]=';';
   out.vi_write(hd, 2);

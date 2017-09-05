@@ -207,7 +207,7 @@ void Filter::FILEE::close() {
 }
 
 /* --- */
-       
+
 static FILE* fopenErr(char const* filename, char const* errhead) {
   FILE *f;
   if (NULLP==(f=fopen(filename,"rb")))
@@ -503,7 +503,7 @@ Filter::PipeE::PipeE(GenBuffer::Writable &out_, char const*pipe_tmpl, slendiff_t
   if (tmpename) Files::tmpRemoveCleanup(tmpename()); /* already term0() */
   if (tmpsname) Files::tmpRemoveCleanup(tmpsname()); /* already term0() */
   /* </code similarity: Filter::PipeE::PipeE and Filter::PipeD::PipeD> */
-  
+
   // fprintf(stderr, "rc: (%s)\n", redir_cmd());
 
  #if HAVE_PTS_POPEN

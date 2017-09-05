@@ -175,7 +175,7 @@ int GenBuffer::cmp(GenBuffer const& s2) const {
     if (0==(u2.len-=m)) s2.next_sub(u2); else u2.beg+=m;
   }
 }
-  
+
 int GenBuffer::cmp(char const* u2beg, slen_t u2len) const {
   Sub u1;
   slen_t m;
@@ -484,9 +484,9 @@ char *SimBuffer::Linked::vi_mkend(slen_t len) {
   n->beg=(char*)(n+1);
   n->len=len;
   n->next=0;
-  if (last==0) first=last=n; 
+  if (last==0) first=last=n;
           else { last->next=n; last=n; }
-  return n->beg;          
+  return n->beg;
 }
 char *SimBuffer::Linked::vi_mkbeg(slen_t len) {
   Node *n=static_cast<Node*>(static_cast<void*>(new char[sizeof(Node)+len]));
@@ -640,7 +640,7 @@ SimBuffer::B::B(SimBuffer::Flat const& other,int): alloced(sizeof(small)) {
 SimBuffer::B::B(SimBuffer::Flat const& other, slen_t from_offset, slen_t len_): alloced(sizeof(small)) {
   /* substr */
   beg=small;
-  if (from_offset<other.len) { 
+  if (from_offset<other.len) {
     if (from_offset+len_>other.len) len_=other.len-from_offset;
     if (len_>sizeof(small)) { len=0; vi_grow2(0, len_, 0, 0); }
                        else len=len_;
@@ -666,7 +666,7 @@ SimBuffer::B::B(GenBuffer::Readable &other): alloced(sizeof(small)) {
   operator <<(other);
 #else
   B_append(other);
-#endif  
+#endif
 }
 
 SimBuffer::B::B(char const* as,slen_t al, char const* bs,slen_t bl): alloced(sizeof(small)) {
@@ -1076,7 +1076,7 @@ SimBuffer::B& SimBuffer::B::appendUnslash(const SimBuffer::Flat &other, int iniq
       rlen++; left-=2;
     }
   }
-  
+
   char *dst; vi_grow2(0, rlen, 0, &dst);
   unsigned tmp1, tmp2;
   left=other.len; p=other.beg;
@@ -1133,7 +1133,7 @@ SimBuffer::B& SimBuffer::B::appendUnslash(const SimBuffer::Flat &other, int iniq
       // if (0!=left--) { *dst++=(*p++); left--; } /* already escaped 1 */
     }
   }
-  return*this;  
+  return*this;
 }
 
 void SimBuffer::B::space_pad_cpy(char *dst, char const*src, slen_t pad) {

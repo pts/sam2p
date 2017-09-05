@@ -9,7 +9,7 @@
 #pragma interface
 #endif
 #endif
- 
+
 #include "config2.h"
 
 #define CRC32_INITIAL ((unsigned PTS_INT32_T)0)

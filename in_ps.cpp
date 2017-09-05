@@ -153,7 +153,7 @@ static Image::Sampled *in_eps_reader(Image::Loader::UFD* ufd, SimBuffer::Flat co
     Error::sev(Error::WARNING) << "in_eps_reader: missing EPS bbox" << (Error*)0;
     bboxline[0]='\0';
   }
-  
+
   return in_ps_reader_low(ufd, bboxline, hints);
 }
 

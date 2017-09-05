@@ -61,7 +61,7 @@ static void test_data() {
        << i << " luftballons.\n"
        << -99U << " negatives.\n";
   sout << (world >= "FooBar") << '\n'; /// true
-  
+
   { bool b=true;
     SimBuffer::Linked sli; sli << (world>"Zorba");
     sli.toBool(b);
@@ -76,7 +76,7 @@ static void test_data() {
   lj.prepend("D.A said: ",10);
   sout << li; /// The answer is 42
   sout << lj; /// D.A said: The answer is 42
-  
+
   { Buffer b="Hello!\n"; /* <= 8 chars */
     sout << b;
   }
@@ -141,7 +141,7 @@ static void test_image() {
 
 static void test_encoder() {
   // Files::tmpRemove=false; /* Imp: make this a command-line option */
-  
+
   { Filter::FILEE a("t.a85");
     PSEncoder *bp=PSEncoder::newASCII85Encode(a,78);
     // FlateEncode c(b,5);
@@ -153,11 +153,11 @@ static void test_encoder() {
       PSEncoder *cp=PSEncoder::newRunLengthEncode(*bp);
       // delete [] cp; exit(0); /* Cannot free a GSEncode with multiple inheritance :-(( -> SegFault. virtual inheritance SUXX */
       // PSEncoder *cp=PSEncoder::newRunLengthEncode(a);
-      
+
       // FILE *fin=fopen("t55","rb");
       FILE *fin=fopen("t.dump","rb");
       // FILE *fin=fopen("t.xin","rb");
-      
+
       static char mybuf[2033];
       unsigned long sum=0;
       while (1) {
@@ -182,7 +182,7 @@ static void test_encoder() {
       cp->vi_write(img->getRowbeg(), img->getWd()*img->getHt());
       cp->vi_write(0,0);
     #endif
-    
+
     delete cp;
     delete bp;
   }
@@ -281,7 +281,7 @@ static void test_hash() {
   printf("korte=%s.\n", h.get("korte",5));
   }
 
-  /* Dat: this might take a long time to run */  
+  /* Dat: this might take a long time to run */
   /* Imp: srand, but that would make the test less predictable */
   char tmp[2];
   unsigned i, j;
@@ -292,7 +292,7 @@ static void test_hash() {
     if ((rand()&3)!=0) h.set(tmp, sizeof(tmp), tmp);
                   else h.deletee(tmp, sizeof(tmp));
     // putchar('.');
-    // h.rehash();                   
+    // h.rehash();
   }
   printf("OK!\n");
 }
@@ -316,7 +316,7 @@ static void test_decoder() {
 int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
-  
+
   Error::argv0=argc>=1 ? argv[0] : "test_main"; /* Imp: update this */
   Error::tmpargv0="test_main";
   Files::tmpRemove=0;

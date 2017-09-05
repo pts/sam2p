@@ -18,7 +18,7 @@
 #include "gensio.hpp"
 #include "input-pnm.ci"
 #include <string.h>
-		    
+
 static Image::Sampled *in_pnm_reader(Image::Loader::UFD* ufd, SimBuffer::Flat const&) {
   Image::Sampled *ret=0;
   #if 0
@@ -45,7 +45,7 @@ static Image::Sampled *in_pnm_reader(Image::Loader::UFD* ufd, SimBuffer::Flat co
     // Error::sev(Error::NOTICE) << "PNM: loading alpha after PNM: "
     //   " ftell=" << ftell(f) <<
     //  " bytes=" << ((unsigned)bitmap.width*bitmap.height*bitmap.np)  << (Error*)0;
-    bitmap=pnm_load_image(ufdd); 
+    bitmap=pnm_load_image(ufdd);
     // fwrite(bitmap.bitmap,1,(unsigned)bitmap.width*bitmap.height*bitmap.np,stdout);
     /* Dat: black pixel is transparent */
     if (BITMAP_PLANES(bitmap)!=1) Error::sev(Error::EERROR) << "PNM: alpha must be PBM or PGM" << (Error*)0;

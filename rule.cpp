@@ -101,7 +101,7 @@ static class ValueDeleter {
 static const slen_t SampleFormat_MAXLEN=32;
 static void init_dicts() {
   register MiniPS::Dict*y;
- 
+
   /** TODO: Make this thread-safe. */
   if (y_FileFormat!=NULLP) return;
 
@@ -386,7 +386,7 @@ void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
   }
   //MiniPS::dump(Predictor);
   // fprintf(stderr,"cpred=%u\n", cache.Predictor);
-  
+
   if ((MiniPS::VALUE)dictHints==MiniPS::Qnull) dict->put("/Hints", (MiniPS::VALUE)(dictHints=new MiniPS::Dict()));
   MiniPS::scanf_dict((MiniPS::VALUE)dictHints, /*show_warnings:*/true,
     "EncoderBPL",      MiniPS::S_PINTEGER,MiniPS::Qinteger(0),   &EncoderBPL,
@@ -807,7 +807,7 @@ void Rule::writeTTE(
   p=template_;
   bool nzp, scp;
   SimBuffer::B scf;
-  while (1) {  
+  while (1) {
     assert(template_==p);
     while (*p!='`' && *p!='\0') p++; /* '`' is the escape character */
     if (p!=template_) out.vi_write(template_, p-template_);
@@ -890,7 +890,7 @@ void Rule::writeTTE(
      case 'O': /* 0..1 /Decode values */
       i=1;
       emit_Decode:
-      j=img->getCpp(); 
+      j=img->getCpp();
       out << "0 " << i;
       while (j--!=1) out << " 0 " << i;
       break;

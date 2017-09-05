@@ -408,7 +408,7 @@ dnl defines ac_cv_pts_string_header
   if test x"$ac_cv_pts_strcpy_in_string" = xyes; then
     ac_cv_pts_have_string=yes
     ac_cv_pts_string_header=string
-  else 
+  else
     AC_PTS_CHECK_HEADER(strings.h, strcpy, strcpy_in_strings,  [char s[42]="X"; strcpy(s, "Hello, World!"); return *s!='H';] )
     if test x"$ac_cv_pts_strcpy_in_strings" = xyes; then
       ac_cv_pts_have_string=yes
@@ -422,7 +422,7 @@ dnl defines ac_cv_pts_string_header
   CC="${CC:-cc} -Werror"
   AC_PTS_CHECK_HEADER($ac_cv_pts_string_header.h, memcpy, memcpy_in_stringxs,  [char s[42]="X"; memcpy(s, "Hello, World!", 2); return *s!='H'; ])
   CC="$CC_bak"
-  
+
   AC_CACHE_CHECK(whether memcmp and memcpy are built-in, ac_cv_pts_have_memcmpy_builtin, [
     ac_cv_pts_have_memcmpy_builtin=no
     if test x"$ac_cv_pts_have_string" = xyes; then
@@ -455,7 +455,7 @@ dnl g++-3.2: cc1plus: warning: ignoring command line option '-Wnested-externs'
 dnl Usage: AC_PTS_CHECK_IGNORING(nebfcmd,-Wnested-externs -Wbad-function-cast -Wmissing-declarations)
 AC_DEFUN([AC_PTS_CHECK_IGNORING], [
   XTRA="$2"
-  CC_bak="$CC"   CC="${CC:-cc}  -Werror $2" 
+  CC_bak="$CC"   CC="${CC:-cc}  -Werror $2"
   CXX_bak="$CXX" CXX="${CXX:-c++} -Werror $2"
   AC_CACHE_CHECK([for ignored $2],ac_cv_pts_ignoring_$1, [
       AC_TRY_COMPILE([],[],
@@ -493,7 +493,7 @@ int main
   return 1;
 }],
       [ac_cv_pts_have_switch_enum_bug=no],
-      [ac_cv_pts_have_switch_enum_bug=yes], 
+      [ac_cv_pts_have_switch_enum_bug=yes],
       [AC_MSG_ERROR(cross compiling not supported by .._PTS_HAVE_SWITCH_ENUM_BUG)]
     )
   ])
@@ -511,7 +511,7 @@ AC_DEFUN([AC_PTS_HAVE_ASCII_SYSTEM], [
 #else
 ascii_yes
 #endif
-], 
+],
       ac_cv_pts_have_ascii_system=yes, ac_cv_pts_have_ascii_system=no
     )
   ])
@@ -548,7 +548,7 @@ int main
   return 0;
 }],
       [ac_cv_pts_cfg_p_tmpdir=\""`cat conftestval`"\"],
-      [ac_cv_pts_cfg_p_tmpdir=0], 
+      [ac_cv_pts_cfg_p_tmpdir=0],
       [AC_MSG_ERROR(cross compiling not supported by .._PTS_CFG_P_TMPDIR)]
     )
   ])
@@ -613,7 +613,7 @@ int main
 #else
 (argc, argv) int argc; char **argv;
 #endif
-{ 
+{
   (void)argc;
   (void)argv;
   if (0!=system("echo t >conftestval && echo \"let  it\" be  e >conftestval")) {
@@ -626,7 +626,7 @@ int main
   return 0;
 }
 ],    [ac_cv_pts_systemf="`cat conftestval`"; ac_cv_pts_systemf="${ac_cv_pts_systemf:-invalid}"],
-      [ac_cv_pts_systemf=compile-error], 
+      [ac_cv_pts_systemf=compile-error],
       [AC_MSG_ERROR(cross compiling not supported by .._PTS_HAVE_VSNPRINTF)]
     )
     # echo "($ac_cv_pts_systemf)"
@@ -697,12 +697,12 @@ int main
   p=fopen("conftestval","rb");
   if (p==0) return 34;
   for (i=0;i<666;i++) if (getc(p)!=(i&255)) return 35;
-  if (fclose(p)!=0) return 36;  
+  if (fclose(p)!=0) return 36;
 
   return 0;
 }
 ],    [ac_cv_pts_have_popen_b=yes],
-      [ac_cv_pts_have_popen_b=no], 
+      [ac_cv_pts_have_popen_b=no],
       [AC_MSG_ERROR(cross compiling not supported by .._PTS_HAVE_POPEN_B)]
     )
   ])
@@ -746,12 +746,12 @@ int main
   p=fopen("conftestval","rb");
   if (p==0) return 34;
   for (i=0;i<666;i++) if (getc(p)!=(i&255)) return 35;
-  if (fclose(p)!=0) return 36;  
+  if (fclose(p)!=0) return 36;
 
   return 0;
 }
 ],    [ac_cv_pts_have_popen_=yes],
-      [ac_cv_pts_have_popen_=no], 
+      [ac_cv_pts_have_popen_=no],
       [AC_MSG_ERROR(cross compiling not supported by .._PTS_HAVE_POPEN_)]
     )
   ])
@@ -776,7 +776,7 @@ AC_DEFUN([AC_PTS_HAVE_VSNPRINTF], [
 #endif
 #ifdef __cplusplus
 extern "C" void exit(int);
-#endif                     
+#endif
 #define _BSD_SOURCE 1 /* vsnprintf */
 #define _POSIX_SOURCE 1
 #define _POSIX_C_SOURCE 2
@@ -835,7 +835,7 @@ int main
 
     buf[0]='#';
     i=myprintf(0, buf, "%s-%ld", "Alma", -1234L);
-    if (t==c99t && i==sun99t[3]) t=sun99t; 
+    if (t==c99t && i==sun99t[3]) t=sun99t;
     g[3]=(i==t[3] && buf[0]=='#');
     /* printf("(%s) %d %d\n", buf, i, g[3]); */
 
@@ -851,7 +851,7 @@ int main
   return 0;
 }
 ],    [ac_cv_pts_vsnprintf="`cat conftestval`"; ac_cv_pts_vsnprintf="${ac_cv_pts_vsnprintf:-invalid}"],
-      [ac_cv_pts_vsnprintf=no], 
+      [ac_cv_pts_vsnprintf=no],
       [AC_MSG_ERROR(cross compiling not supported by .._PTS_HAVE_VSNPRINTF)]
     )
   ])
@@ -986,7 +986,7 @@ if AC_TRY_EVAL(ac_compile); then
 else
   echo "configure: failed program was:" >&AC_FD_CC
   cat conftest.$ac_ext >&AC_FD_CC
-ifelse([$4], , , [  
+ifelse([$4], , , [
   $4
 ])dnl
 fi
@@ -1019,7 +1019,7 @@ AC_DEFUN([AC_PTS_GCC_LINKS_CXX], [
     ],[
       case x"$CC" in
         xgcc-*) CXX="$CC" ;; # gcc-3.2
-        x*-gcc-*) CXX="$CC" ;; # 
+        x*-gcc-*) CXX="$CC" ;; #
         x*-gcc) CXX="$CC" ;; # i386-uclibc-gcc
         *) CXX=gcc ;;
       esac
@@ -1031,7 +1031,7 @@ AC_DEFUN([AC_PTS_GCC_LINKS_CXX], [
         LIBS="$LIBS_saved c_lgcc.cpp"
         if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext} && ./conftest${ac_exeext}
         then ac_cv_pts_gcc_links_cxx=yes-with-help
-        else 
+        else
           LIBS="$LIBS_saved c_lgcc3.cpp"
           if AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext} && ./conftest${ac_exeext}
           then ac_cv_pts_gcc_links_cxx=yes-with-help3
@@ -1063,7 +1063,7 @@ AC_DEFUN(AC_PTS_PROG_CXXFLAGS,
 AC_CACHE_CHECK(whether ${CXX-g++} accepts $2, ac_cv_prog_cxx_$1,
 [echo 'void f(void);void f(void){}' > conftest.cc
 if test -z "`${CXX-g++} $2 -c conftest.cc 2>&1`"
-then ac_cv_prog_cxx_$1=yes; 
+then ac_cv_prog_cxx_$1=yes;
 else ac_cv_prog_cxx_$1=no; fi
 rm -f conftest*
 ])
@@ -1098,7 +1098,7 @@ AC_DEFUN(AC_PTS_PROG_CFLAGS,
 AC_CACHE_CHECK(whether ${CC-gcc} accepts $2, ac_cv_prog_cc_$1,
 [echo 'void f(void);void f(void){}' > conftest.c
 if test -z "`${CC-gcc} $2 -c conftest.c 2>&1`"
-then ac_cv_prog_cc_$1=yes; 
+then ac_cv_prog_cc_$1=yes;
 else ac_cv_prog_cc_$1=no; fi
 rm -f conftest*
 ])
@@ -1164,7 +1164,7 @@ AC_CACHE_VAL(ac_cv_path_$1,
   /*)
   ac_cv_path_$1="[$]$1" # Let the user override the test with a path.
   ;;
-  ?:/*)			 
+  ?:/*)
   ac_cv_path_$1="[$]$1" # Let the user override the test with a dos path.
   ;;
   *)
@@ -1173,7 +1173,7 @@ dnl $ac_dummy forces splitting on constant user-supplied paths.
 dnl POSIX.2 word splitting is done only on the output of word expansions,
 dnl not every word.  This closes a longstanding sh security hole.
   ac_dummy="ifelse([$4], , $PATH, [$4])"
-  for ac_dir in $ac_dummy; do 
+  for ac_dir in $ac_dummy; do
     test -z "$ac_dir" && ac_dir=.
     if test -x $ac_dir/$ac_word; then
       ac_cv_path_$1="$ac_dir/$ac_word"

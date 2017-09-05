@@ -104,7 +104,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 //
 ATOM MyRegisterClass(HINSTANCE hInstance) {
 	WNDCLASSEX wcex;
-	wcex.cbSize = sizeof(WNDCLASSEX); 
+	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style		= 0; /*CS_HREDRAW | CS_VREDRAW;*/
 	wcex.lpfnWndProc	= (WNDPROC)WndProc;
 	wcex.cbClsExtra		= 0;
@@ -158,7 +158,7 @@ void WinFastImage::getSize(HBITMAP hbitmap, slen_t &wd, slen_t &ht) {
   h2.biSize=sizeof(h2);
   h2.biBitCount=0;
   // h2.biWidth=11; h2.biHeight=22; h2.biPlanes=1;
-  HDC hxdc=CreateDC("DISPLAY",NULL,NULL,NULL);  
+  HDC hxdc=CreateDC("DISPLAY",NULL,NULL,NULL);
   GetDIBits(hxdc, hbitmap, 0, 0, NULL, (BITMAPINFO*)&h2, DIB_RGB_COLORS);
   wd=h2.biWidth; ht=h2.biHeight;
   DeleteDC(hxdc);
@@ -315,7 +315,7 @@ void WinImageRGB::fill(char r, char g, char b) {
     x=header.biWidth;
     while (x--!=0) { *p++=b; *p++=g; *p++=r; }
     p+=pad;
-  }  
+  }
 }
 
 void WinImageRGB::putPixel(slen_t x, slen_t y, char r, char g, char b) {
@@ -363,9 +363,9 @@ static bool first_paint_p=true;
 /* !! SetWindowText() LineScroll() */
 /* !! bongeszo ne irjon felul ablakot */
 /* !! transparent images */
-/* void CHistoryEdit::AppendString(CString str) 
-                      { SendMessage(EM_SETSEL,0xFFFFFFFF,-1); 
-                        SendMessage(EM_REPLACESEL,FALSE,(LPARAM)(LPCTSTR)str); 
+/* void CHistoryEdit::AppendString(CString str)
+                      { SendMessage(EM_SETSEL,0xFFFFFFFF,-1);
+                        SendMessage(EM_REPLACESEL,FALSE,(LPARAM)(LPCTSTR)str);
                       }
 */
 
@@ -547,7 +547,7 @@ static bool do_open_image(char const* filename) {
   SetWindowLong(hwnd_main, GWL_STYLE, GetWindowLong(hwnd_main, GWL_STYLE)&~WS_THICKFRAME);
   /* ^^^ The Win32 API way to say hwnd_main.setResizable(false); :-) */
   InvalidateRect(hwnd_main, NULL, TRUE);
-#if 0  
+#if 0
   LONG fr_wd, fr_ht;
   getFrameSize(hwnd_main, fr_wd, fr_ht);
   // !! handle minimum window size
@@ -564,18 +564,18 @@ BOOL CYourWndOrDialog::ResizeClient (int nWidth,  int nHeight, BOOL bRedraw) {
                         rcWnd.right = nWidth;
                        if(nHeight != -1)
                         rcWnd.bottom = nHeight;
-                       if(!::AdjustWindowRectEx(&rcWnd, 
-                                                GetStyle(), 
-                                                (!(GetStyle() & WS_CHILD) 
+                       if(!::AdjustWindowRectEx(&rcWnd,
+                                                GetStyle(),
+                                                (!(GetStyle() & WS_CHILD)
                        && GetMenu() != NULL)), GetExStyle()))
                         return FALSE;
                        UINT uFlags = SWP_NOZORDER | SWP_NOMOVE;
                        if(!bRedraw)
                         uFlags |= SWP_NOREDRAW;
-                       return SetWindowPos(NULL, 
-                                           0, 0, 
-                                           rcWnd.right - rcWnd.left, 
-                                           rcWnd.bottom - rcWnd.top, 
+                       return SetWindowPos(NULL,
+                                           0, 0,
+                                           rcWnd.right - rcWnd.left,
+                                           rcWnd.bottom - rcWnd.top,
                                            uFlags);
                       } // CYourWndOrDialog::ResizeClient
 #endif
@@ -652,7 +652,7 @@ static void do_open(void) {
   ofn.lpstrDefExt = "txt";
   ofn.hInstance=NULL;
   ofn.lpstrCustomFilter=NULL; // !!
-  ofn.nMaxCustFilter=0; // !! 
+  ofn.nMaxCustFilter=0; // !!
   ofn.nFilterIndex=0; // use Custom Filter
   ofn.lpstrFileTitle=NULL;
   ofn.nMaxFileTitle=0;
@@ -885,7 +885,7 @@ LRESULT CALLBACK dialogRun(HWND hdlg, UINT message, WPARAM wParam, LPARAM /*lPar
       unsigned i;
       char buf[222];
       for (i=0;i<100;i++) {
-        SendMessage(hwnd,EM_SETSEL,0U-1,0U-1); 
+        SendMessage(hwnd,EM_SETSEL,0U-1,0U-1);
 	sprintf(buf, "%d Hello, World! 0123456789 1111111111 222222222 333333333\r\n", i);
         SendMessage(hwnd,EM_REPLACESEL,FALSE,(LPARAM)(LPCTSTR)buf);
       }
@@ -898,16 +898,16 @@ LRESULT CALLBACK dialogRun(HWND hdlg, UINT message, WPARAM wParam, LPARAM /*lPar
    case WM_ACTIVATE:
     { // HWND hwnd=GetDlgItem(hdlg, IDC_ELOG);
       // MessageBox(NULL,"Hello","",0);
-      //SendMessage(hwnd,EM_SETSEL,-1,2000); 
+      //SendMessage(hwnd,EM_SETSEL,-1,2000);
       //SendMessage(hwnd,EM_SCROLLCARET,0,0);
       //InvalidateRect(hwnd,NULL,FALSE); /* no effect */
     }
     return TRUE;
- #endif   
+ #endif
    case WM_COMMAND:
     if (LOWORD(wParam) == IDOK) {
       HWND hwnd=GetDlgItem(hdlg, IDC_ELOG);
-      SendMessage(hwnd,EM_SETSEL,0xFFFFFFFF,-1); 
+      SendMessage(hwnd,EM_SETSEL,0xFFFFFFFF,-1);
       SendMessage(hwnd,EM_REPLACESEL,FALSE,(LPARAM)(LPCTSTR)"Append.");
       break;
     }

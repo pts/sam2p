@@ -217,7 +217,7 @@ Image::Sampled *LBMRead::doit() {
               mask<<=1;
               take+=byteswide;
             }
-            if (res==transp) had_transp=true; 
+            if (res==transp) had_transp=true;
             *picput++=res;
             if (bit==1) { bit=128; ++lines; } else bit>>=1;
           }

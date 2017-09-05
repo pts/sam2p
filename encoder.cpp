@@ -851,7 +851,7 @@ void FlateEncode::vi_write(char const*buf, slen_t len) {
     return;
   }
   assert(fs!=NULL);
-  
+
   /* From rfc1950.txt:
            Adler-32 is composed of two sums accumulated per byte: s1 is
            the sum of all bytes, s2 is the sum of all s1 values. Both sums
@@ -1118,7 +1118,7 @@ void GSEncode::P::vi_check() {
 
 PSEncoder* PSEncoder::newASCIIHexEncode(GenBuffer::Writable &out_,unsigned maxcpl_) {
   // SimBuffer::B fp; (fp << maxcpl_ << " pop/ASCIIHexEncode").term0();
-  // PSEncoder *ret=new GSEncode(out_, fp());  
+  // PSEncoder *ret=new GSEncode(out_, fp());
   PSEncoder *ret=new ASCIIHexEncode(out_,maxcpl_);
   // ret->shortname="AHx";  ret->longname="ASCIIHex";
   // ret->filter_psname << fp;
@@ -1253,7 +1253,7 @@ PSEncoder* PSEncoder::newDCTEncode(GenBuffer::Writable &out_,
   /* Imp: respect QFactor (double) */
   /* Imp: respect QuantTables */
   /* Imp: respect numHuffTables, HuffTables */
-  
+
   SimBuffer::B fp("<<");
   fp << "/Columns " << Columns
      << "/Rows " << Rows
@@ -1322,11 +1322,11 @@ void TIFFPredictor2::vi_write(char const*buf, slen_t len) {
       i=*p++;
       d=(i>>7); o =((d-((h>>bpccpp)))&1)<<7; h=(h<<1)|d;
       d=(i>>6); o|=((d-((h>>bpccpp)))&1)<<6; h=(h<<1)|d;
-      d=(i>>5); o|=((d-((h>>bpccpp)))&1)<<5; h=(h<<1)|d;        
+      d=(i>>5); o|=((d-((h>>bpccpp)))&1)<<5; h=(h<<1)|d;
       d=(i>>4); o|=((d-((h>>bpccpp)))&1)<<4; h=(h<<1)|d;
-      d=(i>>3); o|=((d-((h>>bpccpp)))&1)<<3; h=(h<<1)|d;        
+      d=(i>>3); o|=((d-((h>>bpccpp)))&1)<<3; h=(h<<1)|d;
       d=(i>>2); o|=((d-((h>>bpccpp)))&1)<<2; h=(h<<1)|d;
-      d=(i>>1); o|=((d-((h>>bpccpp)))&1)<<1; h=(h<<1)|d;        
+      d=(i>>1); o|=((d-((h>>bpccpp)))&1)<<1; h=(h<<1)|d;
       d=(i   ); o|=((d-((h>>bpccpp)))&1)   ; h=(h<<1)|d;
       *op++=o;
       if (--opleft==0) { h=0; out.vi_write((char*)obuf,rlen); op=obuf; opleft=rlen; }
@@ -1336,7 +1336,7 @@ void TIFFPredictor2::vi_write(char const*buf, slen_t len) {
       i=*p++;
       d=(i>>6); o =((d-((h>>bpccpp)))&3)<<6; h=(h<<2)|d; // fprintf(stderr,"d=%#x\n", d);
       d=(i>>4); o|=((d-((h>>bpccpp)))&3)<<4; h=(h<<2)|d;
-      d=(i>>2); o|=((d-((h>>bpccpp)))&3)<<2; h=(h<<2)|d;        
+      d=(i>>2); o|=((d-((h>>bpccpp)))&3)<<2; h=(h<<2)|d;
       d=(i   ); o|=((d-((h>>bpccpp)))&3)   ; h=(h<<2)|d;
       *op++=o;
       if (--opleft==0) { h=0; out.vi_write((char*)obuf,rlen); op=obuf; opleft=rlen; }
@@ -1354,7 +1354,7 @@ void TIFFPredictor2::vi_write(char const*buf, slen_t len) {
       i=*p++; *op++=((i-((h>>bpccpp)))/*&255*/); h=(h<<8)|i;
       if (--opleft==0) { h=0; out.vi_write((char*)obuf,rlen); op=obuf; opleft=rlen; }
     }
-  } else assert(0);  
+  } else assert(0);
 }
 
 /* --- */

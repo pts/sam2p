@@ -203,7 +203,7 @@ dnl AC_PTS_TYPE_GETGROUPS
 dnl ^^^ doesn't work wth CPPFLAGS=-traditional
 AC_PTS_CHECK_SIZEOF(bool, -1)
 dnl ^^^ Dat: 0 #if (PC: 1, Digital Unix: 8, Solaris: 4)
-dnl ^^^ Dat: autoconf-2.54 AC_CHECK_SIZEOF checks sys/types.h sys/stat.h stdlib.h string.h memory.h strings.h inttypes.h stdint.h unistd.h 
+dnl ^^^ Dat: autoconf-2.54 AC_CHECK_SIZEOF checks sys/types.h sys/stat.h stdlib.h string.h memory.h strings.h inttypes.h stdint.h unistd.h
 
 dnl Checks for library functions.
 dnl (None!)

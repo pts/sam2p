@@ -22,7 +22,7 @@
 # Dat: tag-parser treats comments as legal tokens
 # Dat: <Insert> matches <Shift-Insert>, <Key-Insert> does not.
 # Dat: <Motion> is mouse motion event over the sub-window
-# Dat: <Enter> and <Leave> is an event sent when 
+# Dat: <Enter> and <Leave> is an event sent when
 # SUXX: Tcl: 8.0 doesn't have [string map ...]
 # SUXX: Tk: radio and checkbuttons cannot be made smaller or larger
 # SUXX: Tk: color for -relief cannot be specified
@@ -221,7 +221,7 @@ proc pts_text_insert_newline {w autoindent} {
     if {![string length [set tmp [$w search -regexp "\[^ \t]" {insert linestart} {insert lineend}]]]} {set tmp "insert lineend"}
     $w insert insert \n[$w get {insert linestart} $tmp]
   } {$w insert insert \n}
-  $w see insert  
+  $w see insert
 }
 proc pts_text_autoindent {w bool} {
   if $bool {} ;# early error message if bool is malformed
@@ -309,7 +309,7 @@ proc pts_message_box {args} {
 
     #
     # The default value of the title is space (" ") not the empty string
-    # because for some window managers, a 
+    # because for some window managers, a
     #		wm title .foo ""
     # causes the window title to be "foo" instead of the empty string.
     #
@@ -608,7 +608,7 @@ bind Text <Button-2> {}
 
 # vvv allow the well-known (almost indrustry standard) Windows/Borland/GTK
 #     cliboard key bindings on all platforms
-event add <<Cut>> <Control-Key-x> <Shift-Key-Delete>    
+event add <<Cut>> <Control-Key-x> <Shift-Key-Delete>
 event add <<Copy>> <Control-Key-c> <Control-Key-Insert>
 event add <<Paste>> <Control-Key-v> <Shift-Key-Insert>
 # event add <<PasteSelection>> <ButtonRelease-2>
@@ -1291,7 +1291,7 @@ $g.f.sd configure -activebackground [$g.f.sd cget -background]
 pts_readonly_color $g.f.td
 # puts $g.f.td
 # puts TD:[bind .gtop.g3.f.td <Key-Return>]
-  
+
 pts_fix_one_tab $g.f.td
 $g.f.td insert end "Debug messages, sam2p output:\n\n"
 # $g.f.td insert end "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n"

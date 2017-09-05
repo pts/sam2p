@@ -1494,7 +1494,7 @@ int CGIFFF DGifSlurp(CGIFFF GifFileType *GifFile)
 		ext.ImageDesc=sp->ImageDesc;
 		*sp=ext;
 		ext=noext;
-		
+
 		/**** pts ****/
 		sp->RasterBits = (GifPixelType*) malloc((0L+sp->ImageDesc.Width) * sp->ImageDesc.Height * sizeof(GifPixelType));
 		if (sp->RasterBits==NULL) { _GifError=D_GIF_ERR_NOT_ENOUGH_MEM; return GIF_ERROR; }

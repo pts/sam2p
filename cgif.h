@@ -19,7 +19,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.  
+THE SOFTWARE.
  */
 
 /******************************************************************************
@@ -231,7 +231,7 @@ typedef struct SavedImage {
 
     /**** pts ****/
     /** from Graphics Control extension: 0..63 */
-    unsigned char dispose; 
+    unsigned char dispose;
     /** from Graphics Control extension: 0..65535 */
     unsigned short delay;
     /** from Graphics Control extension: transparency index: -1 or 0..255 */

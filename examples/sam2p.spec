@@ -1,4 +1,4 @@
-# Contributed by Richard <rz@linux-m68k.org> .
+# Contributed by Richard Zidlicky <rz@linux-m68k.org> .
 # Works for some version of Fedora.
 # This is for debug-flavor. Do not remove. Package is stripped conditionally.
 #%#define __os_install_post       %{nil}
@@ -21,7 +21,7 @@ License: GPLv2, see COPYING
 Group: System Environment/Libs
 BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
 #Prefix: %#{_prefix}
-#URL: 
+#URL:
 
 %description
 
@@ -33,7 +33,7 @@ case "${RPM_COMMAND:-all}" in
 all)
 
  # -n dirname
-%setup -q 
+%setup -q
 #%#patch0 -p1 -b .rz
 ;;
 esac
@@ -42,7 +42,7 @@ esac
 
 case "${RPM_COMMAND:-all}" in
 all|config)
-#export CFLAGS="$RPM_OPT_FLAGS -O1 -g" 
+#export CFLAGS="$RPM_OPT_FLAGS -O1 -g"
 #./configure --prefix=%{prefix}
 %configure
 ;;
@@ -78,5 +78,5 @@ rm -rf $RPM_BUILD_ROOT
 * Mon Mar 14 2011 Richard Zidlicky <rz@linux-m68k.org> - 0.47-1
 - first build of sam2p
 
-* Fri Dec 26 2003 Richard Zidlicky <rz@linux-m68k.org> 
+* Fri Dec 26 2003 Richard Zidlicky <rz@linux-m68k.org>
 - created skel.spec

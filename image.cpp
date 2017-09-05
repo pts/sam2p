@@ -269,7 +269,7 @@ void Image::Sampled::to8mul() {
   rowbeg=const_cast<char*>(beg)+(rowbeg-oldBeg);
   trail= const_cast<char*>(beg)+len-bpc;
   memcpy(const_cast<char*>(beg), oldBeg, rowbeg-beg);
-  
+
   unsigned char *to=(unsigned char*)rowbeg, *toend;
   unsigned int i, j;
   Image::Sampled::dimen_t htc;
@@ -318,7 +318,7 @@ void Image::Sampled::to8mul() {
       if (0!=((wdcpp)&1)) *to++=(*p++>>4)*17;
     }
   } else assert(0 && "invalid bpc");
-  
+
   delete [] const_cast<char*>(oldBeg);
 }
 
@@ -338,7 +338,7 @@ void Image::Sampled::to8nomul() {
   rowbeg=const_cast<char*>(beg)+(rowbeg-oldBeg);
   trail= const_cast<char*>(beg)+len-bpc;
   memcpy(const_cast<char*>(beg), oldBeg, rowbeg-beg);
-  
+
   unsigned char *to=(unsigned char*)rowbeg, *toend;
   unsigned int i, j;
   Image::Sampled::dimen_t htc;
@@ -390,7 +390,7 @@ void Image::Sampled::to8nomul() {
       if (0!=((wdcpp)&1)) *to++=(*p++>>4);
     }
   } else assert(0 && "invalid bpc");
-  
+
   delete [] const_cast<char*>(oldBeg);
 }
 
@@ -464,7 +464,7 @@ Image::Indexed* Image::Sampled::addAlpha0(Image::Indexed *iimg, Image::Gray *al)
   iimg->setPal(ncols,0); /* black */
   iimg->setTransp(ncols);
   assert(iimg->getRlen()==iimg->getWd());
-  assert(iimg->getWd()==al->getWd());  
+  assert(iimg->getWd()==al->getWd());
   char *p=iimg->getRowbeg(), *pend=p+iimg->getRlen()*iimg->getHt(), *alq=al->getRowbeg();
   while (p!=pend) {
     if ((unsigned char)*alq++!=255) *p=ncols; /* make it transparent */
@@ -617,7 +617,7 @@ void Image::Indexed::copyRGBRow(char *to, Image::Sampled::dimen_t whichrow) cons
   unsigned char *p=(unsigned char*)rowbeg+rlen*whichrow;
   char *r, *toend=to+3*wd;
   unsigned int i, j;
-  
+
   if (bpc==1) {
     toend-=3*(wd&7);
     while (to!=toend) {
@@ -671,7 +671,7 @@ void Image::Indexed::packPal() {
   assert(transp>=-1);
   assert(transp<(int)oldNcols);
   if (oldNcols<=1) return; /* Cannot optimize further. */
-  
+
   /* Find unused colors. old2new[c]=(is c used at least once)?1:0 */
   unsigned char old2new[256], newpal[768];
   memset(old2new, 0, sizeof(old2new));
@@ -731,7 +731,7 @@ void Image::Indexed::packPal() {
     p=newpal+newTransp*3;
   }
 
-  /* Update the image. */  
+  /* Update the image. */
   for (p=(unsigned char*)rowbeg, pend=p+wd*ht; p!=pend; p++) {
     assert(*p<oldNcols);
     *p=old2new[*p];
@@ -771,7 +771,7 @@ void Image::Indexed::sortPal() {
   for (i = 1; i < ncols; ++i) {
     if (d[i] < d[i - 1]) break;
   }
-  if (i >= ncols) return;  /* Palette already sorted. */ 
+  if (i >= ncols) return;  /* Palette already sorted. */
 
   /* Heap sort (unstable). Based on Knuth's TAOCP 5.2.3.H .
    * Although heap sort is unstable, sortPal implements a stable sort, because
@@ -936,7 +936,7 @@ void Image::Indexed::setBpc(unsigned char bpc_) {
   to8(); /* Imp: make the transition without the intermediate 8-bits... */
   if (bpc_==8) return;
   if (ht==0 || wd==0) { bpc=bpc_; return; }
-  
+
   const char *oldBeg=beg;
   unsigned char *p=(unsigned char*)rowbeg;
   assert(cpp==1);
@@ -948,7 +948,7 @@ void Image::Indexed::setBpc(unsigned char bpc_) {
   rowbeg=const_cast<char*>(beg)+(rowbeg-oldBeg);
   trail= const_cast<char*>(beg)+len-bpc;
   memcpy(const_cast<char*>(beg), oldBeg, rowbeg-beg);
-  
+
   unsigned char *to=(unsigned char*)rowbeg, *toend;
   unsigned int i;
   Image::Sampled::dimen_t htc;
@@ -1048,7 +1048,7 @@ Image::Sampled* Image::Indexed::addAlpha(Image::Gray *al) {
     if (ncols==256) { /* Try again, probably now we have fewer colors */
       packPal();
       if ((ncols=getNcols())==256) Error::sev(Error::EERROR) << "Indexed::addAlpha: too many colors, transparency impossible" << (Error*)0;
-      for (p=rowbeg,alq=al->getRowbeg(); p!=pend; p++) 
+      for (p=rowbeg,alq=al->getRowbeg(); p!=pend; p++)
         if ((unsigned char)*alq++!=255) *p=ncols;
     }
     setNcolsMove(ncols+1);
@@ -1302,9 +1302,9 @@ GenBuffer::Writable& operator<<(GenBuffer::Writable& gw, Image::Sampled const& i
   Image::Sampled::dimen_t y, ht=img.getHt();
   /* vvv in the xv program: image file must be >=30 bytes long to be treated as image */
   gw << "P6\n###############\n" << img.getWd() << ' ' << ht;
-  if (img.getTranspc()>=0x1000000UL) gw << "\n#Opaque"; 
+  if (img.getTranspc()>=0x1000000UL) gw << "\n#Opaque";
                                 else gw << "\n#T" << img.rgb2webhash(img.getTranspc());
-  gw << "\n255\n";  
+  gw << "\n255\n";
   for (y=0; y<ht; y++) {
     img.copyRGBRow(buf, y);
     gw.vi_write(buf, buflen);
@@ -1877,7 +1877,7 @@ bool Image::SampledInfo::setSampleFormat(sf_t sf_, bool WarningOK, bool TryOnly,
     }
     sf=SF_Asis; return true;
   }
-  assert(0 && "unknown SampleFormat requested");  
+  assert(0 && "unknown SampleFormat requested");
   return false; /* NOTREACHED */
 }
 

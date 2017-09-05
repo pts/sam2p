@@ -230,7 +230,7 @@ static Image::Sampled *in_xpm_reader(Image::Loader::UFD *ufd, SimBuffer::Flat co
   int i; /* multiple purpose */
   while ((i=tok.getcc())==' ' || i=='\t' || USGE(9,i-'0')) ;
   tok.ungetcc(i); tok.getComma();
-  
+
   // Error::sev(Error::DEBUG) << "wd="<<wd<<" ht="<<ht<<" colors="<<colors<<" cpp="<<cpp << (Error*)0;
   if (1UL*cpp*colors>65535) Error::sev(Error::EERROR) << "XPM: too many colors" << (Error*)0;
   // if (cpp==1) {
@@ -263,7 +263,7 @@ static Image::Sampled *in_xpm_reader(Image::Loader::UFD *ufd, SimBuffer::Flat co
     if (transp!=colors) Error::sev(Error::WARNING) << "XPM: too many colors, transparency blacked" << (Error*)0;
   }
   outbuf=ret->getRowbeg();
-  
+
   if (cpp==1) { /* Easy job: make an Indexed image; defer .packPal() */
     assert(colors<=256);
     signed short bin[256], s;
@@ -390,7 +390,7 @@ static Image::Sampled *in_xpm_reader(Image::Loader::UFD *ufd, SimBuffer::Flat co
       }
     }
    #endif
-  } 
+  }
   delete [] tab;
   delete [] rgb;
   /* Dat: we don't check for EOF. Imp: emit a warning? */

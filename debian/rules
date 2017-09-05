@@ -32,7 +32,7 @@ binary-arch: checkroot build
 	$(MAKE) install prefix=`pwd`/debian/tmp/usr DESTDIR=`pwd`/debian/tmp/usr
 # Must have debmake installed for this to work. Otherwise please copy
 # /usr/bin/debstd into the debian directory and change debstd to debian/debstd
-	debstd README README.1 README.2 README.3 README.4 README.5 README.6 README~ 
+	debstd README README.1 README.2 README.3 README.4 README.5 README.6 README~
 	dpkg-gencontrol -isp
 	chown -R root.root debian/tmp
 	chmod -R go=rX debian/tmp

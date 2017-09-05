@@ -77,7 +77,7 @@
     } for
     (.\n) print
   }bind def
-    
+
   /TypeStack { % <list> TypeStack <bool>
     dup length count 2 sub eq {
       true exch count 2 add 1 index length 1 sub 0 exch 1 exch

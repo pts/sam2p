@@ -579,14 +579,14 @@ LZWDecode(TIFF* tif, tidataval_t* op0, tsize_t occ0)
 			nbits = BITS_MIN;
 			nbitsmask = MAXCODE(BITS_MIN);
 			maxcodep = sp->dec_codetab + nbitsmask-1;
-			
+
 #if 1 /**** pts ****/
 			NextCode(tif, sp, bp, code, GetNextCode);
 			if (code == CODE_EOI)
 				break;
 			*op++ = code, occ--;
 			oldcodep = sp->dec_codetab + code; /* ! */
-#endif			
+#endif
 			continue;
 		}
 		codep = sp->dec_codetab + code;
