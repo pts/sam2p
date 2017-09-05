@@ -142,9 +142,9 @@ Turbo tutorial
 ~~~~~~~~~~~~~~
 Quick compilation instructions:
 
-1. ./configure --enable-lzw --enable-gif
-2. make
-3. Copy the `sam2p' executable to your $PATH, or invoke it as `./sam2p'.
+1. Run: make
+   It also runs ./configure with the right defaults for you.
+2. Copy the `sam2p' executable to your $PATH, or invoke it as `./sam2p'.
 
 Quick try:
 
