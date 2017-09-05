@@ -105,7 +105,7 @@ sub shq($) {
     # .       A string surrounded by double quotation marks is interpreted as a
     # single argument, regardless of white space contained within. A quoted
     # string can be embedded in an argument. Note that the caret (^) is not
-    # recognized as an escape character or delimiter. 
+    # recognized as an escape character or delimiter.
     # .       A double quotation mark preceded by a backslash, \", is interpreted as
     # a literal double quotation mark (").
     # .       Backslashes are interpreted literally, unless they immediately precede
@@ -308,8 +308,8 @@ GLOBFILES=Makefile Makedep
 endif
 ';
 
-die unless print MD "ALL +=", join(' ',sort keys%mapro), "\n"; 
-die unless print MD "TARGETS =", join(' ',sort keys%mapro), "\n"; 
+die unless print MD "ALL +=", join(' ',sort keys%mapro), "\n";
+die unless print MD "TARGETS =", join(' ',sort keys%mapro), "\n";
 
 # vvv Thu Oct 31 09:49:02 CET 2002
 # (not required)
@@ -367,8 +367,6 @@ for my $EXE (sort keys%mapro) {
     q! (size: `perl -e 'print -s "!.$EXE.q!"'`)."!. "\n";
   # vvv Sat Jun  1 15:40:19 CEST 2002
   for my $FA (@FAL) {
-    # !! TODO(pts): Resolve .cpp, .c, .ci files recursively for \$(${EXE}_DS),
-    #               https://github.com/pts/sam2p/issues/11 should be fixed.
     die unless print MD
         "$EXE.$FA: \$(GLOBFILES) \$(${EXE}_DS) \$(${EXE}_H)\n\t".
         "\$(CXD_$FA) \$(CXDFAL) \$(${EXE}_DS) -o $EXE.$FA\n";
