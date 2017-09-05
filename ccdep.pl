@@ -160,7 +160,7 @@ if ($R!~/#\s*warning\s/) {
 
 $R =~ s@\\\n@@g;  # Merge line continuations emitted by `gcc -M -MG'.
 
-#** $idep{"x.ds"} contains the the dependency line for x.ds
+#** $idep{"x.ds"} contains the .h and .ds dependency line for x.ds
 my %idep;
 #** $odep{"x.o"} is "x.ds"
 my %odep;
@@ -234,7 +234,8 @@ my %req;
 my %con;
 #** $repro{"feature"} is a hash=>1 of .ds that provide "feature"
 my %repro;
-#** $mapro{"executable"} eq "x.ds" if "x.ds" provides main() for "executable"
+#** $mapro{"executable"} eq "x.ds" if "x.ds" provides main() for "executable".
+#** It looks like values are never used.
 my %mapro;
 #** hash=>1 of "feature"s of NULL-PROVIDES
 my %nullpro;
@@ -316,48 +317,61 @@ die unless print MD "TARGETS =", join(' ',sort keys%mapro), "\n";
 #for my $FA (@FAL) { $targets_fal{$FA}="TARGETS_$FA =" }
 
 for my $EXE (sort keys%mapro) {
-  my $MDS = $mapro{$EXE};
   print "exe $EXE\n";
-  my @FEA2BA=("${EXE}_main");
-  my @DSO=(); # list of .o files required
-  my @DSL=(); # list of .ds files required
-  my %CON=(); # hash=>1 of features already conflicted
-  my %PRO=%nullpro; # hash=>1 of features already provided
-  my $feature;
-  
-  while (defined($feature=pop@FEA2BA)) {
-    next if exists $PRO{$feature};
-    # print " feat $feature (@FEA2BA)\n"; ##
-    # vvv Dat: r.b.e == required by executable
-    die "$0: feature $feature r.b.e $EXE conflicts\n" if exists $CON{$feature};
-    my @L=sort keys%{$repro{$feature}};
-    die "$0: feature $feature r.b.e $EXE unprovided\n" if!@L;
-    die "$0: feature $feature r.b.e $EXE overprovided: @L\n" if$#L>=1;
-    # Now: $L[0] is a .ds providing the feature
-    push @DSL, $L[0];
-    my $O=$L[0]; $O=~s@\.[^.]+\Z@.o@;
-    push @DSO, $O;
+  my @REQO  = (); # Will be list of .o files required by $EXE.
+  my @REQDS = (); # Will be list of .ds files required $EXE.
+  my @REQH  = (); # Will be list of .h files required $EXE.
 
-    $PRO{$feature}=1;
-    for my $feature2 (@{$pro{$L[0]}}) {
-      die "$0: extra feature $feature2 r.b.e $EXE conflicts\n" if exists $CON{$feature2} and not exists $PRO{$feature2};
-      $PRO{$feature2}=1;
+  # Find the transitive dependencies of $EXE, save to @REQO, @REQDS, @REQH.
+  {
+    my %CON=(); # hash=>1 of features already conflicted
+    my %PRO=%nullpro; # hash=>1 of features already provided
+    my $feature;
+    my @features_to_analyze=("${EXE}_main");
+    while (defined($feature=pop@features_to_analyze)) {
+      next if exists $PRO{$feature};
+      #print "feat $feature (@features_to_analyze)\n"; ##
+      # vvv Dat: r.b.e == required by executable
+      die "$0: feature $feature r.b.e $EXE conflicts\n" if exists $CON{$feature};
+      my @L=sort keys%{$repro{$feature}};
+      die "$0: feature $feature r.b.e $EXE unprovided\n" if!@L;
+      die "$0: feature $feature r.b.e $EXE overprovided: @L\n" if$#L>=1;
+      # Now: $L[0] is a .ds providing the feature
+      push @REQDS, $L[0];
+      my $O=$L[0]; $O=~s@\.[^.]+\Z@.o@;
+      push @REQO, $O;
+
+      $PRO{$feature}=1;
+      for my $feature2 (@{$pro{$L[0]}}) {
+        die "$0: extra feature $feature2 r.b.e $EXE conflicts\n" if exists $CON{$feature2} and not exists $PRO{$feature2};
+        $PRO{$feature2}=1;
+      }
+      for my $feature2 (@{$req{$L[0]}}) {
+        push @features_to_analyze, $feature2 if!exists $PRO{$feature2}
+      }
+      for my $feature2 (@{$con{$L[0]}}) { $CON{$feature2}=1 }
+      # die if! exists $PRO{$feature}; # assert
     }
-    for my $feature2 (@{$req{$L[0]}}) { push @FEA2BA, $feature2 if!exists $PRO{$feature2} }
-    for my $feature2 (@{$con{$L[0]}}) { $CON{$feature2}=1 }
-    # die if! exists $PRO{$feature}; # assert
+    my %REQH;
+    for my $DS (@REQDS) {
+      for my $HDS (split' ', $idep{$DS}) {
+        $REQH{$HDS} = 1 if !is_ds($HDS);
+      }
+    }
+    push @REQH, sort keys %REQH;
   }
 
-  die unless print MD "${EXE}_DS=@DSL\n".
-    "$EXE: \$(GLOBFILES) @DSO\n\t\$(LDALL) @DSO -o $EXE\n\t".
+  die unless print MD "${EXE}_DS=@REQDS\n${EXE}_H=@REQH\n".
+    "$EXE: \$(GLOBFILES) @REQO\n\t\$(LDALL) @REQO -o $EXE\n\t".
     q!@echo "Created executable file: !.$EXE.
     q! (size: `perl -e 'print -s "!.$EXE.q!"'`)."!. "\n";
   # vvv Sat Jun  1 15:40:19 CEST 2002
   for my $FA (@FAL) {
     # !! TODO(pts): Resolve .cpp, .c, .ci files recursively for \$(${EXE}_DS),
     #               https://github.com/pts/sam2p/issues/11 should be fixed.
-    die unless print MD "$EXE.$FA: \$(GLOBFILES) \$(${EXE}_DS)\n\t".
-      "\$(CXD_$FA) \$(CXDFAL) \$(${EXE}_DS) -o $EXE.$FA\n";
+    die unless print MD
+        "$EXE.$FA: \$(GLOBFILES) \$(${EXE}_DS) \$(${EXE}_H)\n\t".
+        "\$(CXD_$FA) \$(CXDFAL) \$(${EXE}_DS) -o $EXE.$FA\n";
     # $targets_fal{$FA}.=" $EXE.$FA";
   }
 }
