@@ -257,11 +257,12 @@ for my $instruction (@instructions) {
 }
 @instructions=();  # Save memory.
 
-mustbe_subset_of "providers"=>[keys(%pro)], "dep_sources"=>[keys(%idep)];
-mustbe_subset_of "dep_sources"=>[keys(%idep)], "sources"=>\@DS;
+mustbe_subset_of "providers"=>[sort keys(%pro)], "dep_sources"=>[sort keys(%idep)];
+mustbe_subset_of "dep_sources"=>[sort keys(%idep)], "sources"=>\@DS;
 
 { my @K=keys %repro;
-  while (my($DS,$L)=each%con) {
+  for my $DS (sort keys%con) {
+    my $L = $con{$DS};
     my @R=();
     for my $feature (@$L) { expand_glob $feature, \@K, \@R }
     # ^^^ multiplicity remains
@@ -329,7 +330,7 @@ for my $EXE (sort keys%mapro) {
     # print " feat $feature (@FEA2BA)\n"; ##
     # vvv Dat: r.b.e == required by executable
     die "$0: feature $feature r.b.e $EXE conflicts\n" if exists $CON{$feature};
-    my @L=keys%{$repro{$feature}};
+    my @L=sort keys%{$repro{$feature}};
     die "$0: feature $feature r.b.e $EXE unprovided\n" if!@L;
     die "$0: feature $feature r.b.e $EXE overprovided: @L\n" if$#L>=1;
     # Now: $L[0] is a .ds providing the feature
