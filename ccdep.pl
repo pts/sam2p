@@ -271,7 +271,8 @@ mustbe_subset_of "dep_sources"=>[sort keys(%idep)], "sources"=>\@DS;
   }
 }
 
-die unless open MD, "> Makedep";
+my $outfn = "Makedep";
+die unless open MD, "> $outfn";
 die unless print MD '
 ifndef CCALL
 CCALL=$(CC) $(CFLAGS) $(CFLAGSB) $(CPPFLAGS) $(INCLUDES)
@@ -304,7 +305,7 @@ ifndef CXXFLAGS
 CXXFLAGS=-O2 -W -Wall -fsigned-char
 endif
 ifndef GLOBFILES
-GLOBFILES=Makefile Makedep
+GLOBFILES=Makefile $outfn
 endif
 ';
 
@@ -391,6 +392,6 @@ print MD "\n";
 
 die unless close MD;
 
-print "$0: done.\n";
+print "$0: done, created $outfn\n";
 
 __END__

@@ -216,7 +216,7 @@ AC_OUTPUT(Makehelp)
 
 dnl AC_PTS_RUN_OK([perl -x -S ./ccdep.pl $CXX], [], [AC_MSG_ERROR(cannot compute depends)])
 rm -f Makedep
-AC_PTS_RUN_OK([make Makedep], [], [AC_MSG_ERROR(cannot compute depends)])
+AC_PTS_RUN_OK([make Makedep.force], [], [AC_MSG_ERROR(cannot compute depends)])
 AC_PTS_OK
 echo "configure done. Now you should run: make; make install"
 
