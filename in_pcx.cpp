@@ -28,7 +28,7 @@
 #define byte unsigned char
 #define PCX_SIZE_T slen_t
 #define malloc_byte(n) new byte[n]
-#define PCX_FREE(p) delete (p)
+#define PCX_FREE(p) delete [] (p)
 /* the following list give indicies into saveColors[] array in xvdir.c */
 #define F_FULLCOLOR 0
 #define F_GREYSCALE 1
