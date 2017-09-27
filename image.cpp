@@ -111,6 +111,11 @@ char const *Image::Sampled::cs2devcs(unsigned char cs) {
 void Image::Sampled::init(slen_t l_comment, slen_t l_header, dimen_t wd_, dimen_t ht_,
   /* ^^^ 24 is required for /Transparent in out_tiff_work */
   unsigned char bpc_, unsigned char ty_, unsigned char cpp_) {
+  /* Even if we continue from here, most probably we'll reach
+   * ``sam2p.yes: Error: applyProfile: invalid combination, no applicable OutputRule''.
+   * So more work is needed to support output images of size 0.
+   */
+  if (wd_ <= 0 || ht_ <= 0) Error::sev(Error::EERROR) << "Image: image of size 0" << (Error*)0;
   bpc=bpc_;
   ty=ty_;
   wd=wd_;
