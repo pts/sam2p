@@ -107,6 +107,36 @@ char const *Image::Sampled::cs2devcs(unsigned char cs) {
   return cs>=1 && cs<=5 ? names[cs] : (char*)NULLP;
 }
 
+static void fatal_image_too_large() {
+  Error::sev(Error::EERROR) << "Image: Image too large." << (Error*)0;
+}
+
+static slen_t multiply_check(slen_t a, slen_t b) {
+  const slen_t result = a * b;
+  /* Check for overflow. Works only if everything is unsigned. */
+  if (result / a != b) fatal_image_too_large();
+  return result;
+}
+
+static slen_t multiply_check(slen_t a, slen_t b, slen_t c) {
+  return multiply_check(multiply_check(a, b), c);
+}
+
+static slen_t add_check(slen_t a, slen_t b) {
+  /* Check for overflow. Works only if everything is unsigned. */
+  if (b > (slen_t)-1 - a) fatal_image_too_large();
+  return a + b;
+}
+
+#if 0
+static slen_t add_check(slen_t a, slen_t b, slen_t c) {
+  return add_check(add_check(a, b), c);
+}
+#endif
+
+static slen_t add_check(slen_t a, slen_t b, slen_t c, slen_t d) {
+  return add_check(add_check(a, b), add_check(c, d));
+}
 
 void Image::Sampled::init(slen_t l_comment, slen_t l_header, dimen_t wd_, dimen_t ht_,
   /* ^^^ 24 is required for /Transparent in out_tiff_work */
@@ -115,7 +145,7 @@ void Image::Sampled::init(slen_t l_comment, slen_t l_header, dimen_t wd_, dimen_
    * ``sam2p.yes: Error: applyProfile: invalid combination, no applicable OutputRule''.
    * So more work is needed to support output images of size 0.
    */
-  if (wd_ <= 0 || ht_ <= 0) Error::sev(Error::EERROR) << "Image: image of size 0" << (Error*)0;
+  if (wd_ <= 0 || ht_ <= 0) Error::sev(Error::EERROR) << "Image: Image of size 0." << (Error*)0;
   bpc=bpc_;
   ty=ty_;
   wd=wd_;
@@ -123,8 +153,10 @@ void Image::Sampled::init(slen_t l_comment, slen_t l_header, dimen_t wd_, dimen_
   cpp=cpp_;
   // pred=1;
   transpc=0x1000000UL; /* Dat: this means: no transparent color */
-  rlen=(((rlen_t)bpc_)*cpp_*wd_+7)>>3;
-  beg=new char[len=l_comment+l_header+rlen*ht_+bpc];
+  const slen_t rlens = add_check(multiply_check(bpc_, cpp_, wd_), 7) >> 3;
+  rlen = rlens;
+  if (rlen != rlens) fatal_image_too_large();
+  beg=new char[len=add_check(l_comment, l_header, multiply_check(rlen, ht_), bpc)];
   rowbeg=(headp=const_cast<char*>(beg)+l_comment)+l_header;
   trail=const_cast<char*>(beg)+len-bpc;
   memset(trail, 0, bpc);
