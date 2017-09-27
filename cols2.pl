@@ -272,7 +272,7 @@ sub hash0($) {
   push @{$P[$N]}, $_[0];
 }
 
-@P=();
+@P=(undef)x1109;
 for (@L) { hash0($_); }
 # my $S="";
 # die @P;
