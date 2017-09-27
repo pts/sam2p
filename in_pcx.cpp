@@ -162,11 +162,11 @@ static Image::Sampled *LoadPCX
     return_pcxError(bname,"unrecognized magic number");
   }
 
-  pinfo->w = (hdr[PCX_XMAXL] + ((int) hdr[PCX_XMAXH]<<8))
-           - (hdr[PCX_XMINL] + ((int) hdr[PCX_XMINH]<<8));
+  pinfo->w = (hdr[PCX_XMAXL] + ((dimen) hdr[PCX_XMAXH]<<8))
+           - (hdr[PCX_XMINL] + ((dimen) hdr[PCX_XMINH]<<8));
 
-  pinfo->h = (hdr[PCX_YMAXL] + ((int) hdr[PCX_YMAXH]<<8))
-           - (hdr[PCX_YMINL] + ((int) hdr[PCX_YMINH]<<8));
+  pinfo->h = (hdr[PCX_YMAXL] + ((dimen) hdr[PCX_YMAXH]<<8))
+           - (hdr[PCX_YMINL] + ((dimen) hdr[PCX_YMINH]<<8));
 
   pinfo->w++;  pinfo->h++;
 
@@ -178,7 +178,7 @@ static Image::Sampled *LoadPCX
           pinfo->w, pinfo->h, hdr[PCX_VER], hdr[PCX_ENC]);
   fprintf(stderr,"   BitsPerPixel=%d, planes=%d, BytePerRow=%d, colors=%d\n",
           hdr[PCX_BPP], hdr[PCX_PLANES],
-          hdr[PCX_BPRL] + ((int) hdr[PCX_BPRH]<<8),
+          hdr[PCX_BPRL] + ((dimen) hdr[PCX_BPRH]<<8),
           colors);
 #endif
 
@@ -356,7 +356,7 @@ static int pcxLoadImage24 ___((char *fname, FILE *fp, PICINFO *pinfo, byte *hdr)
   w = pinfo->w;  h = pinfo->h;
 
   planes = (int) hdr[PCX_PLANES];
-  bperlin = hdr[PCX_BPRL] + ((int) hdr[PCX_BPRH]<<8);
+  bperlin = hdr[PCX_BPRL] + ((dimen) hdr[PCX_BPRH]<<8);
 
   /* allocate 24-bit image */
   pic24 = (byte *) malloc_byte((PCX_SIZE_T) w*h*planes);
@@ -436,9 +436,10 @@ static void pcxLoadRaster ___((FILE *fp, byte *image, int depth, byte *hdr, dime
   int b;
   byte *oldimage;
 
-  bperlin = hdr[PCX_BPRL] + ((int) hdr[PCX_BPRH]<<8);
-  if (depth == 1) pad = (bperlin * 8) - w;
-             else pad = bperlin - w;
+  bperlin = hdr[PCX_BPRL] + ((dimen) hdr[PCX_BPRH]<<8);
+  pad = (depth == 1) ? bperlin * 8 : bperlin;
+  if (pad < w) FatalError("pad too small");
+  pad -= w;
 
   row = bcnt = 0;
 
