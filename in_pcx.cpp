@@ -355,7 +355,7 @@ static int pcxLoadImage24 ___((char *fname, FILE *fp, PICINFO *pinfo, byte *hdr)
 
   w = pinfo->w;  h = pinfo->h;
 
-  planes = (int) hdr[PCX_PLANES];
+  planes = (unsigned) hdr[PCX_PLANES];
   bperlin = hdr[PCX_BPRL] + ((dimen) hdr[PCX_BPRH]<<8);
 
   /* allocate 24-bit image */
@@ -379,6 +379,7 @@ static int pcxLoadImage24 ___((char *fname, FILE *fp, PICINFO *pinfo, byte *hdr)
       if (c == EOF) { MACRO_GETC(fp); break; }
     }
     else cnt = 1;
+    if (cnt > nbytes) FatalError("Repeat count too large.");
 
 #if 0 /**** pts ****/
     if (c > maxv)  maxv = c;
@@ -403,6 +404,7 @@ static int pcxLoadImage24 ___((char *fname, FILE *fp, PICINFO *pinfo, byte *hdr)
       }
     }
   }
+  if (nbytes != 0) pcxError(0, "Image data truncated.");
 
 
 #if 0 /**** pts ****/
