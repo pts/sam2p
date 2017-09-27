@@ -753,6 +753,7 @@ void Image::Indexed::sortPal() {
   unsigned ncols = getNcols(), i;
   assert(transp == -1 || transp + 0U == ncols - 1);
   assert(ncols <= 256);
+  if (ncols == 0) return;  /* Safe if ncols == 0 and transp == -1. */
   if (transp + 0U == ncols - 1) --ncols;
   if (ncols <= 1) return;
   #if SIZEOF_SHORT>=4
