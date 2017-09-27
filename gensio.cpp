@@ -893,7 +893,7 @@ int Files::system3(char const *commands) {
     p=commands; while (*p!='\0' && *p!='\n') p++;
     if (*p=='\0') return system(commands); /* no newline -- simple run */
     SimBuffer::B tmpnam;
-    FILE *f=Files::open_tmpnam(tmpnam, /*binary_p:*/false, ".bat");
+    FILE *f=Files::open_tmpnam(tmpnam, "w", ".bat");
     tmpnam.term0();
     Files::tmpRemoveCleanup(tmpnam());
     fprintf(f, "@echo off\n%s\n", commands);
