@@ -1153,6 +1153,7 @@ LZWCleanup(TIFF* tif)
 		_TIFFfree(tif->tif_data);
 		tif->tif_data = NULL;
 	}
+	_TIFFfree(tif->tif_rawdata);
 }
 
 static int
@@ -1415,8 +1416,8 @@ static int feeder(char *readbuf, unsigned readlen, TIFF *tif) {
     }
   } else {
     if (!LZWPostEncode(tif)) goto e1;
-    LZWCleanup(tif);
     if (!TIFFFlushData1(tif)) goto e2;
+    LZWCleanup(tif);
   }
   return 1;
 }
