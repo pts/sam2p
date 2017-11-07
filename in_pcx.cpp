@@ -368,6 +368,7 @@ static int pcxLoadImage24 ___((char *fname, FILE *fp, PICINFO *pinfo, byte *hdr)
   /* allocate 24-bit image */
   const PCX_SIZE_T alloced = multiply_check(w, h, planes);
   const PCX_SIZE_T w_planes = multiply_check(w, planes);
+  const PCX_SIZE_T pixfix = w > bperlin ? (w - bperlin) * planes : 0;
   pic24 = (byte *) malloc_byte(alloced);
   if (!pic24) FatalError("couldn't malloc 'pic24'");
 
@@ -375,7 +376,6 @@ static int pcxLoadImage24 ___((char *fname, FILE *fp, PICINFO *pinfo, byte *hdr)
    * if malloc_byte has succeeded.
    */
   xvbzero((char *) pic24, alloced);
-  fprintf(stderr, "AAA3\n");
 
 #if 0 /**** pts ****/
   maxv = 0;
@@ -407,6 +407,7 @@ static int pcxLoadImage24 ___((char *fname, FILE *fp, PICINFO *pinfo, byte *hdr)
       nbytes--;
       if (j == bperlin) {
 	j = 0;
+        pix += pixfix;
 	if (++i < planes) {
 	  pix -= w_planes-1;  /* next plane on this line */
 	}
