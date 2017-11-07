@@ -50,6 +50,14 @@ struct Bitmap_Head_Struct
                         /* 36 */
 } Bitmap_Head;
 
+static at_dimen_t multiply_check(at_dimen_t a, at_dimen_t b) {
+  const at_dimen_t result = a * b;
+  /* Check for overflow. Works only if everything is unsigned. */
+  if (result / a != b) FATALP("BMP: Image too large.");
+  return result;
+}
+
+
 static long        ToL           (unsigned char *);
 static short       ToS           (unsigned char *);
 static int         ReadColorMap  (FILE *,
@@ -58,12 +66,12 @@ static int         ReadColorMap  (FILE *,
 				   int,
 				   int *);
 static unsigned char        *ReadImage     (FILE *,
-				   int,
-				   int,
+				   at_dimen_t,
+				   at_dimen_t,
 				   unsigned char[256][3],
 				   int,
 				   int,
-				   int,
+				   at_dimen_t,
 				   int);
 
 #if PTS_SAM2P
@@ -74,7 +82,8 @@ bitmap_type bmp_load_image (at_string filename)
 {
   FILE *fd;
   unsigned char buffer[64];
-  int ColormapSize, rowbytes, Maps=0, Grey;
+  int ColormapSize, Maps=0, Grey;
+  at_dimen_t rowbytes;
   unsigned char ColorMap[256][3];
   bitmap_type image;
 
@@ -185,7 +194,7 @@ bitmap_type bmp_load_image (at_string filename)
    * word length (32 bits == 4 bytes)
    */
 
-  rowbytes= ( (Bitmap_Head.biWidth * Bitmap_Head.biBitCnt - 1) / 32) * 4 + 4;
+  rowbytes = ((multiply_check(Bitmap_Head.biWidth, Bitmap_Head.biBitCnt) >> 3) + 3) & ~3;
 
 #ifdef DEBUG
   printf("\nSize: %u, Colors: %u, Bits: %u, Width: %u, Height: %u, Comp: %u, Zeile: %u\n",
@@ -246,40 +255,40 @@ ReadColorMap (FILE   *fd,
 
 static unsigned char*
 ReadImage (FILE   *fd,
-	   int    width,
-	   int    height,
+	   at_dimen_t width,
+	   at_dimen_t height,
 	   unsigned char  cmap[256][3],
 	   int    bpp,
 	   int    compression,
-	   int    rowbytes,
+	   at_dimen_t rowbytes,
 	   int    grey)
 {
   unsigned char v,howmuch;
-  int xpos = 0, ypos = 0;
+  unsigned xpos = 0, ypos = 0;
   unsigned char *image;
   unsigned char *temp, *buffer;
-  long rowstride, channels;
+  unsigned char channels;
   unsigned short rgb;
+  const at_dimen_t wdht = multiply_check(width, height);
+  at_dimen_t rowstride;
   int i, j;
 
   if (bpp >= 16) /* color image */
     {
-      XMALLOCT (image, unsigned char*, width * height * 3 * sizeof (unsigned char));
       channels = 3;
     }
   else if (grey) /* grey image */
     {
-      XMALLOCT (image, unsigned char*, width * height * 1 * sizeof (unsigned char));
 	  channels = 1;
 	}
   else /* indexed image */
 	{
-      XMALLOCT (image, unsigned char*, width * height * 1 * sizeof (unsigned char));
 	  channels = 1;
 	}
 
+  XMALLOCT (image, unsigned char*, multiply_check(wdht, channels));
   XMALLOCT (buffer, unsigned char*, rowbytes);
-  rowstride = width * channels;
+  rowstride = multiply_check(width, channels);
 
   ypos = height - 1;  /* Bitmaps begin in the lower left corner */
 
@@ -355,14 +364,14 @@ ReadImage (FILE   *fd,
 		    xpos = 0;
 
 		  }
-		if (ypos < 0)
+		if ((int)ypos < 0)
 		  break;
 	      }
 	    break;
 	  }
 	else
 	  {
-	    while (ypos >= 0 && xpos <= width)
+	    while ((int)ypos >= 0 && xpos <= width)
 	      {
 		(void) ReadOK (fd, buffer, 2);
 		if ((unsigned char) buffer[0] != 0)
@@ -442,7 +451,7 @@ ReadImage (FILE   *fd,
       unsigned char *temp2, *temp3;
       unsigned char index;
       temp2 = temp = image;
-      XMALLOCT (image, unsigned char*, width * height * 3 * sizeof (unsigned char));
+      XMALLOCT (image, unsigned char*, multiply_check(wdht, 3));
       temp3 = image;
       for (ypos = 0; ypos < height; ypos++)
         {
