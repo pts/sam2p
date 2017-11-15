@@ -287,7 +287,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   /* ^^^ Imp: separate hint for each -c arg?? */
   SimBuffer::B LoadHints;
   bool TmpRemove_p=true;
-  Rule::Cache::pr_t Predictor=Rule::Cache::PR_None; /* Imp: separate for each Compression */
+  Rule::Cache::pr_t Predictor=Rule::Cache::PR_PNGAutoMaybe; /* 25 */
   Rule::Cache::ff_t FileFormat=Rule::Cache::FF_default;
   Rule::Cache::te_t TransferEncoding=Rule::Cache::TE_default;
   do_DisplayJobFile=false;
@@ -464,10 +464,14 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
        case OPT_Compression:
         assert(param!=(char const*)NULLP);
              if (0==GenBuffer::nocase_strcmp(param, "none")) APPEND_co(Rule::Cache::CO_None);
-        else if (0==GenBuffer::nocase_strcmp(param, "lzw"))  APPEND_co(Rule::Cache::CO_LZW);
-        else if (0==GenBuffer::nocase_strcmp(param, "zip"))  APPEND_co(Rule::Cache::CO_ZIP);
-        else if (0==GenBuffer::nocase_strcmp(param, "rle")
-              || 0==GenBuffer::nocase_strcmp(param, "packbits")) APPEND_co(Rule::Cache::CO_RLE);
+        else if (0==GenBuffer::nocase_strcmp(param, "lzw")) {
+          Predictor = Rule::Cache::PR_None;  /* 1 */
+          APPEND_co(Rule::Cache::CO_LZW);
+        } else if (0==GenBuffer::nocase_strcmp(param, "zip")) {
+          Predictor = Rule::Cache::PR_None;  /* 1 */
+          APPEND_co(Rule::Cache::CO_ZIP);
+        } else if (0==GenBuffer::nocase_strcmp(param, "rle")
+                   || 0==GenBuffer::nocase_strcmp(param, "packbits")) APPEND_co(Rule::Cache::CO_RLE);
         else if (0==GenBuffer::nocase_strcmp(param, "dct"))  { APPEND_co(Rule::Cache::CO_DCT); Hints << "\n/DCT<<>>"; }
         else if (0==GenBuffer::nocase_strcmp(param, "jpg")
               || 0==GenBuffer::nocase_strcmp(param, "jpeg")) { APPEND_co(Rule::Cache::CO_JAI); APPEND_co(Rule::Cache::CO_IJG); }
@@ -672,9 +676,28 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
     badp=true;
   }
   if (badp) return true;
-  
-  int prcc = (colen==0) ? 2 : 1;
-  if (colen==0) { /* apply default if Compression is unspecified */
+
+  if (Predictor == Rule::Cache::PR_PNGAutoMaybe) {
+    switch (FileFormat) {
+     case Rule::Cache::FF_eps:
+     case Rule::Cache::FF_pdf:
+     case Rule::Cache::FF_pdfb:
+     case Rule::Cache::FF_PSL1:
+     case Rule::Cache::FF_PSLC:
+     case Rule::Cache::FF_PSL2:
+     case Rule::Cache::FF_PSL3:
+     case Rule::Cache::FF_PDFB10:
+     case Rule::Cache::FF_PDFB12:
+     case Rule::Cache::FF_PDF10:
+     case Rule::Cache::FF_PDF12:
+     case Rule::Cache::FF_PNG:
+     /*case Rule::Cache::FF_TIFF:*/
+      break;
+     default: ;  /* Keep PR_None (1) as the default. */
+      Predictor = Rule::Cache::PR_None;  /* 1 */
+    }
+  }
+  if (colen==0) { /* apply default if Compression (-c:...) is unspecified */
     // Error::sev(Error::FATAL) << "FileFormat=" << (unsigned)FileFormat << (Error*)0;
     switch (FileFormat) {
      case Rule::Cache::FF_TIFF:
@@ -832,7 +855,6 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
   unsigned coi, sfi;
   slen_t orc=0;
   int prc;
-  bool is_predictor_recommended;
   for (sfi=0;sfi<sflen;sfi++) { for (coi=0;coi<colen;coi++) {
   // for (coi=0;coi<colen;coi++) for (sfi=0;sfi<sflen;sfi++)
       Rule::Cache::co_t co=cot[coi];
@@ -840,30 +862,39 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
       if (co==Rule::Cache::CO_JAI) {
         if (!jaip || sf!=Image::SF_Asis) continue;
       }
-      for (prc=prcc; prc>0; --prc) {
-        /* Add an extra predictor only for LZW or ZIP, appropriate SampleFormat
-         * and if the `-c' command line option was not specified.
-         * So if the user specifies `-c zip', he won't get a predictor by
-         * default; but if he specifies no `-c', he might get a `-c:zip:15'.
-         * To get the smallest file size, he should specify `-c zip:15:9'.
-         *
-         * The value we assign to is_predictor_recommended comes from the
-         * do_filter = ... assignment in png_write_IHDR() in pngwutil.c of
-         * libpng-1.2.15 .
-         */
-        is_predictor_recommended = (
-            sf==Image::SF_Gray8 || sf==Image::SF_Rgb8);
-        if (prc>1 && ((co!=Rule::Cache::CO_LZW && co!=Rule::Cache::CO_ZIP) ||
-            !is_predictor_recommended)) continue;
+      /* Only LZW and ZIP compression can take a predictor. */
+      const bool is_predictor_ok_compress =
+          co==Rule::Cache::CO_LZW || co==Rule::Cache::CO_ZIP;
+      /* Add an extra predictor 15 (PR_PNGAuto) only for LZW or ZIP, appropriate
+       * SampleFormat and if (the `-c' command line option was not specified
+       * or `-c:zip:25' or `-c:lzw:25' was specified).
+       * So if the user specifies `-c:zip', he won't get a predictor by
+       * default; but if he specifies no `-c', he might get a `-c:zip:15'.
+       * To get the heuristically smallest file size (maximum compression),
+       * he should specify `-c:zip:25:9'.
+       *
+       * Some FileFormats don't support predictors (in fact only PS, PDF,
+       * PNG and TIFF do, but TIFF doesn't support PR_PNGAuto), so we always
+       * try predictor 1 (PR_None) afterwards as a fallback.
+       *
+       * The value we assign to is_predictor_recommended comes from the
+       * do_filter = ... assignment in png_write_IHDR() in pngwutil.c of
+       * libpng-1.2.15 .
+       */
+      const bool do_try_pngauto_predictor =
+          is_predictor_ok_compress &&
+          Predictor == Rule::Cache::PR_PNGAutoMaybe &&
+          (sf==Image::SF_Gray8 || sf==Image::SF_Rgb8);
+      for (prc = 1 + do_try_pngauto_predictor; prc > 0; --prc) {
         jobss << "<<% OutputRule #" << orc++
               << "\n  /FileFormat /" << protect_null(Rule::Cache::dumpFileFormat(FileFormat, co))
               << "\n  /TransferEncoding /" << protect_null(Rule::Cache::dumpTransferEncoding(TransferEncoding))
               << "\n  /SampleFormat /" << protect_null(Rule::Cache::dumpSampleFormat(sf))
               << "\n  /Compression /"  << protect_null(Rule::Cache::dumpCompression (co))
-              << "\n  /Predictor " << (int)(co==Rule::Cache::CO_LZW || co==Rule::Cache::CO_ZIP ?
-                  /* If no compression (or predictor) specified, try predictor 15, then 1; otherwise try the specified predictor */
+              << "\n  /Predictor " << (int)(
                   /* +0 down there to avoid linking problems with g++ on Mac OS X 10.5.6 */
-                  (prc>1 ? Rule::Cache::PR_PNGAuto+0 : Predictor != Rule::Cache::PR_PNGAutoMaybe ? Predictor : is_predictor_recommended ? Rule::Cache::PR_PNGAuto+0 : Rule::Cache::PR_None+0) : Rule::Cache::PR_None+0)
+                  prc > 1 ? Rule::Cache::PR_PNGAuto+0 /* 15 */ :
+                  Predictor == Rule::Cache::PR_PNGAutoMaybe ? Rule::Cache::PR_None+0 : Predictor)
               << "\n  /Hints << " << Hints << " >>";
         // jobss << "  /Transparent (\377\377\377)\n";
         if (Transparent!=NULL) {
