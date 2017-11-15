@@ -1241,7 +1241,7 @@ Rule::Applier::cons_t out_tiffjai_check_rule(Rule::OutputRule* or_) {
     badp=true;
   }
   if (cache->hasPredictor()) {
-    Error::sev(Error::WARNING_DEFER) << "check_rule: /FileFormat/TIFF /Compression/JAI requires /Prediror 1" << (Error*)0;
+    Error::sev(Error::WARNING_DEFER) << "check_rule: /FileFormat/TIFF /Compression/JAI requires /Predictor 1" << (Error*)0;
     badp=true;
   }
   if (badp) return Rule::Applier::BAD;
