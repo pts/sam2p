@@ -89,6 +89,7 @@ bool GenBuffer::toInteger(unsigned long &dst) {
   char *p=numtmp;
   if (*p=='+') p++;
   unsigned long i=0;
+  if (*p == '\0') return true;  /* No digit at all. */
   while (1) {
     // fprintf(stderr,"toInteger'%c'\n", *p);
     if (*p<'0' || *p>'9') break;
@@ -107,6 +108,7 @@ bool GenBuffer::toInteger(signed long &dst) {
   bool neg=false;
   if (*p=='+') p++;
   else if (*p=='-') { neg=true; p++; }
+  if (*p == '\0') return true;  /* No digit at all. */
   unsigned long i=0;
   while (1) {
     if (*p<'0' || *p>'9') break;
@@ -124,6 +126,7 @@ bool GenBuffer::toInteger(unsigned PTS_CFG_LONGEST &dst) {
   /* ASSERT(numtmp null-terminated) */
   char *p=numtmp;
   if (*p=='+') p++;
+  if (*p == '\0') return true;  /* No digit at all. */
   unsigned PTS_CFG_LONGEST i=0;
   while (1) {
     if (*p<'0' || *p>'9') break;
@@ -142,6 +145,7 @@ bool GenBuffer::toInteger(signed PTS_CFG_LONGEST &dst) {
   bool neg=false;
   if (*p=='+') p++;
   else if (*p=='-') { neg=true; p++; }
+  if (*p == '\0') return true;  /* No digit at all. */
   unsigned PTS_CFG_LONGEST i=0;
   while (1) {
     if (*p<'0' || *p>'9') break;
