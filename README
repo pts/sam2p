@@ -373,11 +373,13 @@ Options (case insensitive):
 -- -t:msb1 -f:msb2lsb : [pts,tiffcp] hint /TransferEncoding/MSBfirst
 
 -- -c:none                 : [pts,tiffcp] non-default hint /Compression/None
--- -c:lzw                  : [pts,tiffcp] hint /Compression/LZW
--- -c:lzw:(1..99)          : [pts] hint /Compression/LZW /Predictor ...
--- -c:zip                  : [pts,tiffcp] hint /Compression/ZIP
--- -c:zip:(1..99)          : [pts] hint /Compression/ZIP /Predictor ...
+-- -c:zip:25:9             : [pts,tiffcp] ZIP, maximum effort, best predictor
 -- -c:zip:(1..99):(-1..9)  : [pts] hint /Compression/ZIP /Predictor ... /Effort ...
+-- -c:zip:(1..99)          : [pts] same as -c:zip(1..99):5
+-- -c:zip                  : [pts,tiffcp] same as -c:zip:1:5
+-- -c:lzw:25               : [pts] LZW, best predictor
+-- -c:lzw:(1..99)          : [pts] hint /Compression/LZW /Predictor ...
+-- -c:lzw                  : [pts,tiffcp] same as -c:lzw:1
 -- -c:(rle|packbits)       : [pts,tiffcp] hint /Compression/RLE
 -- -c:(rle|packbits):(0..) : [pts] hint /Compression/RLE /RecordSize ...
 -- -c:fax                  : [pts] hint /Compression/Fax
@@ -1248,24 +1250,31 @@ Output rule entries:
      input file must be a JPEG file -- its contents are transferred
      unmodified into the /DCTDecode JPEG stream). This requires
      /SampleFormat/Asis, and doesn't work with any other /SampleFormats
--- Predictor: enum (see later), default: 25, numbering same as PSL1 filter.
-   1 -- no predictor. (default) Must be this unless Compression is /LZW or
-        /Flate
+-- Predictor: enum (see below), default is 25 (except if -c:zip or -c:lzw is
+   specified without more parameters, because then 1 is used), numbering is
+   same as PSL1 filter.
+   Affects PNG output, PS output (with -c:zip:... and -c:lzw:...), PDF
+   output (with -c:zip:... and -c:lzw:...), TIFF output (with -c:zip:... and
+   -c:lzw:...).
+   1 -- (default if -c:zip or -c:lzw is specified without more parameters)
+        No predictor. If FileFormat is PNG, then 10 is used instead.
    2 -- TIFF predictor 2 (horizontal differencing)
    10 -- PNG predictor, None function
    11 -- PNG predictor, Sub function
    12 -- PNG predictor, Up function
    13 -- PNG predictor, Average function
    14 -- PNG predictor, Paeth function
-   15 -- PNG predcitor, individually chosen for each line (absolute minimum)
-         This is the same as what libpng uses by default when creating PNG.
-   25 -- Pick 15 or 1 based on the SampleFormat: use 15 for Gray8 and Rgb8,
+   15 -- PNG predictor, individually chosen for each line (absolute minimum)
+   25 -- (default if -c:zip and -c:lzw are notespecified)
+         Use 15 if FileFormat supports 15 (PS, PDF or PNG),
+         Compression supports predictors (ZIP or LZW) and SampleFormat
+         is Gray8 or Rgb8; use 10 if FileFormat is PNG; otherwise use 1.
          and use 1 (no predictor) for everything else. This is the default.
-   45 -- PNG predcitor, individually chosen for each line (unsigned minimum)
-         Don't use this, it is quite inefficient.
-   55 -- PNG predcitor, individually chosen for each line (signed minimum)
-         Don't use this, it is quite inefficient.
-
+         For PNG output, this is the same as what libpng uses by default.
+   45 -- PNG predictor, individually chosen for each line (unsigned minimum)
+         Don't use this, it generates a large output file.
+   55 -- PNG predictor, individually chosen for each line (signed minimum)
+         Don't use this, it generates a large output file.
 -- Transparent: color. Default: null. Specify a color forced to be
    transparent. Old transparency, if exists, is blacked!
 -- Hints: dict
@@ -2204,7 +2213,9 @@ Q33. How do I control ZIP compression ratio?
 A33. Use
 
 	sam2p -c:zip:1:0 in.img out.png  # uncompressed ZIP carrier
-	sam2p -c:zip:1:1 in.img out.png  # normal compression
+	sam2p -c:zip:1:1 in.img out.png  # little compression
+	sam2p -c:zip     in.img out.png  # default normal compression
+	sam2p -c:zip:1:5 in.img out.png  # default normal compression
 	sam2p -c:zip:1:9 in.img out.png  # maximum compression
 
 Q34. ImageMagick convert creates smaller PNGs. Why?
