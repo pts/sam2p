@@ -110,6 +110,12 @@ static void pcxLoadRaster  PARM((FILE *, byte *, int, byte *, dimen, dimen));
 static int  pcxWarning       PARM((char *, char *));
 #endif
 
+static slen_t add_check(PCX_SIZE_T a, PCX_SIZE_T b) {
+  /* Check for overflow. Works only if everything is unsigned. */
+  if (b > (PCX_SIZE_T)-1 - a) FatalError("Image too large.");
+  return a + b;
+}
+
 static PCX_SIZE_T multiply_check(PCX_SIZE_T a, PCX_SIZE_T b) {
   PCX_SIZE_T result;
   if (a == 0) return 0;
@@ -334,7 +340,8 @@ static int pcxLoadImage8 ___((char *fname, FILE *fp, PICINFO *pinfo, byte *hdr),
 
   byte *image;
 
-  image = (byte *) malloc_byte(multiply_check(pinfo->h, pinfo->w));
+  /* Adding 7 bytes as a sentinel for depth == 1 in pcxLoadRaster. */
+  image = (byte *) malloc_byte(add_check(multiply_check(pinfo->h, pinfo->w), 7));
   if (!image) FatalError("Can't alloc 'image' in pcxLoadImage8()");
 
   xvbzero((char *) image, multiply_check(pinfo->h, pinfo->w));
@@ -456,14 +463,17 @@ static void pcxLoadRaster ___((FILE *fp, byte *image, int depth, byte *hdr, dime
 {
   /* was supported:  8 bits per pixel, 1 plane, or 1 bit per pixel, 1-8 planes */
 
-  unsigned row, bcnt, bperlin, pad, cnt, pmask, i, pleft;
+  unsigned row, cnt, pmask, pleft;
+  PCX_SIZE_T bperlin, pad, bcnt;
   int b;
   byte *oldimage;
 
   bperlin = hdr[PCX_BPRL] + ((dimen) hdr[PCX_BPRH]<<8);
-  pad = (depth == 1) ? bperlin * 8 : bperlin;
-  if (pad < w) FatalError("pad too small");
+  pad = multiply_check(bperlin, 8 / depth);
+  if (pad < w) FatalError("bperlin too small");
   pad -= w;
+  /* image (including sentinel) isn't large enough for bperlin. */
+  if (pad > 7) FatalError("bperlin too large");
 
   row = bcnt = 0;
 
@@ -478,7 +488,7 @@ static void pcxLoadRaster ___((FILE *fp, byte *image, int depth, byte *hdr, dime
     }
     else cnt = 1;
 
-    for (i=0; i<cnt; i++) {
+    while (cnt-- > 0) {
       switch (depth) {
        case 1:
         *image++|=(b&0x80)?pmask:0;
