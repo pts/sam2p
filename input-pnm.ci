@@ -392,7 +392,7 @@ pnm_load_rawpbm (PNMScanner *scan,
 
   fd = pnmscanner_fd(scan);
   /****pts****/ /* rowlen = (unsigned int)ceil((double)(info->xres)/8.0);*/
-  rowlen=(info->xres+7)>>3;
+  rowlen = (info->xres >> 3) + (info->xres & 3 ? 1 : 0);
   /* buf = (unsigned char *)malloc(rowlen*sizeof(unsigned char)); */
   XMALLOCT(buf, unsigned char*, rowlen*sizeof(unsigned char));
 
