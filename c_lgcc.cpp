@@ -31,7 +31,7 @@ extern "C" void __pure_virtual(); void __pure_virtual() { abort(); }
  *   works for g++-4.2.1 and g++-4.4.1 as well
  *   removed dependency on stdio, so we get more reliable OOM reporting
  */
-static void* emulate_cc_new(unsigned len) { \
+static void* emulate_cc_new(size_t len) { \
   void *p = malloc(len);
   if (p == 0) {
     /* Don't use stdio (e.g. fputs), because that may want to allocate more
