@@ -223,7 +223,8 @@ static Image::Sampled *LoadPCX
   if (ferror(fp) | feof(fp))    /* just a warning */
     pcxWarning(bname, "PCX file appears to be truncated.");
 
-  if (colors>16 && !fullcolor) {       /* handle trailing colormap */
+  if (!fullcolor) {
+  if (colors>16) {       /* handle trailing colormap */
     while (1) {
       i=MACRO_GETC(fp);
       if (i==PCX_MAPSTART || i==EOF) break;
@@ -257,10 +258,11 @@ static Image::Sampled *LoadPCX
   if (colors == 2) {    /* b&w */
 #if 0 /**** pts ****/
     if (MONO(PAL_R(pinfo,0), PAL_G(pinfo,0), PAL_B(pinfo,0)) ==
-	MONO(PAL_R(pinfo,1), PAL_G(pinfo,1), PAL_B(pinfo,1))) {
+	MONO(PAL_R(pinfo,1), PAL_G(pinfo,1), PAL_B(pinfo,1)))
 #else
-    if (PAL_R(pinfo,0)==PAL_R(pinfo,1) && PAL_G(pinfo,0)==PAL_G(pinfo,1) && PAL_B(pinfo,0)==PAL_B(pinfo,1)) {
+    if (PAL_R(pinfo,0)==PAL_R(pinfo,1) && PAL_G(pinfo,0)==PAL_G(pinfo,1) && PAL_B(pinfo,0)==PAL_B(pinfo,1))
 #endif
+    {
       /* create cmap */
       PAL_R(pinfo,0) = PAL_G(pinfo,0) = PAL_B(pinfo,0) = 255;
       PAL_R(pinfo,1) = PAL_G(pinfo,1) = PAL_B(pinfo,1) = 0;
@@ -269,6 +271,7 @@ static Image::Sampled *LoadPCX
 #endif
     }
   }
+  }  /* if (!fullColor) */
   /* fclose(fp); */
 
   /* finally, convert into XV internal format */
