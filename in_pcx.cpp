@@ -239,7 +239,7 @@ static Image::Sampled *LoadPCX
     if (fread(pinfo->pal, 1, colors*3, fp) != colors * 3 + 0U ||
         ferror(fp) || feof(fp)) {
       pcxError(bname,"Error reading PCX colormap.  Using grayscale.");
-      for (i=0; i<256; i++) PAL_R(pinfo,i) = PAL_G(pinfo,i) = PAL_B(pinfo,i) = i;
+      for (i=0; i<colors; i++) PAL_R(pinfo,i) = PAL_G(pinfo,i) = PAL_B(pinfo,i) = i;
     }
   }
   else if (colors<=16) {   /* internal colormap */
