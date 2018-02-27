@@ -319,7 +319,7 @@ ReadImage (FILE   *fd,
                *(temp++)= buffer[xpos * 4 + 1];
                *(temp++)= buffer[xpos * 4];
             }
-          --ypos; /* next line */
+          if (ypos-- == 0) break;  /* next line */
         }
     }
 	break;
@@ -335,7 +335,7 @@ ReadImage (FILE   *fd,
                *(temp++)= buffer[xpos * 3 + 1];
                *(temp++)= buffer[xpos * 3];
             }
-          --ypos; /* next line */
+          if (ypos-- == 0) break;  /* next line */
         }
 	}
     break;
@@ -352,7 +352,7 @@ ReadImage (FILE   *fd,
                *(temp++)= (unsigned char)(((rgb >> 5)  & 0x1f) * 8);
                *(temp++)= (unsigned char)(((rgb)       & 0x1f) * 8);
             }
-          --ypos; /* next line */
+          if (ypos-- == 0) break;  /* next line */
         }
     }
 	break;
@@ -378,12 +378,9 @@ ReadImage (FILE   *fd,
 		if (xpos == width)
 		  {
 		    if (!ReadOK (fd, buffer, rowpad)) break;
-		    ypos--;
+		    if (ypos-- == 0) break;  /* next line */
 		    xpos = 0;
-
 		  }
-		if ((int)ypos < 0)
-		  break;
 	      }
 	    break;
 	  }
