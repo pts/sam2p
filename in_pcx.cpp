@@ -20,7 +20,7 @@
 
 /* Imp: palette handling etc. according to PCX_VER, see decode.c */
 #define dimen Image::Sampled::dimen_t
-#define pcxError(bname,conststr) Error::sev(Error::WARNING) << "PCX: " conststr << (Error*)0
+#define pcxWarning(bname,conststr) Error::sev(Error::WARNING) << "PCX: " conststr << (Error*)0
 #define WaitCursor()
 #define xvbzero(p,len) memset(p, '\0', len)
 #define FatalError(conststr) Error::sev(Error::EERROR) << "PCX: " conststr << (Error*)0
@@ -107,7 +107,7 @@ static int  pcxLoadImage8  PARM((char *, FILE *, PICINFO *, byte *));
 static int  pcxLoadImage24 PARM((char *, FILE *, PICINFO *, byte *));
 static void pcxLoadRaster  PARM((FILE *, byte *, int, byte *, dimen, dimen));
 #if 0 /**** pts ****/
-static int  pcxError       PARM((char *, char *));
+static int  pcxWarning       PARM((char *, char *));
 #endif
 
 static PCX_SIZE_T multiply_check(PCX_SIZE_T a, PCX_SIZE_T b) {
@@ -221,7 +221,7 @@ static Image::Sampled *LoadPCX
 
 
   if (ferror(fp) | feof(fp))    /* just a warning */
-    pcxError(bname, "PCX file appears to be truncated.");
+    pcxWarning(bname, "PCX file appears to be truncated.");
 
   if (colors>16 && !fullcolor) {       /* handle trailing colormap */
     while (1) {
@@ -238,7 +238,7 @@ static Image::Sampled *LoadPCX
 #endif
     if (fread(pinfo->pal, 1, colors*3, fp) != colors * 3 + 0U ||
         ferror(fp) || feof(fp)) {
-      pcxError(bname,"Error reading PCX colormap.  Using grayscale.");
+      pcxWarning(bname,"Error reading PCX colormap.  Using grayscale.");
       for (i=0; i<colors; i++) PAL_R(pinfo,i) = PAL_G(pinfo,i) = PAL_B(pinfo,i) = i;
     }
   }
@@ -419,7 +419,7 @@ static int pcxLoadImage24 ___((char *fname, FILE *fp, PICINFO *pinfo, byte *hdr)
       }
     }
   }
-  if (nbytes != 0) pcxError(0, "Image data truncated.");
+  if (nbytes != 0) pcxWarning(0, "Image data truncated.");
 
 
 #if 0 /**** pts ****/
@@ -521,7 +521,7 @@ static void pcxLoadRaster ___((FILE *fp, byte *image, int depth, byte *hdr, dime
 
 #if 0 /**** pts ****/
 /*******************************************/
-static int pcxError(fname,st)
+static int pcxWarning(fname,st)
      char *fname, *st;
 {
   SetISTR(ISTR_WARNING,"%s:  %s", fname, st);
