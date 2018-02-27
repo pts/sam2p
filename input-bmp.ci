@@ -172,6 +172,12 @@ bitmap_type bmp_load_image (at_string filename)
 
   if (Maps != 3 && Maps != 4) FATALP("BMP: Bad color_size.");
 
+  switch (Bitmap_Head.biBitCnt) {
+   case 32: case 24: case 16: case 8: case 4: case 2: case 1: break;
+   default:
+    FATALP ("BMP: Invalid bpp.");
+  }
+
   /* Valid options 1, 4, 8, 16, 24, 32 */
   /* 16 is awful, we should probably shoot whoever invented it */
 
