@@ -111,9 +111,10 @@ static int  pcxError       PARM((char *, char *));
 #endif
 
 static PCX_SIZE_T multiply_check(PCX_SIZE_T a, PCX_SIZE_T b) {
-  const PCX_SIZE_T result = a * b;
+  PCX_SIZE_T result;
+  if (a == 0) return 0;
   /* Check for overflow. Works only if everything is unsigned. */
-  if (result / a != b) FatalError("Image too large.");
+  if ((result = a * b) / a != b) FatalError("Image too large.");
   return result;
 }
 

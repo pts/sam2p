@@ -112,9 +112,10 @@ static void fatal_image_too_large() {
 }
 
 static slen_t multiply_check(slen_t a, slen_t b) {
-  const slen_t result = a * b;
+  slen_t result;
+  if (a == 0) return 0;
   /* Check for overflow. Works only if everything is unsigned. */
-  if (result / a != b) fatal_image_too_large();
+  if ((result = a * b) / a != b) fatal_image_too_large();
   return result;
 }
 
