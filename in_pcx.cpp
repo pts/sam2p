@@ -140,7 +140,8 @@ static Image::Sampled *LoadPCX
   char *errstr; byte *image;
   int gray;
 #endif
-  int    i, colors, fullcolor;
+  unsigned i, colors;
+  unsigned char fullcolor;
 
   pinfo->pic     = (byte *) NULL;
   pinfo->pal     = (byte *) NULL;
@@ -181,8 +182,16 @@ static Image::Sampled *LoadPCX
 
   pinfo->w++;  pinfo->h++;
 
-  colors = 1 << (hdr[PCX_BPP] * hdr[PCX_PLANES]);
-  fullcolor = (hdr[PCX_BPP] == 8 && hdr[PCX_PLANES] == 3);
+  fullcolor = hdr[PCX_BPP] == 8 && hdr[PCX_PLANES] == 3;
+  if (fullcolor) {
+    colors = 0;
+  } else {
+    colors = hdr[PCX_BPP] * hdr[PCX_PLANES];
+    if (colors > 8) {
+      return_pcxError(bname,"No more than 256 colors allowed in PCX file.");
+    }
+    colors = 1 << colors;
+  }
 
 #if USE_PCX_DEBUG_MESSAGES
   fprintf(stderr,"PCX: %dx%d image, version=%d, encoding=%d\n",
@@ -192,11 +201,6 @@ static Image::Sampled *LoadPCX
           hdr[PCX_BPRL] + ((dimen) hdr[PCX_BPRH]<<8),
           colors);
 #endif
-
-  if (colors>256 && !fullcolor) {
-    /* fclose(fp); */
-    return_pcxError(bname,"No more than 256 colors allowed in PCX file.");
-  }
 
   if (hdr[PCX_ENC] != 1) {
     /* fclose(fp); */
