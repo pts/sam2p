@@ -226,6 +226,7 @@ bitmap_type pnm_load_image (at_string filename)
     FATALP ("PNM: is not a valid file");
 
   /* Look up magic number to see what type of PNM this is */
+  pnminfo->loader = NULL;
   for (ctr=0; pnm_types[ctr].name; ctr++)
     if (buf[1] == pnm_types[ctr].name)
       {
@@ -233,6 +234,7 @@ bitmap_type pnm_load_image (at_string filename)
 	pnminfo->asciibody = pnm_types[ctr].asciibody;
 	pnminfo->maxval    = pnm_types[ctr].maxval;
 	pnminfo->loader    = pnm_types[ctr].loader;
+	break;
       }
   if (!pnminfo->loader)
       FATALP ("PNM: file not in a supported format");
