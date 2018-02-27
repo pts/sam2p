@@ -83,7 +83,7 @@ bitmap_type bmp_load_image (at_string filename)
   FILE *fd;
   unsigned char buffer[64];
   int ColormapSize, Maps=0, Grey;
-  at_dimen_t rowbytes;
+  at_dimen_t rowbytes, wd_bpp;
   unsigned char ColorMap[256][3];
   bitmap_type image;
 
@@ -169,6 +169,8 @@ bitmap_type bmp_load_image (at_string filename)
   else
       FATALP ("BMP: Error reading BMP file header #4");
 
+  if (Maps != 3 && Maps != 4) FATALP("BMP: Bad color_size.");
+
   /* Valid options 1, 4, 8, 16, 24, 32 */
   /* 16 is awful, we should probably shoot whoever invented it */
 
@@ -193,8 +195,8 @@ bitmap_type bmp_load_image (at_string filename)
   /* Windows and OS/2 declare filler so that rows are a multiple of
    * word length (32 bits == 4 bytes)
    */
-
-  rowbytes = ((multiply_check(Bitmap_Head.biWidth, Bitmap_Head.biBitCnt) >> 3) + 3) & ~3;
+  wd_bpp = multiply_check(Bitmap_Head.biWidth, Bitmap_Head.biBitCnt);
+  rowbytes = ((wd_bpp >> 5) + (wd_bpp & 31 ? 1 : 0)) << 2;
 
 #ifdef DEBUG
   printf("\nSize: %u, Colors: %u, Bits: %u, Width: %u, Height: %u, Comp: %u, Zeile: %u\n",
@@ -229,27 +231,31 @@ bitmap_type bmp_load_image (at_string filename)
 
 static int
 ReadColorMap (FILE   *fd,
-	      unsigned char  buffer[256][3],
-	      int    number,
-	      int    size,
+	      unsigned char  cmap[256][3],
+	      int    color_count,
+	      int    color_size,  /* 3 or 4. */
 	      int   *grey)
 {
   int i;
   unsigned char rgb[4];
 
-  *grey=(number>2);
-  for (i = 0; i < number ; i++)
+#ifdef DEBUG
+  fprintf(stderr, "color_size=%d\n", color_size);
+#endif
+  *grey=(color_count>2);
+  for (i = 0; i < color_count ; i++)
     {
-      if (!ReadOK (fd, rgb, size))
+      if (!ReadOK (fd, rgb, color_size))
           FATALP ("BMP: Bad colormap");
 
       /* Bitmap save the colors in another order! But change only once! */
 
-      buffer[i][0] = rgb[2];
-      buffer[i][1] = rgb[1];
-      buffer[i][2] = rgb[0];
+      cmap[i][0] = rgb[2];
+      cmap[i][1] = rgb[1];
+      cmap[i][2] = rgb[0];
       *grey = ((*grey) && (rgb[0]==rgb[1]) && (rgb[1]==rgb[2]));
     }
+  memset(&cmap[i], 0, (256 - i) * 3);
   return 0;
 }
 
@@ -287,6 +293,7 @@ ReadImage (FILE   *fd,
 	}
 
   XMALLOCT (image, unsigned char*, multiply_check(wdht, channels));
+  memset(image, 0, wdht * channels);
   XMALLOCT (buffer, unsigned char*, rowbytes);
   rowstride = multiply_check(width, channels);
 
@@ -349,17 +356,21 @@ ReadImage (FILE   *fd,
     {
       if (compression == 0)
 	  {
+	    const int bpp8  = 8 / bpp;
+	    const at_dimen_t rowpad = rowbytes - (width * bpp + 7) / 8;
+#ifdef DEBUG
+	    fprintf(stderr, "BMP bpp=%d width=%d height=%d channels=%d malloced=%d rowbytes=%d\n", bpp, width, height, channels, width * height * channels, rowbytes);
+#endif
 	    while (ReadOK (fd, &v, 1))
 	      {
-		for (i = 1; (i <= (8 / bpp)) && (xpos < width); i++, xpos++)
+		for (i = 1; i <= bpp8 && xpos < width; i++, xpos++)
 		  {
 		    temp = (unsigned char*) (image + (ypos * rowstride) + (xpos * channels));
 		    *temp= (unsigned char)(( v & ( ((1<<bpp)-1) << (8-(i*bpp)) ) ) >> (8-(i*bpp)));
 		  }
 		if (xpos == width)
 		  {
-		    (void) ReadOK (fd, buffer, rowbytes - 1 -
-                                   (width * bpp - 1) / 8);
+		    if (!ReadOK (fd, buffer, rowpad)) break;
 		    ypos--;
 		    xpos = 0;
 
