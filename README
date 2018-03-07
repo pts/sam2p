@@ -2680,6 +2680,19 @@ A60. Please download the newest sam2p:
      Work is being done to make ccdep.pl more resilient
      (https://github.com/pts/sam2p/issues/5).
 
+Q61. What is lzw_codec and how does sam2p use it?
+
+     lzw_codec is an external program which can do LZW compression and
+     decompression. If sam2p is configured with --enable-lzw (default), then
+     it uses a built-in LZW compressor (and it doesn't use lzw_codec). If
+     sam2p is compiled with --disable-lzw, then it uses lzw_codec for LZW
+     compression (and fails if not installed).
+
+     If in doubt, then you don't need lzw_codec to do LZW compression with
+     sam2p): just use the built-in LZW compressor by default.
+
+     lzw_codec is available from https://github.com/pts/lzw_codec .
+
 Standards
 ~~~~~~~~~
 -- PSL1 is PostScript LanguageLevel1, as defined by Adobe's PostScript
