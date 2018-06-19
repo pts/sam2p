@@ -1321,13 +1321,13 @@ void TIFFPredictor2::vi_write(char const*buf, slen_t len) {
     while (p!=pend0) {
       i=*p++;
       d=(i>>7); o =((d-((h>>bpccpp)))&1)<<7; h=(h<<1)|d;
-      d=(i>>6); o|=((d-((h>>bpccpp)))&1)<<6; h=(h<<1)|d;
-      d=(i>>5); o|=((d-((h>>bpccpp)))&1)<<5; h=(h<<1)|d;
-      d=(i>>4); o|=((d-((h>>bpccpp)))&1)<<4; h=(h<<1)|d;
-      d=(i>>3); o|=((d-((h>>bpccpp)))&1)<<3; h=(h<<1)|d;
-      d=(i>>2); o|=((d-((h>>bpccpp)))&1)<<2; h=(h<<1)|d;
-      d=(i>>1); o|=((d-((h>>bpccpp)))&1)<<1; h=(h<<1)|d;
-      d=(i   ); o|=((d-((h>>bpccpp)))&1)   ; h=(h<<1)|d;
+      d=(i>>6); o|=((d-((h>>bpccpp)))&1)<<6; h=(h<<1)|(d&1);
+      d=(i>>5); o|=((d-((h>>bpccpp)))&1)<<5; h=(h<<1)|(d&1);
+      d=(i>>4); o|=((d-((h>>bpccpp)))&1)<<4; h=(h<<1)|(d&1);
+      d=(i>>3); o|=((d-((h>>bpccpp)))&1)<<3; h=(h<<1)|(d&1);
+      d=(i>>2); o|=((d-((h>>bpccpp)))&1)<<2; h=(h<<1)|(d&1);
+      d=(i>>1); o|=((d-((h>>bpccpp)))&1)<<1; h=(h<<1)|(d&1);
+      d=(i   ); o|=((d-((h>>bpccpp)))&1)   ; h=(h<<1)|(d&1);
       *op++=o;
       if (--opleft==0) { h=0; out.vi_write((char*)obuf,rlen); op=obuf; opleft=rlen; }
     }
@@ -1335,9 +1335,9 @@ void TIFFPredictor2::vi_write(char const*buf, slen_t len) {
     while (p!=pend0) {
       i=*p++;
       d=(i>>6); o =((d-((h>>bpccpp)))&3)<<6; h=(h<<2)|d; // fprintf(stderr,"d=%#x\n", d);
-      d=(i>>4); o|=((d-((h>>bpccpp)))&3)<<4; h=(h<<2)|d;
-      d=(i>>2); o|=((d-((h>>bpccpp)))&3)<<2; h=(h<<2)|d;
-      d=(i   ); o|=((d-((h>>bpccpp)))&3)   ; h=(h<<2)|d;
+      d=(i>>4); o|=((d-((h>>bpccpp)))&3)<<4; h=(h<<2)|(d&3);
+      d=(i>>2); o|=((d-((h>>bpccpp)))&3)<<2; h=(h<<2)|(d&3);
+      d=(i   ); o|=((d-((h>>bpccpp)))&3)   ; h=(h<<2)|(d&3);
       *op++=o;
       if (--opleft==0) { h=0; out.vi_write((char*)obuf,rlen); op=obuf; opleft=rlen; }
     }
@@ -1345,7 +1345,7 @@ void TIFFPredictor2::vi_write(char const*buf, slen_t len) {
     while (p!=pend0) {
       i=*p++;
       d=(i>>4); o =((d-((h>>bpccpp)))&15)<<4; h=(h<<4)|d;
-      d=(i   ); o|=((d-((h>>bpccpp)))&15)   ; h=(h<<4)|d;
+      d=(i   ); o|=((d-((h>>bpccpp)))&15)   ; h=(h<<4)|(d&15);
       *op++=o;
       if (--opleft==0) { h=0; out.vi_write((char*)obuf,rlen); op=obuf; opleft=rlen; }
     }
