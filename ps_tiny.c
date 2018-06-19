@@ -150,7 +150,7 @@ static void ungetcc(int c) {
   }
 }
 
-static void erri(char const*msg1, char const*msg2) {
+__attribute__((noreturn)) static void erri(char const*msg1, char const*msg2) {
   fprintf(stderr, "%s: error at %" SLEN_P "u.%" SLEN_P "u.%" SLEN_P "u: %s%s\n",
     PROGNAME, curline, curofs-leftofs+1, curofs, msg1, msg2?msg2:"");
   exit(3);
@@ -350,6 +350,7 @@ static char gettok(void) {
      *     preprocessor's feature of including whitespace.
      */
     /* fall-through, b will begin with '/' */
+    /*fallthrough*/
    default: /* /nametype, /integertype or /realtype */
     *ibufb++=c;
     while ((c=getcc())!=-1 && is_ps_name(c)) {

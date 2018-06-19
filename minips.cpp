@@ -161,6 +161,7 @@ int MiniPS::Tokenizer::yylex() {
       } /* SWITCH */
     } /* WHILE */
     uf_str: Error::sev(Error::EERROR) << "miniPS: unfinished str" << (Error*)0;
+    break;
    case '/':
     /* fall-through, b will begin with '/' */
    default: /* /nametype, /integertype or /realtype */
@@ -300,15 +301,15 @@ void MiniPS::Real::dump(GenBuffer::Writable &out_, bool dumpPS_force) {
 }
 MiniPS::Real::metric_t MiniPS::Real::str2metric(char const str[2]) {
   switch (str[0]) {
-   case 'b': if (str[1]=='p') return ME_bp;  break;
-   case 'i': if (str[1]=='n') return ME_in;  break;
-   case 'p': if (str[1]=='t') return ME_pt;
-             if (str[1]=='c') return ME_pc;  break;
-   case 'd': if (str[1]=='d') return ME_dd;  break;
-   case 'c': if (str[1]=='c') return ME_cc;
-             if (str[1]=='m') return ME_cm;  break;
-   case 's': if (str[1]=='p') return ME_sp;  break;
-   case 'm': if (str[1]=='m') return ME_mm;  break;
+   case 'b': if (str[1]=='p') { return ME_bp; }  break;
+   case 'i': if (str[1]=='n') { return ME_in; }  break;
+   case 'p': if (str[1]=='t') { return ME_pt; }
+             if (str[1]=='c') { return ME_pc; }  break;
+   case 'd': if (str[1]=='d') { return ME_dd; }  break;
+   case 'c': if (str[1]=='c') { return ME_cc; }
+             if (str[1]=='m') { return ME_cm; }  break;
+   case 's': if (str[1]=='p') { return ME_sp; }  break;
+   case 'm': if (str[1]=='m') { return ME_mm; }  break;
   }
   return ME_COUNT;
 }

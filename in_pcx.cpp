@@ -235,9 +235,10 @@ static Image::Sampled *LoadPCX
 
   if (!fullcolor) {
   if (colors>16) {       /* handle trailing colormap */
+    int ccc;
     while (1) {
-      i=MACRO_GETC(fp);
-      if (i==PCX_MAPSTART || i==EOF) break;
+      ccc=MACRO_GETC(fp);
+      if (ccc==PCX_MAPSTART || ccc==EOF) break;
     }
 
 #if 0 /**** pts ****/

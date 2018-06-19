@@ -32,6 +32,8 @@ extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list 
 #endif
 #undef  _XOPEN_SOURCE /* pacify gcc-3.1 */
 #define _XOPEN_SOURCE 1 /* popen() on Digital UNIX */
+#undef  _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1  /* pacify Debian 10 warning: _BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE */
 #endif
 
 #include "gensio.hpp"

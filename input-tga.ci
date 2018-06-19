@@ -340,6 +340,7 @@ ReadImage (FILE              *fp,
     {
     case TGA_TYPE_MAPPED_RLE:
       rle = 1;
+      /*fallthrough*/
     case TGA_TYPE_MAPPED:
       itype = INDEXED;
 
@@ -358,12 +359,14 @@ ReadImage (FILE              *fp,
 
     case TGA_TYPE_GRAY_RLE:
       rle = 1;
+      /*fallthrough*/
     case TGA_TYPE_GRAY:
       itype = GRAY;
       break;
 
     case TGA_TYPE_COLOR_RLE:
       rle = 1;
+      /*fallthrough*/
     case TGA_TYPE_COLOR:
       itype = TGA_RGB;
       break;
