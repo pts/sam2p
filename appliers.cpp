@@ -277,6 +277,7 @@ Rule::Applier::cons_t out_l23_work(GenBuffer::Writable& out, Rule::OutputRule*or
       GenBuffer::Writable *hp=PSEncoder::newASCIIHexEncode(colorSpace, or_->cacheHints.TransferCPL);
       hp->vi_write(sf->getImg()->getHeadp(), ncols*3);
       hp->vi_write(0,0);
+      delete hp;
       colorSpace << ']'; /* Dat: '>' is appended by ASCIIHexEncode */
 #endif
       writeXData=Rule::writeData; /* The palette has already been written. */
