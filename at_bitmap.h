@@ -20,7 +20,7 @@
 #define FATALP1(m,a) Error::sev(Error::EERROR) << m << a << (Error*)0;
 #define WARNINGP1(m,a) Error::sev(Error::WARNING) << m << a << (Error*)0;
 #define FATALP3(m,a,n,b,o,c,p) Error::sev(Error::EERROR) << m << a << n << b << o << c << p << (Error*)0;
-#define WARNINGP3(m,a,n,b,o,c,p) Error::sev(Error::WARNING) << m << n << b << o << c << p << (Error*)0;
+#define WARNINGP3(m,a,n,b,o,c,p) Error::sev(Error::WARNING) << m << a << n << b << o << c << p << (Error*)0;
 
 #define XMALLOCT(var,typep,size) var=(typep)new char[size]
 #define XFREE(p) delete [] (char*)(p)
