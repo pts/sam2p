@@ -1934,128 +1934,106 @@ Rule::Applier out_png_applier = { "PNG", out_png_check_rule, out_png_work, 0 };
 
 /* --- Sat Jun 15 19:30:41 CEST 2002 */
 
-/** BMP RLE compression, type 1. Seems to be optimal.
+/** BMP RLE compression, type 1. Close to optimal.
  * @param dst buffer with enough place for compressed data. The caller must
- *        pre-allocate >=(send-sbeg)+(send-sbeg+128)*2/255.
- * @param sbeg first raw data char to compress
- * @param send char to finish compression just before
+ *        pre-allocate >=(pend-p)+(pend-p+254)/255*2 bytes.
+ * @param p first raw data char to compress
+ * @param pend char to finish compression just before
  * @return dst+(number of characters occupied by compressed data)
  *
- * in-memory implementation Sun Jun 23 20:02:41 CEST 2002
+ * BUGFIX on output size at Tue Jul 17 17:31:52 CEST 2018
  */
 
-static char *bmp_compress1_row(char *dst, char const *sbeg, char const *send) {
-  #if 0
-  #  define BMP_ASSERT(x) assert(x)
-  #else
-  #  define BMP_ASSERT(x)
-  #endif
-  #undef  BUF
-  #define BUF(x) (*(x))
-  #undef  PUTCH__
-  #define PUTCH__(c) (*dst++=(c))
-  char c, c2;
-  char const *beg, *end, *rend, *q, *r, *best;
-  signed bestca, rca; /* both must fit into -255..255 */
-  slen_t frl, efrl;
-  int ci;
-  // bool oddp;
-
-  beg=sbeg;
-  end=(send-sbeg>255) ? beg+255 : send;
-
-  while (beg!=end) { /* there is still unprocessed data in the buffer */
-    c=BUF(beg++);
-    if (beg==end) { PUTCH__(1); PUTCH__(c); break; } /* last char */
-    if (c==BUF(beg)) { /* sure r chunk */
-      ci=2; beg++;
-     rep:
-      while (beg!=end && c==BUF(beg)) { beg++; ci++; }
-      PUTCH__(ci); PUTCH__(c); /* r chunk */
-    } else { /* possible c chunk */
-      rend=end;
-      BMP_ASSERT(end-beg<=254);
-      if (end!=send) { /* read an extra char as the terminator of the last run-length of c, buf:0..254 */
-        end++;
-        BMP_ASSERT(end-beg==255); /* buffer is full (255 chars) */
-      }
-
-      best=r=beg;
-      bestca=rca=-1; /* best and current advantage of c over r */
-
-      while (r!=rend) { /* c chunk should stop only at run-length boundaries */
-        BMP_ASSERT(-255<=rca && rca<=255);
-        BMP_ASSERT(-255<=bestca && bestca<=255);
-        q=r; r=q+1; ci=1; while (r!=end && BUF(r)==BUF(q)) { r++; ci++; }
-        if (r==end && end!=rend) break;
-        if (((r-beg)&1)==0) { /* odd (!) copy length */
-          rca+=3-ci;
-          if (rca<=bestca-1) { r--; break; } /* fix-5 (instead of rule-4): `xyz|bbbbb|xyz|', `abcdef|gggggggg|abababababab|', `abcdef|ggg|hhh|ggg|hhh|ggg|hhh|ggg|hhh|abababababab|' */
-          if (bestca<rca) { bestca=rca; best=r-1; } /* make c as short as possible */
-          rca--;
-        } else { /* even copy length */
-          rca+=2-ci;
-          if (rca<=bestca-2) break; /* fix-5 (instead of rule-4): `xyz|bbbbb|xyz|', `abcdef|gggggggg|abababababab|', `abcdef|ggg|hhh|ggg|hhh|ggg|hhh|ggg|hhh|abababababab|' */
-          if (bestca<rca) { bestca=rca; best=r; } /* make c as short as possible */
-        }
-      }
-      BMP_ASSERT(-255<=rca && rca<=255);
-      BMP_ASSERT(-255<=bestca && bestca<=255);
-      if (bestca<=0 /* no possible positive advantage */
-       || best-beg<=1  /* 1: c is one char, plus 1 char in buf.  Imp: ==1?! */
-         ) { ci=1; goto rep; }
-      r=best; /* Imp: get rid of this assignment */
-      BMP_ASSERT(beg!=r);
-      BMP_ASSERT(((r-beg)&1)==1); /* even copy length */
-
-      if (end==r) { /* no followers, last chunk */
-        /* BMP_ASSERT(had_eof); */
-        // oddp=(1+(r-beg)&1)==1;
-        PUTCH__(0);
-        PUTCH__((r-beg)+1);
-        PUTCH__(c);
-        while (beg!=r) { PUTCH__(BUF(beg)); beg++; } /* emit c chunk */
-        // if (oddp) PUTCH__(0); /* Imp: padding breaks optimality */
+static char *bmp_compress1_row(char *dst, char const *p, char const *pend) {
+#ifndef NDEBUG
+  char const * const dstend = dst + (pend - p) + (pend - p + 254) / 255 * 2;
+#endif
+  while (p != pend) {
+    char const *px = p;
+    char c = *p++;
+    if (p == pend) {
+      assert(dst + 2 <= dstend);
+      *dst++ = 1;
+      *dst++ = c;
+      break;
+    }
+    if (c == *p) {
+      for (++p; p != pend && c == *p && p - px < 255; ++p) {}
+      assert(dst + 2 <= dstend);
+      *dst++ = p - px;
+      *dst++ = c;
+      continue;
+    }
+   extend_c_chunk:
+    if (p == pend || p - px == 255) { emit_cr_chunk:
+      if (p - px == 1) {
+        assert(dst + 2 <= dstend);
+        *dst++ = 1;
+        *dst++ = *px;
+      } else if (p - px == 2) {
+        assert(dst + 4 <= dstend);
+        /* 0, 2 is BMP delta record, so emit 2 r chunks. */
+        *dst++ = 1;
+        *dst++ = *px;
+        *dst++ = 1;
+        *dst++ = px[1];
       } else {
-        BMP_ASSERT(r!=end);
-        /* BMP_ASSERT(r!=rend); */ /* r==rend is possible here */
-        c2=BUF(r); frl=1; q=r+1;
-        while (q!=end && c2==BUF(q)) { q++; frl++; } /* count follower run length */
-        efrl=frl; ci=-2; if (q==end) { /* Imp: get rid of -2 (-2 -> -1) */
-          BMP_ASSERT(q==end);
-          while ((ci=(q==send)?-1:(unsigned char)*q++)!=-1 && (char)ci==c2) efrl++;
+        assert(dst + 2 + (p - px) <= dstend);
+        *dst++ = 0;
+        assert(p - px >= 3 && p - px <= 255);
+        *dst++ = p - px;
+        for (; px != p; *dst++ = *px++) {}  /* memcpy(). */
+      }
+      continue;
+    }
+   extend_c_chunk_nonempty:
+    c = *p;
+    if (p + 1 != pend && p[1] == c) {
+      if (p + 2 != pend && p[2] == c) {  /* Scan. */
+        if (p == pend) {
+          goto emit_cr_chunk;
+        } else {
+          char const *py = p + 3;  /* Scanning has started at p. */
+          char state = 1 + (p - px > 1);
+          goto at_least_3;
+          for (;;) {
+            assert(state == 1 || state == 2);
+            assert(py < pend);
+            if (py - px > 255) goto emit_cr_chunk;  /* Just speed. */
+            c = *py++;
+            if (py == pend) {  /* 1 byte before EOF */
+              if (--state != 0 && py - px <= 255) p = py;
+              goto emit_cr_chunk;
+            }
+            if (*py != c) {  /* Not even a run of 2. */
+              --py;
+              assert(py - px <= 255);
+              p = py;
+              if (p - px == 255) goto emit_cr_chunk;
+              goto extend_c_chunk_nonempty;
+            }
+            ++py;
+            if (py == pend) goto emit_cr_chunk;
+            if (*py == c) {  /* Run of at least 3. */
+              ++py;
+             at_least_3:
+              if (py == pend) goto emit_cr_chunk;
+              if (*py == c) goto emit_cr_chunk;  /* Run of at least 4. */
+              if (--state == 0) goto emit_cr_chunk;
+              /* Skip over run of 3. */
+            }
+          }
         }
-
-        /* printf("clen=%u\n", clen); */
-        if (1+(r>beg ? r-beg : 256+beg-r)<255 && efrl>=256 && efrl%255==1) { r++; efrl--; } /* make the c chunk one char longer if appropriate */
-
-        // oddp=(1+(r-beg)&1)==1;
-        PUTCH__(0);
-        PUTCH__(1+(r-beg));
-        PUTCH__(c);
-        while (beg!=r) { PUTCH__(BUF(beg)); beg++; } /* emit c chunk */
-        // if (oddp) PUTCH__(0); /* Imp: padding breaks optimality */
-
-        beg=q; /* remove beginning of the r chunk from the buffer */
-        if (ci>=0) { beg--; BMP_ASSERT((unsigned char)BUF(beg)==ci); }
-
-        while (efrl>=255) { PUTCH__('\377'); PUTCH__(c2); efrl-=255; } /* emit full r chunks */
-        if (efrl>=2) { /* emit last r chunk */
-          PUTCH__(efrl); PUTCH__(c2);
-        } else if (efrl!=0) {
-          BMP_ASSERT(efrl==1);
-          beg--; /* leave a single instance of c2 in beginning of the buffer */
-          BMP_ASSERT(BUF(beg)==c2);
-        }
-      } /* IF c chunk has followers */
-    } /* IF r or c chunk */
-    end=(send-beg>255) ? beg+255 : send;
-  } /* WHILE main loop */
+      } else if (p - px == 254) {
+        /* !! Suboptimal for 'ab' * 127 + 'y' * 256. */
+        goto emit_cr_chunk;
+      }
+    }
+    ++p;
+    goto extend_c_chunk;
+  }
   return dst;
-  #undef  BUF
-  #undef  PUTCH__
 }
-
 
 /** Windows Bitmap BMP output */
 Rule::Applier::cons_t out_bmp_check_rule(Rule::OutputRule* or_) {
@@ -2111,7 +2089,7 @@ Rule::Applier::cons_t out_bmp_work(GenBuffer::Writable& out, Rule::OutputRule*or
    : or_->cache.SampleFormat==Image::SF_Indexed4 ? 2 : 1;
 
   SimBuffer::B data;
-  slen_t crowsize=2+ rlen+(rlen+128)*2/255; /* !! Imp: real upper bound? */
+  slen_t crowsize=2+ rlen+(rlen+254)/255*2; /* !! Imp: real upper bound? */
   char *crow=new char[crowsize];
   /* !! GIMP compatibility */
   if (or_->cache.Compression==or_->cache.CO_RLE) {
