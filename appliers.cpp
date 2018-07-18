@@ -1999,7 +1999,7 @@ static char *bmp_compress1_row(char *dst, char const *p, char const *pend) {
           for (;;) {
             assert(state == 1 || state == 2);
             assert(py < pend);
-            if (py - px > 255) goto emit_cr_chunk;  /* Just speed. */
+            if (py - px > 255) goto emit_cr_chunk;  /* Needed below. */
             c = *py++;
             if (py == pend) {  /* 1 byte before EOF */
               if (--state != 0 && py - px <= 255) p = py;
@@ -2029,7 +2029,7 @@ static char *bmp_compress1_row(char *dst, char const *p, char const *pend) {
                 goto emit_cr_chunk;
               }
               if (--state == 0) goto emit_cr_chunk;
-              /* Skip over run of 3. */
+              /* Skip over run of 3, extending the chunk. */
             }
           }
         }
