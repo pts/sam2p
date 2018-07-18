@@ -1934,7 +1934,7 @@ Rule::Applier out_png_applier = { "PNG", out_png_check_rule, out_png_work, 0 };
 
 /* --- Sat Jun 15 19:30:41 CEST 2002 */
 
-/** BMP RLE compression, type 1. Close to optimal.
+/** BMP RLE compression, type 1. Probably optimal.
  * @param dst buffer with enough place for compressed data. The caller must
  *        pre-allocate >=(pend-p)+(pend-p+254)/255*2 bytes.
  * @param p first raw data char to compress
@@ -2018,14 +2018,23 @@ static char *bmp_compress1_row(char *dst, char const *p, char const *pend) {
               ++py;
              at_least_3:
               if (py == pend) goto emit_cr_chunk;
-              if (*py == c) goto emit_cr_chunk;  /* Run of at least 4. */
+              if (*py == c) {  /* Run of at least 4. */
+                if (p - px == 255) goto emit_cr_chunk;
+                /* Determine whether to extend the c chunk with *p. */
+                for (++py; py != pend && *py == c; ++py) {}
+                /* Example ==1 input: 'ab' * 127 + 'y' * 256.
+                 * Our output: c(255: ab...y), r(255: y).
+                 */
+                if ((py - p) % 255 == 1) ++p;
+                goto emit_cr_chunk;
+              }
               if (--state == 0) goto emit_cr_chunk;
               /* Skip over run of 3. */
             }
           }
         }
       } else if (p - px == 254) {
-        /* !! Suboptimal for 'ab' * 127 + 'y' * 256. */
+        /* Example input: 'ab' * 127 + 'yy'. */
         goto emit_cr_chunk;
       }
     }
@@ -2093,6 +2102,21 @@ Rule::Applier::cons_t out_bmp_work(GenBuffer::Writable& out, Rule::OutputRule*or
   char *crow=new char[crowsize];
   /* !! GIMP compatibility */
   if (or_->cache.Compression==or_->cache.CO_RLE) {
+#if 0
+    {  /* Example input: 'ab' * 127 + 'y' * 256. */
+      char dst[520], *dstend, *q;
+      char p[512], *pend = p;
+      unsigned i;
+      for (i = 0; i < 127; ++i, *pend++ = 'a', *pend++ = 'b') {}
+      /* *pend++ = 'y'; */
+      for (i = 0; i < 256; ++i, *pend++ = 'y') {}
+      dstend = bmp_compress1_row(dst, p, pend);
+      printf("dst=<");
+      for (q = dst; q != dstend; ++q) printf("%02x", 255 & *q);
+      printf(">\n");
+      fflush(stdout);
+    }
+#endif
     /* Imp: bmp_compress2_row */
     char *crow2;
     while (htc--!=0) { /* BMP stores rows from down */
