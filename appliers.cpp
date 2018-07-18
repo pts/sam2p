@@ -1941,7 +1941,7 @@ Rule::Applier out_png_applier = { "PNG", out_png_check_rule, out_png_work, 0 };
  * @param pend char to finish compression just before
  * @return dst+(number of characters occupied by compressed data)
  *
- * BUGFIX on output size at Tue Jul 17 17:31:52 CEST 2018
+ * BUGFIX on output size by a full rewrite at Tue Jul 17 17:31:52 CEST 2018
  */
 
 static char *bmp_compress1_row(char *dst, char const *p, char const *pend) {
@@ -2089,7 +2089,7 @@ Rule::Applier::cons_t out_bmp_work(GenBuffer::Writable& out, Rule::OutputRule*or
    : or_->cache.SampleFormat==Image::SF_Indexed4 ? 2 : 1;
 
   SimBuffer::B data;
-  slen_t crowsize=2+ rlen+(rlen+254)/255*2; /* !! Imp: real upper bound? */
+  const slen_t crowsize = 2 + rlen + (rlen + 254) / 255 * 2;
   char *crow=new char[crowsize];
   /* !! GIMP compatibility */
   if (or_->cache.Compression==or_->cache.CO_RLE) {
@@ -2097,22 +2097,6 @@ Rule::Applier::cons_t out_bmp_work(GenBuffer::Writable& out, Rule::OutputRule*or
     char *crow2;
     while (htc--!=0) { /* BMP stores rows from down */
       crow2=bmp_compress1_row(crow, pend-rlen, pend);
-#if 0
-      crow2=crow;
-      *crow2++=10;
-      *crow2++=1;
-      *crow2++=10;
-      *crow2++=2;
-      *crow2++=10;
-      *crow2++=3;
-      *crow2++=10;
-      *crow2++=4;
-      *crow2++=10;
-      *crow2++=5;
-      *crow2++=10;
-      *crow2++=6;
-#endif
-
       assert((slen_t)(crow2-crow)<=crowsize-2);
       pend-=rlen;
       *crow2++='\0'; *crow2++='\0'; /* signal end of compressed data row */
