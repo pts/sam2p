@@ -180,11 +180,16 @@ void XPMTok::readInStr(char *buf, unsigned len) {
   if (state!=ST_STR) { len--; goto real; }
   int i;
   while (len--!=0) {
-    if ((i=MACRO_GETC(f))>=0 && i<=255 && i!='"' && i!='\\') *buf++=i;
-    else { assert(i>=0); ungetc(i,f); real:
-      i=getcc();
-      // fprintf(stderr,"i=%d\n", i);
-      if (i>=0 && i<=255) *buf++=i; else Error::sev(Error::EERROR) << "XPM: data expected" << (Error*)0;
+    if ((i=MACRO_GETC(f))<0) { on_eof:
+      Error::sev(Error::EERROR) << "XPM: data expected" << (Error*)0;
+    } else if (i!='"' && i!='\\') {
+      goto append;
+    } else {
+      ungetc(i,f);
+     real:
+      if ((i=getcc()) < 0) goto on_eof;
+     append:
+      *buf++=i;
     }
   }
 }
@@ -225,19 +230,20 @@ static Image::Sampled *in_xpm_reader(Image::Loader::UFD *ufd, SimBuffer::Flat co
   Image::Sampled::dimen_t ht=tok.getDimen();
   Image::Sampled::dimen_t colors=tok.getDimen();
   Image::Sampled::dimen_t cpp=tok.getDimen(); /* chars per pixel */
+  // Error::sev(Error::DEBUG) << "wd="<<wd<<" ht="<<ht<<" colors="<<colors<<" cpp="<<cpp << (Error*)0;
+  if (cpp <= 0) Error::sev(Error::EERROR) << "XPM: too few characters per pixels" << (Error*)0;
+  if (1UL*cpp*colors>65535) Error::sev(Error::EERROR) << "XPM: too many colors" << (Error*)0;
 
   /* width height ncolors cpp [x_hot y_hot] */
   int i; /* multiple purpose */
   while ((i=tok.getcc())==' ' || i=='\t' || USGE(9,i-'0')) ;
   tok.ungetcc(i); tok.getComma();
 
-  // Error::sev(Error::DEBUG) << "wd="<<wd<<" ht="<<ht<<" colors="<<colors<<" cpp="<<cpp << (Error*)0;
-  if (1UL*cpp*colors>65535) Error::sev(Error::EERROR) << "XPM: too many colors" << (Error*)0;
   // if (cpp==1) {
   // }
   Image::Sampled::dimen_t transp=colors; /* No transparent colors yet. */
   /* vvv Dat: last cpp bytes of tab are used for storing current pixel. */
-  char *tab=new char[cpp*(colors+1)], *p, *pend; /* BUGFIX: unsinged at Fri Nov 26 12:18:21 CET 2004 */
+  char *tab=new char[cpp*(colors+1)], *p, *pend; /* BUGFIX: unsigned at Fri Nov 26 12:18:21 CET 2004 */
   Image::Sampled::rgb_t *rgb=new Image::Sampled::rgb_t[colors], *rp;
   for (rp=rgb,p=tab,pend=tab+cpp*colors; p!=pend; p+=cpp,rp++) {
     tok.read(p,cpp);
