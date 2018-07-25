@@ -37,6 +37,18 @@
 #undef CGIFFF
 #define CGIFFF CGIF::
 
+static void *xmalloc(size_t size) {
+  void *result = malloc(size + (size == 0));
+  if (!result) Error::sev(Error::EERROR) << "GIF: out of memory" << (Error*)0;
+  return result;
+}
+
+static void *xrealloc(void *ptr, size_t size) {
+  void *result = realloc(ptr, size + (size == 0));
+  if (!result) Error::sev(Error::EERROR) << "GIF: out of memory" << (Error*)0;
+  return result;
+}
+
 static Image::Sampled *in_gif_reader(Image::Loader::UFD *ufd, SimBuffer::Flat const&) {
   Image::Indexed *img;
   CGIFFF GifFileType *giff;
