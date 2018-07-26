@@ -867,7 +867,7 @@ Image::Indexed **Image::Indexed::separate() {
   Indexed **ret=new Indexed*[nncols+1], **curimg=ret;
   Image::Sampled::dimen_t htc;
   assert(cpp==1);
-  slen_t wdcpp=wd/* *cpp*/;
+  const slen_t wdcpp=wd/* *cpp*/;
   register unsigned char *p;
   char *to, *toend;
   register unsigned int i;
@@ -881,7 +881,7 @@ Image::Indexed **Image::Indexed::separate() {
     curimg[0]->setTransp(1);
     to=curimg[0]->rowbeg; p=(unsigned char*)rowbeg;
     htc=ht; while (htc--!=0) {
-      toend=to+((wdcpp+7)>>3);
+      toend=to+(wdcpp>>3);
       while (to!=toend) {
         i =(*p++!=curcol)<<7; i|=(*p++!=curcol)<<6;
         i|=(*p++!=curcol)<<5; i|=(*p++!=curcol)<<4;
@@ -889,7 +889,14 @@ Image::Indexed **Image::Indexed::separate() {
         i|=(*p++!=curcol)<<1; i|=(*p++!=curcol);
         *to++=i;
       }
-      if (0!=(wdcpp&7)) p+=(wdcpp&7)-8; /* negative */
+      if (0 != (wdcpp & 7)) {
+        i = (*p++ != curcol) << 7;
+        unsigned char j = 6;
+        for (unsigned char *pend = p + (wdcpp & 7) - 1; p != pend; ++p, --j) {
+          i |= (*p != curcol) << j;
+        }
+        *to++ = i;
+      }
     }
     curimg++;
   }
