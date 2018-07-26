@@ -1532,7 +1532,7 @@ Image::SampledInfo::SampledInfo(Sampled *img_)
 
 Image::SampledInfo::~SampledInfo() {
   delete img;
-  if (imgs!=NULLP) { Image::Indexed::delete_separated(imgs); delete imgs; }
+  if (imgs!=NULLP) { Image::Indexed::delete_separated(imgs); delete [] imgs; }
 }
 
 void Image::SampledInfo::separate() {
