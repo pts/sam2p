@@ -31,7 +31,7 @@ static Image::Sampled *in_tga_reader(Image::Loader::UFD *ufd, SimBuffer::Flat co
     memcpy(img->getRowbeg(), BITMAP_BITS(bitmap), (slen_t)3*BITMAP_WIDTH(bitmap)*BITMAP_HEIGHT(bitmap));
     ret=img;
   } else assert(0 && "invalid TGA depth");
-  delete [] BITMAP_BITS(bitmap);
+  free(BITMAP_BITS(bitmap));
   return ret;
 }
 
