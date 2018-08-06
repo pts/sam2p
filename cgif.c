@@ -1368,6 +1368,12 @@ static int DGifDecompressInput(GifFilePrivateType *Private, int *Code)
 	0x0fff
     };
 
+    /* The image can't contain more than LZ_BITS per code. */
+    if (Private->RunningBits > LZ_BITS) {
+        return GIF_ERROR;
+    }
+    
+
     while (Private->CrntShiftState < Private->RunningBits) {
 	/* Needs to get more bytes from input stream for next code: */
 	if (DGifBufferedInput(Private->File, Private->Buf, &NextByte)
@@ -1383,9 +1389,12 @@ static int DGifDecompressInput(GifFilePrivateType *Private, int *Code)
     Private->CrntShiftDWord >>= Private->RunningBits;
     Private->CrntShiftState -= Private->RunningBits;
 
-    /* If code cannt fit into RunningBits bits, must raise its size. Note */
-    /* however that codes above 4095 are used for special signaling.      */
-    if (++Private->RunningCode > Private->MaxCode1 &&
+    /* If code cannt fit into RunningBits bits, must raise its size. Note  */
+    /* however that codes above 4095 are used for special signaling.       */
+    /* If we're using LZ_BITS bits already and we're at the max code, just */
+    /* keep using the table as it is, don't increment Private->RunningCode.*/ 
+    if (Private->RunningCode < LZ_MAX_CODE + 2 &&
+	++Private->RunningCode > Private->MaxCode1 &&
 	Private->RunningBits < LZ_BITS) {
 	Private->MaxCode1 <<= 1;
 	Private->RunningBits++;
