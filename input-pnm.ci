@@ -184,7 +184,7 @@ static slen_t multiply_check(slen_t a, slen_t b) {
   slen_t result;
   if (a == 0) return 0;
   /* Check for overflow. Works only if everything is unsigned. */
-  if ((result = a * b) / a != b) FATALP("PNM: can't open file\n");
+  if ((result = a * b) / a != b) FATALP("PNM: Image too large.\n");
   return result;
 }
 
