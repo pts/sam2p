@@ -1769,7 +1769,7 @@ void LenCRC32Encode::vi_write(char const*buf, slen_t len) {
   if (len==0) {
     char *s=const_cast<char*>(sofar());
     slen_t slen=sofar.getLength();
-    unsigned PTS_INT32_T crc=crc32(CRC32_INITIAL, s+4, slen-4);
+    PTS_UINT32_T crc=crc32(CRC32_INITIAL, s+4, slen-4);
     slen-=minus+4;
     s[0]=slen>>24; s[1]=slen>>16; s[2]=slen>>8; s[3]=slen;
     s=sofar.vi_mkend(4);
@@ -1821,7 +1821,7 @@ Rule::Applier::cons_t out_png_check_rule(Rule::OutputRule* or_) {
 Rule::Applier::cons_t out_png_work(GenBuffer::Writable& out, Rule::OutputRule*or_, Image::SampledInfo *sf) {
   Rule::Cache *cache=&or_->cache;
   char tmp[64], colortype; register char*p;
-  unsigned PTS_INT32_T crc;
+  PTS_UINT32_T crc;
 
   // assert(0);
   if (out_png_check_rule(or_)!=Rule::Applier::OK) return Rule::Applier::DONT_KNOW;

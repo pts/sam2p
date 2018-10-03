@@ -12,9 +12,9 @@
 
 #include "config2.h"
 
-#define CRC32_INITIAL ((unsigned PTS_INT32_T)0)
+#define CRC32_INITIAL ((PTS_UINT32_T)0)
 /** Usage:
- * unsigned PTS_INT32_T crc=CRC32_INITIAL;
+ * PTS_UINT32_T crc=CRC32_INITIAL;
  * crc=crc32(crc, "alma", 4);
  * crc=crc32(crc, "korte", 5);
  * ...
@@ -27,6 +27,6 @@ extern
 #ifdef __cplusplus
 "C"
 #endif
-unsigned PTS_INT32_T crc32 _((unsigned PTS_INT32_T oldcrc, char PTS_const *s, slen_t slen));
+PTS_UINT32_T crc32 _((PTS_UINT32_T oldcrc, char PTS_const *s, slen_t slen));
 
 #endif /* CRC32_H */

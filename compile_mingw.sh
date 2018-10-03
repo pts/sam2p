@@ -6,8 +6,7 @@
 set -ex
 
 if test -f bts2.tth; then :; else
-  ./configure --enable-lzw --enable-gif
-  make  # generate some files
+  CC=gcc ./gen_bts2_tth.sh  # Not cross-compiled.
 fi
 
 SAM2P_VERSION="$(bash ./mkdist.sh --getversion)"

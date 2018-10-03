@@ -784,7 +784,7 @@ FILE *Files::open_tmpnam(SimBuffer::B &dir, char const*open_mode, char const*ext
   /* Imp: verify / on Win32... */
   /* Imp: ensure uniqueness on NFS */
   /* Imp: short file names */
-  static unsigned PTS_INT32_T counter=0;
+  static PTS_UINT32_T counter=0;
   assert(Error::tmpargv0!=(char const*)NULLP);
   SimBuffer::B fname(DIR_SEP "tmp_", 5, Error::tmpargv0,strlen(Error::tmpargv0));
   /* ^^^ Dat: we need DIR_SEP here, because the name of the tmp file may be

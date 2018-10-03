@@ -603,12 +603,19 @@ Software required for UNIX compilation:
 Compilation:
 
 	# compile and install required programs
-	autoconf  # optional, for experts only
-	export CC=gcc-3.2 CXX=g++-3.2  # optional, for experts only
-	./configure --enable-gif --enable-lzw
+	#autoconf  # optional, for experts only
+	#export CC=gcc-3.2 CXX=g++-3.2  # optional, for experts only
+	#./configure --enable-gif --enable-lzw  # optional, make does it
 	make
 	# the stand-alone utility `./sam2p' is now built
 	make install  # optional, may not work
+
+Alternative compilation, without autoconf (./configure script) or GNU Make:
+
+	./compile.sh
+
+Alternative compilation for some targets, including cross-compilation: use
+the ./compile_*.sh scripts.
 
 If installation doesn't work, please copy the file `sam2p' to somewhere in
 your $PATH, for example /usr/local/bin. Please also copy the README to a

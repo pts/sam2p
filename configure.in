@@ -194,7 +194,7 @@ dnl AC_PTS_CHECK_INTEGRAL_TYPE(mode_t, int)
 dnl AC_PTS_CHECK_INTEGRAL_TYPE(off_t, long)
 dnl AC_PTS_CHECK_INTEGRAL_TYPE(pid_t, int)
 dnl AC_PTS_CHECK_INTEGRAL_TYPE(dev_t, unsigned long)
-dnl dnl ^^^ Dat: unsigned PTS_INT64_T on Linux i386
+dnl dnl ^^^ Dat: PTS_UINT64_T on Linux i386
 dnl AC_PTS_CHECK_INTEGRAL_TYPE(uid_t, unsigned)
 dnl AC_PTS_CHECK_INTEGRAL_TYPE(gid_t, unsigned)
 dnl AC_PTS_CHECK_INTEGRAL_TYPE(size_tt, signed)

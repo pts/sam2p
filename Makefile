@@ -192,7 +192,7 @@ bts2.ttt: bts1.ttt ps_tiny
 
 clean:
 	# Not removing sam2p_version.h, because it would trigger the rerun of ./configure at the next `make'.
-	rm -f *~ a.out DEADJOE core *.o *.tth *.tmp.pin *.tmp.i *.tmp.ps0 *.tmp.h *.tmp.pst autom4te.cache/*
+	rm -f *~ a.out DEADJOE core *.o *.tth *.tmp.pin *.tmp.i *.tmp.ps0 *.tmp.h *.tmp.pst autom4te.cache/* sizeofs.h print_sizeofs
 	rm -f sam2p.yes sam2p.no
 	rm -f debian/changelog.dch debian/*~
 	rm -f $(ALL) $(ALL:=.yes) $(ALL:=.no) $(ALL:=.assert) $(ALL:=.checker)

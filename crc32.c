@@ -32,7 +32,7 @@
 
 #undef NO_UNROLLED_LOOPS
 #define local static
-#define ulg unsigned PTS_INT32_T
+#define ulg PTS_UINT32_T
 #define uch unsigned char
 #define extent slen_t
 #ifndef NULL

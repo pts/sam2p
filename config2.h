@@ -16,16 +16,26 @@
 #  include "config-mingw.h"
 #elif USE_CONFIG_UCLIBC_H
 #  include "config-uclibc.h"
+#elif USE_CONFIG_STDC_H
+#  include "config-stdc.h"
 #else
 #  include "config.h"
 #endif
 
-#if 0
-/* vvv i386 Debian slink gcc */
-#define SIZEOF_SHORT 2
-#define SIZEOF_INT 4
-#define SIZEOF_LONG 4
-#define SIZEOF_LONG_LONG 8
+#ifndef PTS_UINT16_T
+#define PTS_UINT16_T unsigned PTS_INT16_T
+#endif
+
+#ifndef PTS_UINT32_T
+#define PTS_UINT32_T unsigned PTS_INT32_T
+#endif
+
+#ifndef PTS_UINT64_T
+#define PTS_UINT64_T unsigned PTS_INT64_T
+#endif
+
+#ifndef PTS_UINT128_T
+#define PTS_UINT128_T unsigned PTS_INT128_T
 #endif
 
 #if SIZEOF_CHAR_P!=SIZEOF_LONG && SIZEOF_INT>=4

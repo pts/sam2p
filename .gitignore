@@ -28,3 +28,4 @@ darwin_libgcc/
 packaging/
 sam2p.darwinc32
 sam2p.darwinc64
+sizeofs.h

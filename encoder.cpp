@@ -45,13 +45,13 @@ class ASCII85Encode: public PSEncoder {
 
  protected:
   void wencoded(char const *encoded);
-  void wout(unsigned PTS_INT32_T buf_);
+  void wout(PTS_UINT32_T buf_);
   unsigned maxcpl;
   /** Number of digits available in this line */
   GenBuffer::Writable &out;
   unsigned ascii85breaklen;
   unsigned ascii85left;
-  unsigned PTS_INT32_T ascii85buf;
+  PTS_UINT32_T ascii85buf;
   char *obuf, *obufend, *op;
   char dscst;  /* For converting `%%' to `% %' to avoid DSC parser errors */
 };
@@ -280,7 +280,7 @@ class TIFFPredictor2: public Encoder {
   TIFFPredictor2(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
   virtual void vi_write(char const*buf, slen_t len);
  protected:
-  unsigned PTS_INT32_T h;
+  PTS_UINT32_T h;
   unsigned char *obuf, *op, bpc, cpp;
   slen_t rlen;
   GenBuffer::Writable &out;
@@ -302,7 +302,7 @@ class PNGPredictorSub: public Encoder {
   PNGPredictorSub(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
   virtual void vi_write(char const*buf, slen_t len);
  protected:
-  unsigned PTS_INT32_T h;
+  PTS_UINT32_T h;
   unsigned char *obuf, *op;
   slen_t rlen;
   GenBuffer::Writable &out;
@@ -326,7 +326,7 @@ class PNGPredictorAverage: public Encoder {
   PNGPredictorAverage(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
   virtual void vi_write(char const*buf, slen_t len);
  protected:
-  unsigned PTS_INT32_T h/*, g*/;
+  PTS_UINT32_T h/*, g*/;
   unsigned char *obuf, *op, *oq;
   slen_t rlen;
   GenBuffer::Writable &out;
@@ -339,7 +339,7 @@ class PNGPredictorPaeth: public Encoder {
   PNGPredictorPaeth(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
   virtual void vi_write(char const*buf, slen_t len);
  protected:
-  unsigned PTS_INT32_T h, g;
+  PTS_UINT32_T h, g;
   unsigned char *obuf, *op, *oq;
   slen_t rlen;
   GenBuffer::Writable &out;
@@ -356,7 +356,7 @@ class PNGPredictorAutoBadSigned: public Encoder {
   PNGPredictorAutoBadSigned(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
   virtual void vi_write(char const*buf, slen_t len);
  protected:
-  unsigned PTS_INT32_T h, g;
+  PTS_UINT32_T h, g;
   unsigned char *obuf, *o_prior, *o_0, *o_1, *o_2, *o_3, *o_4, *oo[5];
   slen_t rlen;
   GenBuffer::Writable &out;
@@ -374,7 +374,7 @@ class PNGPredictorAutoBadUnsigned: public Encoder {
   PNGPredictorAutoBadUnsigned(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
   virtual void vi_write(char const*buf, slen_t len);
  protected:
-  unsigned PTS_INT32_T h, g;
+  PTS_UINT32_T h, g;
   unsigned char *obuf, *o_prior, *o_0, *o_1, *o_2, *o_3, *o_4, *oo[5];
   slen_t rlen;
   GenBuffer::Writable &out;
@@ -396,7 +396,7 @@ class PNGPredictorAuto: public Encoder {
   PNGPredictorAuto(GenBuffer::Writable &out_, unsigned char bpc_, slen_t columns_, unsigned char cpp_);
   virtual void vi_write(char const*buf, slen_t len);
  protected:
-  unsigned PTS_INT32_T h, g;
+  PTS_UINT32_T h, g;
   unsigned char *obuf, *o_prior, *o_0, *o_1, *o_2, *o_3, *o_4, *oo[5];
   slen_t rlen;
   GenBuffer::Writable &out;
@@ -565,21 +565,21 @@ void ASCII85Encode::vi_write(char const*buf, slen_t len) {
     char encoded[6];
     assert(ascii85left<=4);
     if (ascii85left!=4) {
-      unsigned PTS_INT32_T buf_=ascii85buf<<8*ascii85left;
-      unsigned PTS_INT32_T q;
+      PTS_UINT32_T buf_=ascii85buf<<8*ascii85left;
+      PTS_UINT32_T q;
       unsigned w1;
 
-      q = buf_ / ((unsigned PTS_INT32_T)85*85*85*85);  /* actually only a byte */
+      q = buf_ / ((PTS_UINT32_T)85*85*85*85);  /* actually only a byte */
       assert(q<=85);
       encoded[0] = q + '!';
 
-      buf_ -= q * ((unsigned PTS_INT32_T)85*85*85*85); q = buf_ / ((unsigned PTS_INT32_T)85*85*85);
+      buf_ -= q * ((PTS_UINT32_T)85*85*85*85); q = buf_ / ((PTS_UINT32_T)85*85*85);
       encoded[1] = q + '!';
 
-      buf_ -= q * ((unsigned PTS_INT32_T)85*85*85); q = buf_ / (85*85);
+      buf_ -= q * ((PTS_UINT32_T)85*85*85); q = buf_ / (85*85);
       encoded[2] = q + '!';
 
-      w1 = (unsigned) (buf_ - q*(unsigned PTS_INT32_T)(85*85));
+      w1 = (unsigned) (buf_ - q*(PTS_UINT32_T)(85*85));
       assert(w1/85<85);
       encoded[3] = (w1 / 85) + '!';
       encoded[4] = (w1 % 85) + '!';
@@ -592,7 +592,7 @@ void ASCII85Encode::vi_write(char const*buf, slen_t len) {
     obuf=(char*)NULLP;
   } else {
     assert(obuf!=NULLP);
-    register unsigned PTS_INT32_T abuf=ascii85buf;
+    register PTS_UINT32_T abuf=ascii85buf;
     register unsigned aleft=ascii85left;
     assert(aleft>=1 && aleft<=4);
     do {
@@ -607,22 +607,22 @@ void ASCII85Encode::vi_write(char const*buf, slen_t len) {
   }
 }
 
-void ASCII85Encode::wout(unsigned PTS_INT32_T buf_) {
+void ASCII85Encode::wout(PTS_UINT32_T buf_) {
   char encoded[6];
-  if (buf_ != (unsigned PTS_INT32_T)0) {
-    unsigned PTS_INT32_T q;
+  if (buf_ != (PTS_UINT32_T)0) {
+    PTS_UINT32_T q;
     unsigned w1;
 
-    q = buf_ / ((unsigned PTS_INT32_T)85*85*85*85);  /* actually only a byte */
+    q = buf_ / ((PTS_UINT32_T)85*85*85*85);  /* actually only a byte */
     encoded[0] = q + '!';
 
-    buf_ -= q * ((unsigned PTS_INT32_T)85*85*85*85); q = buf_ / ((unsigned PTS_INT32_T)85*85*85);
+    buf_ -= q * ((PTS_UINT32_T)85*85*85*85); q = buf_ / ((PTS_UINT32_T)85*85*85);
     encoded[1] = q + '!';
 
-    buf_ -= q * ((unsigned PTS_INT32_T)85*85*85); q = buf_ / (85*85);
+    buf_ -= q * ((PTS_UINT32_T)85*85*85); q = buf_ / (85*85);
     encoded[2] = q + '!';
 
-    w1 = (unsigned) (buf_ - q*(unsigned PTS_INT32_T)(85*85));
+    w1 = (unsigned) (buf_ - q*(PTS_UINT32_T)(85*85));
     encoded[3] = (w1 / 85) + '!';
     encoded[4] = (w1 % 85) + '!';
     encoded[5] = '\0';
