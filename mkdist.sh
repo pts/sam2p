@@ -54,6 +54,7 @@ else
   echo "$0: missing: files or **/CVS/Entries" >&2
   exit 3
 fi
+FILES="`echo "$FILES" | sort | uniq`"
 
 
 if test -e "$PRODUCT_AND_VERSION"; then
