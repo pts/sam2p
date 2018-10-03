@@ -71,8 +71,8 @@ set -e # exit on error
 rm -f "../$TGZ_NAME"
 mkdir "$PRODUCT_AND_VERSION"
 (IFS='
-'; exec tar -c -- $FILES "$@") |
-(cd "$PRODUCT_AND_VERSION" && exec tar -xv)
+'; exec tar -cf- -- $FILES "$@") |
+(cd "$PRODUCT_AND_VERSION" && exec tar -xvf-)
 # ^^^ tar(1) magically calls mkdir(2) etc.
 
 # vvv Dat: don't include sam2p-.../ in the filenames of the .tar.gz
