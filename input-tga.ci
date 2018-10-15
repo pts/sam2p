@@ -288,11 +288,13 @@ ReadImage (FILE              *fp,
   unsigned char *buffer;
   unsigned char *alphas;
 
-  int width, height, bpp, abpp, pbpp, nalphas;
+  int width, height, bpp, abpp, pbpp;
+  unsigned nalphas = 0, ncolors = 0;
   int wh, wh3, whp;
   int j, k;
   int pelbytes, wbytes, bsize, npels, pels;
-  int rle, badread;
+  int rle;
+  char badread = 0, badalpha = 0, badcolor = 0;
   int itype=0;
   unsigned char *cmap = NULL;
   int (*myfread)(unsigned char *, int, int, FILE *);
@@ -394,12 +396,10 @@ ReadImage (FILE              *fp,
               (unsigned)hdr->colorMapType);
 
   alphas = 0;
-  nalphas = 0;
   if (hdr->colorMapType == 1)
     {
       /* We need to read in the colormap. */
-      int index, colors;
-	  unsigned int length;
+      unsigned index, length, j, k;
 
       index = (hdr->colorMapIndexHi << 8) | hdr->colorMapIndexLo;
       length = (hdr->colorMapLengthHi << 8) | hdr->colorMapLengthLo;
@@ -408,8 +408,8 @@ ReadImage (FILE              *fp,
         FATALP1 ("TGA: invalid color map length ", length);
 
       pelbytes = ROUNDUP_DIVIDE (hdr->colorMapSize, 8);
-      colors = length + index;
-      cmap = (unsigned char *) malloc (colors * pelbytes);
+      ncolors = length + index;
+      cmap = (unsigned char *) malloc (ncolors * pelbytes);
 
       /* Zero the entries up to the beginning of the map. */
       memset (cmap, 0, index * pelbytes);
@@ -421,10 +421,9 @@ ReadImage (FILE              *fp,
       /* If we have an alpha channel, then create a mapping to the alpha
          values. */
       if (pelbytes > 3)
-        alphas = (unsigned char *) malloc (colors);
+        alphas = (unsigned char *) malloc (ncolors);
 
-      k = 0;
-      for (j = 0; j < colors * pelbytes; j += pelbytes)
+      for (j = k = 0; j < ncolors * pelbytes; j += pelbytes)
         {
           /* Swap from BGR to TGA_RGB. */
           unsigned char tmp = cmap[j];
@@ -437,10 +436,12 @@ ReadImage (FILE              *fp,
             alphas[nalphas ++] = cmap[j + 3];
         }
 
+#if 0  /**** pts ****/
       /* If the last color was transparent, then omit it from the
          mapping. */
       if (nalphas && alphas[nalphas - 1] == 0)
-        colors --;
+        ncolors --;
+#endif
 
       /* Now pretend as if we only have 8 bpp. */
       abpp = 0;
@@ -478,7 +479,6 @@ ReadImage (FILE              *fp,
     myfread = std_fread;
 
   wbytes = width * pelbytes;
-  badread = 0;
 
   npels = wh;
   bsize = wbytes * height;
@@ -510,8 +510,17 @@ ReadImage (FILE              *fp,
       for (j = bsize - pelbytes; j >= 0; j -= pelbytes)
         {
           /* Find the alpha for this index. */
-          image.bitmap[j + 1] = alphas[image.bitmap[k]];
-          image.bitmap[j] = image.bitmap[k --];
+          const unsigned char tmp = image.bitmap[k--];
+          if (tmp >= nalphas) {
+            if (!badalpha) {
+              WARNINGP ("TGA: alpha index too large");
+              badalpha = 1;
+            }
+            image.bitmap[j + 1] = 0;
+          } else {
+            image.bitmap[j + 1] = alphas[tmp];
+          }
+          image.bitmap[j] = tmp;
         }
     }
 
@@ -530,7 +539,7 @@ ReadImage (FILE              *fp,
       /* Rearrange the colors from BGR to TGA_RGB. */
       for (j = 0; j < bsize; j += pelbytes)
         {
-          unsigned char tmp = image.bitmap[j];
+          const unsigned char tmp = image.bitmap[j];
           image.bitmap[j] = image.bitmap[j + 2];
           image.bitmap[j + 2] = tmp;
         }
@@ -578,7 +587,6 @@ ReadImage (FILE              *fp,
   if (hdr->colorMapType == 1)
     {
       unsigned char *temp, *temp2, *temp3;
-      unsigned char index;
       int xpos, ypos;
 
       temp2 = temp = image.bitmap;
@@ -588,10 +596,21 @@ ReadImage (FILE              *fp,
         {
           for (xpos = 0; xpos < width; xpos++)
             {
-               index = *temp2++;
-               *temp3++ = cmap[3*index+0];
-               *temp3++ = cmap[3*index+1];
-               *temp3++ = cmap[3*index+2];
+               const unsigned char index = *temp2++;
+               if (index >= ncolors) {
+                 if (!badcolor) {
+                   WARNINGP ("TGA: color index too large");
+                   badcolor = 1;
+                 }
+                 *temp3++ = 0;
+                 *temp3++ = 0;
+                 *temp3++ = 0;
+               } else {
+                 unsigned char *cdata = cmap + 3 * index;
+                 *temp3++ = *cdata++;
+                 *temp3++ = *cdata++;
+                 *temp3++ = *cdata;
+               }
 	    }
         }
       free (temp);
