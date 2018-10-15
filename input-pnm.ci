@@ -184,7 +184,7 @@ static slen_t multiply_check(slen_t a, slen_t b) {
   slen_t result;
   if (a == 0) return 0;
   /* Check for overflow. Works only if everything is unsigned. */
-  if ((result = a * b) / a != b) FATALP("PNM: Image too large.\n");
+  if ((result = a * b) / a != b) FATALP("PNM: Image too large.");
   return result;
 }
 
@@ -212,7 +212,7 @@ bitmap_type pnm_load_image (at_string filename)
   fd = xfopen (filename, "rb");
   if (fd == NULL)
     {
-      FATAL("PNM: can't open file\n");
+      FATAL("PNM: can't open file");
       BITMAP_BITS (bitmap) = NULL;
       BITMAP_WIDTH (bitmap) = 0;
       BITMAP_HEIGHT (bitmap) = 0;
