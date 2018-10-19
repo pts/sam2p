@@ -13,8 +13,9 @@
 #include "error.hpp"
 #include "gensio.hpp"
 #include <stdio.h>
-#include <stdlib.h> /* exit() */
+#include <stdlib.h> /* exit(), _exit() in MinGW */
 #include <string.h> /* strlen() */
+#include <unistd.h> /* _exit() on Linux */
 #if _MSC_VER > 1000
 #  include "windows.h" /* ExitThread() */
 #endif
@@ -88,8 +89,17 @@ GenBuffer::Writable& operator <<(GenBuffer::Writable& err,Error*) {
       if (NULLP!=p->record) Error::policy_top->err->vi_write(p->record->begin_(), p->record->getLength());
       p=p->next;
     }
-    // if (level>=Error::policy_top->killer)
-    Error::cexit(level);
+    /* __SANITIZE_ADDRESS__ indicates g++ -fsanitize=address. This feature
+     * detects memory leaks, and since sam2p is full of memory leaks on
+     * fatal errors, we don't want them reported. With _exit() and abort(),
+     * -fsanitize=address doesn't report memory leaks.
+     */
+    #if (USE_UEXIT_ON_FATAL_ERROR || __SANITIZE_ADDRESS__) && !(_MSC_VER > 1000)
+      _exit(level);
+    #else
+      // if (level>=Error::policy_top->killer)
+      Error::cexit(level);
+    #endif
   }
   /* Note that the order of error messages might be scrambled, i.e `printed'
    * is printed before `recorded'.
