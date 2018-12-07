@@ -1,0 +1,87 @@
+'\" t
+.\"     Title: SAM2P_PDF_SCALE
+.\"    Author: Tanguy Ortolo <tanguy+debian@ortolo.eu>
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 08/30/2018
+.\"    Manual: User commands
+.\"    Source: sam2p
+.\"  Language: English
+.\"
+.TH "SAM2P_PDF_SCALE" "1" "08/30/2018" "sam2p" "User commands"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+sam2p_pdf_scale \- scale a PDF file from sam2p to a given page size
+.SH "SYNOPSIS"
+.HP \w'\fBsam2p_pdf_scale\fR\ 'u
+\fBsam2p_pdf_scale\fR {\fIpage_width\fR} {\fIpage_height\fR} {\fIinput\&.pdf\fR} [\fIoutput\&.pdf\fR]
+.SH "DESCRIPTION"
+.PP
+This manual page documents briefly the
+\fBsam2p_pdf_scale\fR
+command\&. It was written for the Debian distribution because the original program does not have a manual page\&.
+.PP
+sam2p_pdf_scale
+reads a PDF file and scales it so that it fits into the given page size, adding margins when needed to keep its aspect ratio\&.
+.SH "OPTIONS"
+.PP
+\fIpage_width\fR
+.RS 4
+Page width, in points (1pt = 1/72in)\&.
+.RE
+.PP
+\fIpage_height\fR
+.RS 4
+Page height, in points\&.
+.RE
+.PP
+\fIinput\&.pdf\fR
+.RS 4
+Input file\&.
+.RE
+.PP
+\fIoutput\&.pdf\fR
+.RS 4
+Output file\&. By default, the input file is replaced\&.
+.RE
+.SH "BUGS"
+.PP
+The upstreams
+BTS
+can be found at
+\m[blue]\fBhttp://code\&.google\&.com/p/sam2p/issues\fR\m[]\&.
+.SH "AUTHOR"
+.PP
+\fBTanguy Ortolo\fR <\&tanguy+debian@ortolo\&.eu\&>
+.RS 4
+Wrote this manpage for the Debian system\&.
+.RE
+.SH "COPYRIGHT"
+.br
+Copyright \(co 2011 Tanguy Ortolo
+.br
+.PP
+This manual page was written for the Debian system (and may be used by others)\&.
+.PP
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU General Public License, Version 2 or (at your option) any later version published by the Free Software Foundation\&.
+.PP
+On Debian systems, the complete text of the GNU General Public License can be found in
+/usr/share/common\-licenses/GPL\-2\&.
+.sp

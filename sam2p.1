@@ -1,0 +1,178 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH SAM2P 1 "January 23, 2005"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+sam2p \- program to convert raster images to PostScript, PDF, and
+other formats
+.SH SYNOPSIS
+.B sam2p
+.RI [ options ] " infile" " outfile"
+.br
+.B sam2p
+.RI [ options ] " jobfile"
+.SH DESCRIPTION
+This manual page documents briefly the
+.B sam2p
+command.
+It was written for the Debian distribution
+because the original program does not have a manual page.
+The complete documentation can be found in
+.B /usr/share/doc/sam2p/README.gz
+.PP
+.\" TeX users may be more comfortable with the \fB<whatever>\fP and
+.\" \fI<whatever>\fP escape sequences to invoke bold face and italics, 
+.\" respectively.
+\fBsam2p\fP is a program that converts many
+raster (bitmap) image formats into Adobe PostScript or PDF files and several
+other formats.
+The images are not vectorized.
+.B sam2p
+gives full control to
+the user to specify standards-compliance, compression, and bit depths.
+.PP
+\fBsam2p\fP can operate in two modes: one-liner mode and job mode.
+In job mode the user has to write a ``job'' file which specifies
+the conversion parameters and allows full control of all aspects of the
+final output. This manpage deals only with one-liner mode, see
+.B /usr/share/doc/sam2p/README.gz
+for details on job mode.
+
+.SH EXAMPLES
+
+To convert an image file to EPS, use:
+
+     sam2p infile.gif outfile.eps
+
+The output format is guessed from the file extension. Optionally, the
+output format also can be specified as option or as prefix to the output file.
+For example, the following commands produce postscript level 3:
+
+     sam2p infile.gif psl3:outfile.ps
+     
+     sam2p \-ps:3 infile.gif outfile.ps
+
+.B sam2p
+can include its own (zip and lzw) decompression filter in Postscript
+files, allowing better compression than normally supported by
+Postscript level 1:
+
+     sam2p \-1 \-c:zip infile.gif outfile.ps
+
+     sam2p \-1 \-c:lzw infile.gif outfile.ps
+
+.SH OPTIONS
+
+.TP
+.B \-1, \-ps:1, psl1:
+produce Postscript Level 1
+.TP
+.B \-1c, \-ps:1c, pslc:
+produce Postscript Level 1 with the CMYK and `colorimage' extension
+.TP
+.B \-2, \-ps:2, psl2:
+produce Postscript Level 2 (default for postscript)
+.TP
+.B \-3, \-ps:3, psl3:
+produce Postscript Level 3
+.TP
+.B \-pdf:b0, pdfb1.0:
+produce PDF version 1.0 (BI inline image)
+.TP
+.B \-pdf:b2, pdfb1.2:
+produce PDF version 1.2 (BI inline image) (default for PDF)
+.TP
+.B \-pdf:0, pdf1.0:
+produce PDF version 1.0 (XObject image)
+.TP
+.B \-pdf:2, pdf1.2:
+produce PDF version 1.2 (XObject image)
+.sp 1 
+.TP
+.B \-e:0, \-e:none
+don't scale
+.TP
+.B \-e, \-e:1, \-e:scale
+scale image to fit page
+.TP
+.B \-e:rot, \-e:rotate
+scale and rotate image to fit page (default if output filename has .ps extension)
+.sp 1 
+.TP
+.B \-m:\fIdimen\fP
+set all page margins to \fIdimen\fP
+.br
+\fIdimen\fP can have one of the following units (as in TeX): bp, in, pt, pc, dd,
+cc, sp, cm, mm
+.TP
+.B \-m:\fIspec\fP:\fIdimen\fP
+set \fIspec\fP margin(s) to \fIdimen\fP (\fIspec\fP can be \fBl\fP,  \fBr\fP,
+\fBt\fP, \fBb\fP, \fBv\fP (top and bottom), \fBh\fP (left and right))
+.TP
+.B \-m:dpi:\fIres\fP
+set output EPS or PDF to resolution 72*72/\fIres\fP dpi
+.sp 1     
+.TP
+.B \-m:dpi:-\fIres\fP
+set output EPS or PDF to resolution \fIres\fP dpi
+.sp 1     
+.TP
+.B \-c:none, \-c:lzw, \-c:zip, \-c:rle, \-c:fax, \-c:dct, \-c:jpeg
+select compression type (support depends on output format)
+.sp 1
+.TP
+.B \-j:quiet
+print only error and fatal error messages, suppress warnings, notices etc.
+Must be put at the beginning of the command line to suppress initial banners, too.
+.sp 1     
+.TP
+.B \-\-
+If not the last argument:
+treat all further arguments as files (required if a filename
+contains a colon or starts with a minus)
+.br
+If the last argument: use input filename as output filename (i.e. overwrite input
+file).
+.SH SUPPORTED FILE FORMATS
+.TP
+.B Input formats:
+PNM, PBM, PGM, PPM, XPM, GIF, LBM, TGA, PCX,
+.br
+JPEG (requires djpeg from package libjpeg-progs),
+.br
+TIFF (requires tifftopnm from package netpbm),
+.br
+PNG (requires pngtopnm from package netpbm),
+.br
+PS, EPS, PDF (require ghostscript)
+.TP
+.B Output formats:
+XWD, BMP, PNG, TIFF6, JPEG, PNM, GIF89a, XPM, PS (levels 1,2,3),
+EPS (levels 2,3), PDF (1.0 and 1.2)
+.sp 2
+For some formats,
+.B sam2p
+supports transparency.
+See the README file for more info.
+.SH SEE ALSO
+The program is documented fully in
+.B /usr/share/doc/sam2p/README.gz
+.SH AUTHOR
+sam2p was written by Szab\['o] P\['e]ter <pts@fazekas.hu>.
+.PP
+This manual page was written by Stefan Fritsch <sf@sfritsch.de>,
+for the Debian project (but may be used by others under the
+terms of the GNU General Public License, Version 2).
