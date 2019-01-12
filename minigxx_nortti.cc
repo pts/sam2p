@@ -37,6 +37,10 @@ void* _Znwj /*operator new   i386*/(size_t len) __attribute__((alias("emulate_cc
 void* _Znaj /*operator new[] i386*/(size_t len) __attribute__((alias("emulate_cc_new")));
 void  _ZdlPv/*operator delete  */(void* p) __attribute__((alias("emulate_cc_delete")));
 void  _ZdaPv/*operator delete[]*/(void* p) __attribute__((alias("emulate_cc_delete")));
+void  _ZdlPvm/*operator delete   amd64*/(void* p, unsigned long) __attribute__((alias("emulate_cc_delete")));
+void  _ZdaPvm/*operator delete[] amd64*/(void* p, unsigned long) __attribute__((alias("emulate_cc_delete")));
+void  _ZdlPvj/*operator delete   i386*/(void* p, unsigned int) __attribute__((alias("emulate_cc_delete")));
+void  _ZdaPvj/*operator delete[] i386*/(void* p, unsigned int) __attribute__((alias("emulate_cc_delete")));
 
 /* See https://libcxxabi.llvm.org/spec.html */
 __attribute__((noreturn)) void __cxa_pure_virtual(void) {
