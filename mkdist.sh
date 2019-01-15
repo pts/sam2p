@@ -14,8 +14,16 @@ fi
 
 # Get the release version number.
 if test -f debian/changelog; then
-  # PRODUCT_AND_VERSION=$PRODUCT-$VERSION
-  PRODUCT_AND_VERSION="`<debian/changelog perl -ne 'print"$1-$2"if/^(\S+) +[(]([-.\w]+?)(?:-\d+)?[)] +\w+;/;last'`"
+  # PRODUCT_AND_VERSION=$PRODUCT-$VERSION  without the -revision number.
+  # Like this, but we do it without perl, for compile.sh:
+  # PRODUCT_AND_VERSION="`<debian/changelog perl -ne 'print"$1-$2"if/^(\S+) +[(]([-.\w]+?)(?:-\d+)?[)] +\w+;/;last'`"
+  PRODUCT_AND_VERSION=
+  read A B <debian/changelog
+  case "$B" in \(*\)*) ;; *) B= ; esac
+  if test "$B"; then
+    B="${B%%\)*}"; B="${B#\(}" B="${B%%-*}"
+    PRODUCT_AND_VERSION="$A-$B"
+  fi
   if test "$PRODUCT_AND_VERSION"; then :; else
     echo "$0: couldn't determine version from debian/changelog" >&2
     exit 4
