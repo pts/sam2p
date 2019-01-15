@@ -122,12 +122,13 @@ AC_PTS_WARN_PROG(lzw_codec, [lzw_codec might become recommended for /Compression
 AC_PTS_WARN_PROG(gzip, [gzip might become useful for /Compression/ZIP])
 AC_PTS_WARN_PROG(zip, [zip might become useful for /Compression/ZIP])
 AC_PTS_ERR_PROG(bash, [bash is required for compiling this program])
-AC_PTS_ERR_PROG(make, [make is required for compiling this program])
+dnl Doesn't work like this, e.g. env var ac_cv_path_pts_$MAKE
+dnl AC_PTS_ERR_PROG($MAKE, [$MAKE is required for compiling this program])
 AC_PTS_ERR_PROG(perl, [perl is required for compiling this program])
 dnl AC_PTS_ERR_PROG(touch, [touch is required for compiling this program])
 dnl ^^^ as of 0.37, touch is not required
 
-#AC_CHECK_PROG(ac_pts_cjpeg, cjpeg, yes)
+dnl AC_CHECK_PROG(ac_pts_cjpeg, cjpeg, yes)
 
 dnl Checks for C/C++ language features
 AC_PTS_HAVE_STDC
@@ -218,6 +219,6 @@ dnl AC_PTS_RUN_OK([perl -x -S ./ccdep.pl $CXX], [], [AC_MSG_ERROR(cannot compute
 rm -f Makedep
 AC_PTS_RUN_OK([${MAKE:-make} Makedep.force], [], [AC_MSG_ERROR(cannot compute depends)])
 AC_PTS_OK
-echo "configure done. Now you should run: make; make install"
+echo "configure done. Now you should run: $MAKE; $MAKE install"
 
 dnl end of configure.in

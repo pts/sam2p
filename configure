@@ -2513,51 +2513,6 @@ echo "$as_me: error: bash is required for compiling this program" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-# Extract the first word of "make", so it can be a program name with args.
-set dummy make; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_pts_make+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case "$pts_make" in
-  /*)
-  ac_cv_path_pts_make="$pts_make" # Let the user override the test with a path.
-  ;;
-  ?:/*)
-  ac_cv_path_pts_make="$pts_make" # Let the user override the test with a dos path.
-  ;;
-  *)
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS=":"
-  ac_dummy="$PATH"
-  for ac_dir in $ac_dummy; do
-    test -z "$ac_dir" && ac_dir=.
-    if test -x $ac_dir/$ac_word; then
-      ac_cv_path_pts_make="$ac_dir/$ac_word"
-      break
-    fi
-  done
-  IFS="$ac_save_ifs"
-  ;;
-esac
-fi
-pts_make="$ac_cv_path_pts_make"
-if test -n "$pts_make"; then
-  echo "$as_me:$LINENO: result: $pts_make" >&5
-echo "${ECHO_T}$pts_make" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-if test x"$ac_cv_path_pts_make" = x; then
-  { echo "$as_me:$LINENO: WARNING: make is required:" >&5
-echo "$as_me: WARNING: make is required:" >&2;}
-  { { echo "$as_me:$LINENO: error: make is required for compiling this program" >&5
-echo "$as_me: error: make is required for compiling this program" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
 # Extract the first word of "perl", so it can be a program name with args.
 set dummy perl; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -7534,5 +7489,5 @@ fi
 
 echo "configure:7517: all OK" >&5
 
-echo "configure done. Now you should run: make; make install"
+echo "configure done. Now you should run: $MAKE; $MAKE install"
 

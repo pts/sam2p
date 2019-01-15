@@ -597,7 +597,7 @@ Software required for UNIX compilation:
    working compilers: g++-2.91 g++-2.95 g++-3.0 g++-3.1 g++-3.2, g++-4.0,
    g++-4.4, g++-4.8, g++-6.3, g++-7.3)
 -- perl: Perl >=5.004 (no external Perl modules are required)
--- (optional) make: GNU Make (`make -v' should print `GNU Make')
+-- (optional) make: GNU Make
 -- (optional) autoconf: GNU autoconf >=2.53 (version number is important,
    see AC_C_CONST)
 -- (not required): the following libraries are _not_ required: libjpeg,
@@ -616,15 +616,19 @@ Alternative compilation if you don't want to link against libstdc++:
 Alternative compilation for some targets, including cross-compilation: use
 the ./compile_*.sh scripts.
 
-Alternative compilation, with ./configure script and GNU Make as make:
+If you want to use the ./configure script, run
 
-	# compile and install required programs
-	#autoconf  # optional, for experts only
-	#export CC=gcc-3.2 CXX=g++-3.2  # optional, for experts only
 	#sh configure --enable-gif --enable-lzw  # optional, make does it
 	make
 	# the stand-alone utility `./sam2p' is now built
 	make install  # optional, may not work
+
+If you have GNU Make as gmake on the $PATH, run this:
+
+	sh configure MAKE=gmake --enable-gif --enable-lzw  # optional, gmake does it
+	gmake
+	# the stand-alone utility `./sam2p' is now built
+	gmake install  # optional, may not work
 
 If installation doesn't work, please copy the file `sam2p' to somewhere in
 your $PATH, for example /usr/local/bin. Please also copy the README to a
