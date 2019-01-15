@@ -15,7 +15,8 @@ $CC -O2 -ansi -Wall -W -Wextra print_sizeofs.c -o print_sizeofs
 SAM2P_VERSION="$(set -- --getversion; . ./mkdist.sh)"
 test "$SAM2P_VERSION"
 
-# Don't use `-nostdlib -lc', it prevents linking crtbeginT.o or causes segfault.
+# It also compiles (with some warnings about -nostdc++ for cc1) without -x c++
+# You can also use `-nodefaultlibs -lc', but it's not needed.
 # With or without -fno-use-cxa-atexit, doesn't make a difference.
 $CC -s -O2 \
     -DHAVE_CONFIG2_H -DUSE_CONFIG_STDC_H -DSAM2P_VERSION=\""$SAM2P_VERSION"\" \

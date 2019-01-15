@@ -144,13 +144,6 @@
 # define ___(arg2s,arg1s,argafter) arg1s argafter /* Dat: no direct comma allowed in args :-( */
 #endif
 
-#if SIZEOF_BOOL!=1
-#define bool PTS_bool
-#define true 1
-#define false 0
-typedef unsigned char bool;
-#endif
-
 #ifdef const
 #  undef const
 #  define PTS_const
@@ -312,7 +305,14 @@ char *alloca ();
 #undef  USE_BUILTIN_FAXD /* sure */
 /* #define USE_BUILTIN_FAXD 1 */ /* in config.h */
 
-#ifndef __cplusplus
+#ifdef __cplusplus
+#if SIZEOF_BOOL!=1
+#define bool PTS_bool
+#define true 1
+#define false 0
+typedef unsigned char bool;
+#endif
+#else
 #undef true
 #undef false
 #ifdef __BEOS__

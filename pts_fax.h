@@ -34,7 +34,9 @@ Free Software Foundation, Inc., 59 Temple Place Suite 330, Boston, MA
 
 #ifdef __GNUC__
 #ifndef __clang__
+#ifdef __cplusplus
 #pragma interface
+#endif
 #endif
 #endif
 

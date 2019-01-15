@@ -7,7 +7,9 @@
 
 #ifdef __GNUC__
 #ifndef __clang__
+#ifdef __cplusplus
 #pragma interface
+#endif
 #endif
 #endif
 
