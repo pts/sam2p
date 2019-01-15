@@ -589,33 +589,42 @@ For Win32 compilation, see later.
 
 Software required for UNIX compilation:
 
+-- TL;DR You need these tools on the $PATH: sh perl g++ as ld
 -- a UNIX system
--- a working, GNU-compatible C++ compiler (preferably GNU G++ >=2.91. Known
-   working compilers: g++-2.91 g++-2.95 g++-3.0 g++-3.1 g++-3.2)
--- GNU Make (`make -v' should print `GNU Make')
--- Perl >=5.004 (no external Perl modules are required)
--- a Bourne-compatible shell (preferably GNU Bash >=2.0)
--- the following libraries are _not_ required: libjpeg, libtiff, libpng,
-   libungif, PDFlib, zlib, libm, libstdc++
--- optionally: GNU autoconf >=2.53 (version number is important, see
-   AC_C_CONST)
+-- sh: a Bourne-compatible shell (preferably GNU Bash >=2.0, but can be dash,
+   ksh, zsh, busybox sh or others)
+-- g++: a working, GNU-compatible C++ compiler (preferably GNU G++ >=2.91. Known
+   working compilers: g++-2.91 g++-2.95 g++-3.0 g++-3.1 g++-3.2, g++-4.0,
+   g++-4.4, g++-4.8, g++-6.3, g++-7.3)
+-- perl: Perl >=5.004 (no external Perl modules are required)
+-- (optional) make: GNU Make (`make -v' should print `GNU Make')
+-- (optional) autoconf: GNU autoconf >=2.53 (version number is important,
+   see AC_C_CONST)
+-- (not required): the following libraries are _not_ required: libjpeg,
+   libtiff, libpng, libungif, PDFlib, zlib, libm
 
-Compilation:
+Compilation (it creates the executable file sam2p):
+
+	sh compile.sh
+
+If it doesn't work with your sh, you may want to try bash instead.
+
+Alternative compilation if you don't want to link against libstdc++:
+
+	sh compile_minigxx.sh
+
+Alternative compilation for some targets, including cross-compilation: use
+the ./compile_*.sh scripts.
+
+Alternative compilation, with ./configure script and GNU Make as make:
 
 	# compile and install required programs
 	#autoconf  # optional, for experts only
 	#export CC=gcc-3.2 CXX=g++-3.2  # optional, for experts only
-	#./configure --enable-gif --enable-lzw  # optional, make does it
+	#sh configure --enable-gif --enable-lzw  # optional, make does it
 	make
 	# the stand-alone utility `./sam2p' is now built
 	make install  # optional, may not work
-
-Alternative compilation, without autoconf (./configure script) or GNU Make:
-
-	./compile.sh
-
-Alternative compilation for some targets, including cross-compilation: use
-the ./compile_*.sh scripts.
 
 If installation doesn't work, please copy the file `sam2p' to somewhere in
 your $PATH, for example /usr/local/bin. Please also copy the README to a

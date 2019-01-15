@@ -1,4 +1,4 @@
-#! /bin/bash --
+#! /bin/sh --
 # by pts@fazekas.hu at Sat Jan 12 19:08:59 CET 2019
 
 set -ex
@@ -6,13 +6,13 @@ set -ex
 export CC="${CC:-gcc}"
 
 if test -f bts2.tth; then :; else
-  ./gen_bts2_tth.sh
+  (. ./gen_bts2_tth.sh) || exit "$?"
 fi
 
 $CC -O2 -ansi -Wall -W -Wextra print_sizeofs.c -o print_sizeofs
 ./print_sizeofs >sizeofs.h
 
-SAM2P_VERSION="$(bash ./mkdist.sh --getversion)"
+SAM2P_VERSION="$(set -- --getversion; . ./mkdist.sh)"
 test "$SAM2P_VERSION"
 
 # Don't use `-nostdlib -lc', it prevents linking crtbeginT.o or causes segfault.

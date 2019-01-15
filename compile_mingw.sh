@@ -1,4 +1,4 @@
-#! /bin/bash --
+#! /bin/sh --
 
 # Imp:
 # by pts@fazekas.hu at Fri May 23 23:33:19 CEST 2008
@@ -6,10 +6,10 @@
 set -ex
 
 if test -f bts2.tth; then :; else
-  CC=gcc ./gen_bts2_tth.sh  # Not cross-compiled.
+  (. ./gen_bts2_tth.sh) || exit "$?"  # Not cross-compiled.
 fi
 
-SAM2P_VERSION="$(bash ./mkdist.sh --getversion)"
+SAM2P_VERSION="$(set -- --getversion; . ./mkdist.sh)"
 test "$SAM2P_VERSION"
 
 # vvv either -mwindows or -mconsole

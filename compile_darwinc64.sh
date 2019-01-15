@@ -1,4 +1,4 @@
-#! /bin/bash --
+#! /bin/sh --
 # by pts@fazekas.hu at Mon Jul 24 17:33:42 CEST 2017
 
 set -ex
@@ -14,10 +14,10 @@ STRIP="docker run -v $PWD:/workdir multiarch/crossbuild /usr/osxcross/bin/x86_64
 test -f darwin_libgcc/x86_64-apple-darwin10/4.9.4/libgcc.a
 
 if test -f bts2.tth; then :; else
-  CC=gcc ./gen_bts2_tth.sh  # Not cross-compiled.
+  (. ./gen_bts2_tth.sh) || exit "$?"  # Not cross-compiled.
 fi
 
-SAM2P_VERSION="$(bash ./mkdist.sh --getversion)"
+SAM2P_VERSION="$(set -- --getversion; . ./mkdist.sh)"
 test "$SAM2P_VERSION"
 
 $CCLD -DNDEBUG -O3 -DHAVE_CONFIG2_H -DUSE_CONFIG_UCLIBC_H -DUSE_ATTRIBUTE_ALIAS=0 -DSAM2P_VERSION=\""$SAM2P_VERSION"\" \
