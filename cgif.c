@@ -242,6 +242,9 @@ PTS_const char *CGIFFF GetGifError(void)
 	case D_GIF_ERR_EOF_TOO_SOON:
 	    Err = "Image EOF detected, before image complete";
 	    break;
+	case D_GIF_ERR_EXT_TOO_SHORT:
+	    Err = "Extension data too short";
+	    break;
 	default:
 	    Err = NULL;
 	    break;
@@ -1516,12 +1519,18 @@ int CGIFFF DGifSlurp(CGIFFF GifFileType *GifFile)
 		    #else
                       /**** pts ****/
                       if (0xf9==(unsigned char)(ext_code)) {
-                        assert(ExtData[0]>=4);
+                        if (ExtData[0] < 4) { ext_too_short:
+                          _GifError = D_GIF_ERR_EXT_TOO_SHORT;
+                          return GIF_ERROR;
+                        }
                         ext.dispose=ExtData[1]>>2;
                         ext.delay=(ExtData[3] << 8) | ExtData[2];
-                        if ((ExtData[1] & 0x01) == 1) ext.transp=ExtData[4];
+                        if ((ExtData[1] & 0x01) == 1) {
+                          if (ExtData[0] < 5) goto ext_too_short;
+                          ext.transp=ExtData[4];
+                        }
                       } else if (0xff==(unsigned char)(ext_code)) {
-                        assert(ExtData[0]>=3);
+                        if (ExtData[0] < 4) goto ext_too_short;
                         ext.iter=(ExtData[3] << 8) | ExtData[2];
                       } else {
                         AddExtensionBlock(&ext, ExtData[0], ExtData+1);
