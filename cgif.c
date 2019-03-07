@@ -892,7 +892,11 @@ int CGIFFF DGifGetImageDesc(CGIFFF GifFileType *GifFile)
     Private->PixelCount = (long) Image.Width *
 			    (long) Image.Height;
 
-    DGifSetupDecompress(GifFile);  /* Reset decompress algorithm parameters. */
+    /* Reset decompress algorithm parameters. */
+    if (DGifSetupDecompress(GifFile)==GIF_ERROR) {
+      _GifError = D_GIF_ERR_READ_FAILED;
+      return GIF_ERROR;
+    }
 
     return GIF_OK;
 }
