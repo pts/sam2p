@@ -1551,7 +1551,8 @@ int CGIFFF DGifSlurp(CGIFFF GifFileType *GifFile)
   			  memcpy(ep->Bytes,ExtData,ep->ByteCount * sizeof(char));
   			#else
   			  if (ExtData==NULL) break;
-  			  AddExtensionBlock(sp, ExtData[0], ExtData+1);
+                          AddExtensionBlock(&ext, ExtData[0], ExtData+1);
+                          ext.ExtensionBlocks[ext.ExtensionBlockCount-1].code=ext_code;
   			#endif
 		    }
 		}
