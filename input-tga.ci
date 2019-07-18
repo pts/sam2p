@@ -452,7 +452,7 @@ ReadImage (FILE              *fp,
 	  pelbytes = 3;
 
   wh = (unsigned)width * height;
-  if (wh / width != height) {
+  if (width != 0 && wh / width != height) {
    idl_error:
     FATALP("TGA: image dimensions too large");
   }
