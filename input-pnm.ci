@@ -256,14 +256,14 @@ bitmap_type pnm_load_image (at_string filename)
   if (pnmscanner_eof(scan))
     FATALP ("PNM: premature end of file");
   pnminfo->xres = isdigit(*buf)?atoi(buf):0;
-  if (pnminfo->xres<=0)
+  if (pnminfo->xres+1U<=1U)
     FATALP ("PNM: invalid xres while loading");
 
   pnmscanner_gettoken(scan, (unsigned char *)buf, PNM_BUFLEN);
   if (pnmscanner_eof(scan))
     FATALP ("PNM: premature end of file");
   pnminfo->yres = isdigit(*buf)?atoi(buf):0;
-  if (pnminfo->yres<=0)
+  if (pnminfo->yres+1U<=1U)
     FATALP ("PNM: invalid yres while loading");
 
   if (pnminfo->np != 0)		/* pbm's don't have a maxval field */
