@@ -597,7 +597,7 @@ Filter::PipeD::PipeD(GenBuffer::Readable &in_, char const*pipe_tmpl, slendiff_t 
       // if (*pp) Error::sev(Error::EERROR) << "Filter::PipeD: multiple %escape" << (Error*)0;
       /* ^^^ multiple %escape is now a supported feature */
       if (!*pp && !Files::find_tmpnam(*pp)) Error::sev(Error::EERROR) << "Filter::PipeD" << ": tmpnam() failed" << (Error*)0;
-      assert(*pp);
+      assert(*pp ? true : false);
       pp->term0();
       if ((unsigned char)(s[-1]-'A')<(unsigned char)('Z'-'A'))
         redir_cmd.appendFnq(*pp); /* Capital letter: quote from the shell */
