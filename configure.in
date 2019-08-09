@@ -20,7 +20,7 @@ AC_PTS_ENABLE_DEBUG
 
 AC_MSG_CHECKING([for --enable-lzw])
 AC_ARG_ENABLE(lzw,
-  [  --enable-lzw            enable built-in LZW (de)compression (def: no)],
+  [  --enable-lzw            enable built-in LZW (de)compression (def: yes)],
   [], [])
 if test x1 = x"`perl -e 'print time>1056165811'`"; then
   # After 19 June 2003: default: yes
