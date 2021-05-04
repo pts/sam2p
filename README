@@ -329,26 +329,28 @@ Options (case insensitive):
 -- -l:...      : /LoadHints(...)
 -- disabled: -a: /LoadHints(asis) extra /Compression/JAI; load JPEG files (and others as-is)
 
--- -1  -ps:1 PSL1:         : [tiff2ps] hint /FileFormat/PSL1 among /PSL*
--- -1c -ps:1c -ps:c PSLC:  : [pts] hint /FileFormat/PSLC among /PSL*
--- -2  -ps:2 PSL2: EPS2:   : [tiff2ps,imagemagick] default hint /FileFormat/PSL2 among /PSL*
--- -3  -ps:3 PSL3:         : [pts] hint /FileFormat/PSL3 among /PSL*
--- -pdf:b0 PDFB1.0:        : [pts] hint /FileFormat/PDFB1.0 among /PDF* (PDF 1.0 with inline image)
--- -pdf:b2 PDFB1.2:        : [pts] default hint /FileFormat/PDFB1.2 among /PDF* (PDF 1.2 with inline image; default because image processors usually keep inline images intact, so they wouldn't want to inefficiently recompress our image)
--- -pdf:0 PDF1.0:          : [pts] hint /FileFormat/PDF1.0 among /PDF* (PDF 1.0 with XObject image)
--- -pdf:2 PDF1.2:          : [pts] hint /FileFormat/PDF1.2 among /PDF* (PDF 1.2 with XObject image)
---  EPS: EPSF:             : [pts] hint /FileFormat/PSL2 or
-                                        /FileFormat/PSL3 (for /Compression/ZIP)
---  PDF:                   : [pts] hint /FileFormat/PDFB1.0 or
-                                        /FileFormat/PDFB1.2 (for /Compression/ZIP)
---  PS:                    : [pts] hint /Scale/RotateOK /FileFormat/PSL2 or
-                                        /FileFormat/PSL3 (for /Compression/ZIP)
---  PS2:                   : [imagemagick] hint /Scale/RotateOK
-                                                /FileFormat/PSL2. Deprecated, please use PS:.
+-- -1  -ps:1 PSL1:          : [tiff2ps] hint /FileFormat/PSL1 among /PSL*
+-- -1c -ps:1c -ps:c PSLC:   : [pts] hint /FileFormat/PSLC among /PSL*
+-- -2  -ps:2 PSL2: EPS2:    : [tiff2ps,imagemagick] default hint /FileFormat/PSL2 among /PSL*
+-- -3  -ps:3 PSL3:          : [pts] hint /FileFormat/PSL3 among /PSL*
+-- -pdf:b0 PDFB1.0:         : [pts] hint /FileFormat/PDFB1.0 among /PDF* (PDF 1.0 with inline image)
+-- -pdf:b2 PDFB1.2:         : [pts] default hint /FileFormat/PDFB1.2 among /PDF* (PDF 1.2 with inline image; default because image processors usually keep inline images intact, so they wouldn't want to inefficiently recompress our image)
+-- -pdf:0 PDF1.0:           : [pts] hint /FileFormat/PDF1.0 among /PDF* (PDF 1.0 with XObject image)
+-- -pdf:2 PDF1.2:           : [pts] hint /FileFormat/PDF1.2 among /PDF* (PDF 1.2 with XObject image)
+--  EPS: EPSF:              : [pts] hint /FileFormat/PSL2 or
+                                         /FileFormat/PSL3 (for /Compression/ZIP)
+--  PDF:                    : [pts] hint /FileFormat/PDFB1.0 or
+                                         /FileFormat/PDFB1.2 (for /Compression/ZIP)
+--  PS:                     :  [pts] hint /Scale/RotateOK /FileFormat/PSL2 or
+                                          /FileFormat/PSL3 (for /Compression/ZIP)
+--  PS2:                    : [imagemagick] hint /Scale/RotateOK
+                                            /FileFormat/PSL2. Deprecated, please use PS:.
 
--- -e:0 -e:none            : /Scale/None
--- -e -e:1 -e:scale        : /Scale/OK
--- -e:rot -e:rotate        : /Scale/RotateOK
+-- -e:0 -e:none -e:false    : /Scale/None
+-- -e -e:1 -e:scale -e:true : /Scale/OK
+-- -e:rot -e:rotate         : /Scale/RotateOK
+-- -e:(false-bool)          : /Scale/None
+-- -e:(true-bool)           : /Scale/OK
 
 -- GIF: GIF89a: : [imagemagick,pts] /FileFormat/GIF89a
 -- JPEG: JPG:   : [imagemagick,pts] /FileFormat/JPEG
