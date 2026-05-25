@@ -94,6 +94,13 @@ class Rule { public:
     END_STATIC_ENUM()
     pr_t Predictor;
 
+    BEGIN_STATIC_ENUM(unsigned char,ip_t)
+      IP_default=0, /* emit nothing, or /Interpolate false in templates that historically hard-coded it */
+      IP_No=1,      /* force /Interpolate false */
+      IP_Yes=2      /* force /Interpolate true */
+    END_STATIC_ENUM()
+    ip_t Interpolate;
+
     Image::Sampled::rgb_t Transparent;
     
     bool isOneBit() const;

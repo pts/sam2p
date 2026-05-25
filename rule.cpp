@@ -86,7 +86,7 @@ bool Rule::Cache::isZIPOK() const {
 
 static MiniPS::Dict *y_FileFormat=(MiniPS::Dict*)NULLP,
   *y_SampleFormat, *y_TransferEncoding,
-  *y_Compression, *y_Scale;
+  *y_Compression, *y_Scale, *y_Interpolate;
 static class ValueDeleter {
  public:
   ~ValueDeleter() {
@@ -95,6 +95,7 @@ static class ValueDeleter {
     MiniPS::delete0((MiniPS::VALUE)y_TransferEncoding);
     MiniPS::delete0((MiniPS::VALUE)y_Compression);
     MiniPS::delete0((MiniPS::VALUE)y_Scale);
+    MiniPS::delete0((MiniPS::VALUE)y_Interpolate);
   }
 } value_deleter;
 
@@ -196,6 +197,16 @@ static void init_dicts() {
   y->put("/None",    MiniPS::Qinteger(Rule::CacheHints::SC_None));
   y->put("/OK",      MiniPS::Qinteger(Rule::CacheHints::SC_OK));
   y->put("/RotateOK",MiniPS::Qinteger(Rule::CacheHints::SC_RotateOK));
+
+  y=y_Interpolate=new MiniPS::Dict();
+  y->put("/ ",      MiniPS::Qinteger(Rule::Cache::IP_default)); /* default */
+  y->put("/Default",MiniPS::Qinteger(Rule::Cache::IP_default));
+  y->put("/No",     MiniPS::Qinteger(Rule::Cache::IP_No));
+  y->put("/false",  MiniPS::Qinteger(Rule::Cache::IP_No));
+  y->put("/Off",    MiniPS::Qinteger(Rule::Cache::IP_No));
+  y->put("/Yes",    MiniPS::Qinteger(Rule::Cache::IP_Yes));
+  y->put("/true",   MiniPS::Qinteger(Rule::Cache::IP_Yes));
+  y->put("/On",     MiniPS::Qinteger(Rule::Cache::IP_Yes));
 }
 
 Image::sf_t Rule::Cache::parseSampleFormat(char const*s, slen_t slen) {
@@ -356,7 +367,7 @@ void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
   #endif
   MiniPS::VALUE dummy;  (void)dummy;
   MiniPS::VALUE FileFormat, SampleFormat, WarningOK, TransferEncoding,
-    Compression, Predictor, Transparent;
+    Compression, Predictor, Transparent, Interpolate;
   MiniPS::VALUE PredictorColumns, PredictorColors, PredictorBPC, Effort, K,
     RecordSize, Quality, ColorTransform, TransferCPL,
     EncoderRows, EncoderColumns, EncoderBPL, EncoderColors, DCT, Scale;
@@ -368,6 +379,7 @@ void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
     "TransferEncoding",MiniPS::S_SENUM,   y_TransferEncoding, &TransferEncoding,
     "Compression",     MiniPS::S_SENUM,   y_Compression,      &Compression,
     "Predictor",       MiniPS::S_FUNC,    better_predictor,   &Predictor,
+    "Interpolate",     MiniPS::S_SENUM,   y_Interpolate,      &Interpolate,
     "Transparent",     MiniPS::S_RGBSTR,  MiniPS::Qnull,      &Transparent, /* force an RGB color transparent */
     "Hints",           MiniPS::T_DICT,    MiniPS::Qnull,      &dictHints,
     NULLP
@@ -379,6 +391,7 @@ void Rule::OutputRule::fromDict(MiniPS::VALUE dict_) {
   cache.TransferEncoding=(Rule::Cache::te_t)MiniPS::int2ii(TransferEncoding);
   cache.Compression=(Rule::Cache::co_t)MiniPS::int2ii(Compression);
   cache.Predictor=(Rule::Cache::pr_t)MiniPS::int2ii(Predictor);
+  cache.Interpolate=(Rule::Cache::ip_t)MiniPS::int2ii(Interpolate);
   cache.Transparent=0x1000000UL; /* No extra transparency */
   if (Transparent!=MiniPS::Qnull) {
     unsigned char const*p=(unsigned char const*)(MiniPS::RSTRING(Transparent)->begin_());
@@ -835,6 +848,20 @@ void Rule::writeTTE(
       out << (or_->cache.isGray() ? "image"
             : or_->cache.SampleFormat==Image::SF_Mask || or_->cache.SampleFormat==Image::SF_Indexed1 ? "imagemask"
             : "false 3 colorimage");
+      break;
+     case 'N': /* /Interpolate image-dict key; defaults to /Interpolate false */
+      switch (or_->cache.Interpolate) {
+       case Rule::Cache::IP_Yes:     out << "/Interpolate true";  break;
+       case Rule::Cache::IP_No:      out << "/Interpolate false"; break;
+       case Rule::Cache::IP_default: out << "/Interpolate false"; break;
+      }
+      break;
+     case 'n': /* /Interpolate image-dict key; defaults to omitted */
+      switch (or_->cache.Interpolate) {
+       case Rule::Cache::IP_Yes:     out << "/Interpolate true";  break;
+       case Rule::Cache::IP_No:      out << "/Interpolate false"; break;
+       case Rule::Cache::IP_default: /* nothing */                break;
+      }
       break;
      case 'I': /* PS warning for usage of colorimage operator */
        // if (!or_->cache.isGray()) out << "% PSLC required\n";

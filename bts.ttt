@@ -21,7 +21,7 @@
 save`s 9 dict begin
 {/T currentfile`T def`1setcolorspace
 /F T`F def
-<</ImageType 1/Width `w/Height `h/BitsPerComponent
+<<`n/ImageType 1/Width `w/Height `h/BitsPerComponent
 `b/ImageMatrix[1 0 0 -1 0 `h]/Decode
 [`D]/DataSource F>> image
 `t}
@@ -132,7 +132,7 @@ end restore showpage
 [ (1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj\n) ] %7.0
 [ (4 0 obj\n<</Length ) ] %8.0
 -11 %9
-(/Interpolate false/Type/XObject/Name/S/Subtype/Image/ColorSpace`1/Width
+(`N/Type/XObject/Name/S/Subtype/Image/ColorSpace`1/Width
 `w/Height `h/BitsPerComponent `b`F>>stream\n) %10
 [ (`S) ] %11
 (\nendstream\nendobj\n) %12
@@ -167,7 +167,7 @@ end restore showpage
 [ (1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj\n) ] %7.0
 [ (4 0 obj\n<</Length ) ] %8.0
 -11 %9
-(/Interpolate false/Type/XObject/Name/S/Subtype/Image/ImageMask
+(`N/Type/XObject/Name/S/Subtype/Image/ImageMask
 true/BitsPerComponent 1/Width `w/Height `h`F>>stream\n) %10
 [ (`S) ] %11
 (\nendstream\nendobj\n) %12
@@ -237,7 +237,7 @@ EI\nQ\n) ] %5.0
 [ (1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj\n) ] %7.0
 [ (4 0 obj\n<</Length ) ] %8.0
 -11 %9
-(/Interpolate false/Type/XObject/Name/S/Subtype/Image/ImageMask
+(`N/Type/XObject/Name/S/Subtype/Image/ImageMask
 true/BitsPerComponent 1/Width `w/Height `h`F>>stream\n) %10
 [ (`S) ] %11
 (\nendstream\nendobj\n) %12
@@ -302,7 +302,7 @@ EI\nQ\n) ] %5.0
 [ (3 0 obj\n<</Length ) ] %2
 -5 %3: length of chunk 5
 (>>\nstream\n) %4
-[ (q`s\n`w 0 0 `h 0 0 cm\nBI/Interpolate false/W `w/H `h/CS`1/BPC `b`F ID
+[ (q`s\n`w 0 0 `h 0 0 cm\nBI`N/W `w/H `h/CS`1/BPC `b`F ID
 `S
 EI\nQ\n) ] %5.0
 (endstream\nendobj\n) %6
@@ -337,7 +337,7 @@ EI\nQ\n) ] %5.0
 %[ (3 0 obj\n<</Length ) ] %2
 %-5 %3: length of chunk 5
 %(>>\nstream\n) %4
-%[ (q`s\n`w 0 0 `h 0 0 cm\nBI/Interpolate false/W `w/H `h/CS`1/BPC `b`F ID
+%[ (q`s\n`w 0 0 `h 0 0 cm\nBI`N/W `w/H `h/CS`1/BPC `b`F ID
 %`S
 %EI\nQ\n) ] %5.0
 %(endstream\nendobj\n) %6
@@ -366,7 +366,7 @@ save`s 2 dict begin
 {/Device`d setcolorspace
 /T currentfile`T def
 /F T/DCTDecode filter def
-<</ImageType 1/Width `w/Height `h/BitsPerComponent
+<<`n/ImageType 1/Width `w/Height `h/BitsPerComponent
 `b/ImageMatrix[1 0 0 -1 0 `h]/Decode
 [`D]/DataSource F>> image`t}
 %%BeginData:;
@@ -389,7 +389,7 @@ end restore showpage
 [ (1 0 obj\n<</Type/Catalog/Pages 2 0 R>>\nendobj\n) ] %7.0
 [ (4 0 obj\n<</Length ) ] %8.0
 -11 %9
-(/Type/XObject/Name/S/Subtype/Image/ColorSpace/Device`d/Width
+(`n/Type/XObject/Name/S/Subtype/Image/ColorSpace/Device`d/Width
 `w/Height `h/BitsPerComponent `b`F>>stream\n) %10
 [ (`S) ] %11
 (\nendstream\nendobj\n) %12
@@ -421,7 +421,7 @@ end restore showpage
 [ (3 0 obj\n<</Length ) ] %2
 -5 %3: length of chunk 5
 (>>\nstream\n) %4
-[ (q`s\n`w 0 0 `h 0 0 cm\nBI/W `w/H `h/CS/Device`d/BPC `b`F ID
+[ (q`s\n`w 0 0 `h 0 0 cm\nBI`n/W `w/H `h/CS/Device`d/BPC `b`F ID
 `S
 EI\nQ\n) ] %5.0
 (endstream\nendobj\n) %6
@@ -967,7 +967,7 @@ c - ;/Ex c E O exit}{2 y c y O ? 2 y c ? c - ;}i d u 128 le{L c 0 c 1 + ; u ? 1
 O 0 c ;}i}loop B{12 * H c 12 ; 3 y p O 12 +}forall O O R}false 3 colorimage
 d O d O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-/F T/RunLengthDecode filter def<</ImageType 1/Width `w/Height `h
+/F T/RunLengthDecode filter def<<`n/ImageType 1/Width `w/Height `h
 /BitsPerComponent `b/ImageMatrix[1 0 0 -1 0 `h]/Decode[`D]/DataSource F>>
 image F closefile T closefile
 }ifelse}
@@ -1007,7 +1007,7 @@ A c S O}{L c d c 257 c - 3 y 1 - -1 0{3 y c put O}for O O c
 O 0 c ;}i}loop B{12 * H c 12 ; 3 y p O 12 +}forall O O R}false 3 colorimage
 d O A read O O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-/F T/RunLengthDecode filter def<</ImageType 1/Width `w/Height `h
+/F T/RunLengthDecode filter def<<`n/ImageType 1/Width `w/Height `h
 /BitsPerComponent `b/ImageMatrix[1 0 0 -1 0 `h]/Decode[`D]/DataSource F>>
 image F closefile T closefile
 }ifelse}
@@ -1046,7 +1046,7 @@ c - ;/Ex c E O exit}{2 y c y O ? 2 y c ? c - ;}i A read O u 128 le{L c 0 c 1 +
 O 0 c ;}i}loop B{12 * H c 12 ; 3 y p O 12 +}forall O O R}false 3 colorimage
 A read O O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - A `p " S O]setcolorspace
-/F A/RunLengthDecode filter def<</ImageType 1/Width `w/Height `h
+/F A/RunLengthDecode filter def<<`n/ImageType 1/Width `w/Height `h
 /BitsPerComponent `b/ImageMatrix[1 0 0 -1 0 `h]/Decode[`D]/DataSource F>>
 image F closefile}ifelse}
 %%BeginData:;
@@ -1086,7 +1086,7 @@ u -2 b 3 and B c 3 * 3 ; H c R c p/R R 3 + E
 {12 * H c 12 ; 3 y p O 12 +}forall O O R}false 3 colorimage
 d O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-<</ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
+<<`n/ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
 `h]/Decode[`D]/DataSource T>>image T closefile}ifelse}
 %%BeginData:;
 exec
@@ -1121,7 +1121,7 @@ u -2 b 3 and B c 3 * 3 ; H c R c p/R R 3 + E
 {12 * H c 12 ; 3 y p O 12 +}forall O O R}false 3 colorimage
 A read O O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-<</ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
+<<`n/ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
 `h]/Decode[`D]/DataSource T>>image T closefile}ifelse}
 %%BeginData:;
 exec
@@ -1161,7 +1161,7 @@ c - ;/Ex c E O exit}{2 y c y O ? 2 y c ? c - ;}i d u 128 le{L c 0 c 1 + ; u ? 1
 O 0 c ;}i}loop B{6 * H c 6 ; 3 y p O 6 +}forall O O R}false 3 colorimage
 d O d O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-/F T/RunLengthDecode filter def<</ImageType 1/Width `w/Height `h
+/F T/RunLengthDecode filter def<<`n/ImageType 1/Width `w/Height `h
 /BitsPerComponent `b/ImageMatrix[1 0 0 -1 0 `h]/Decode[`D]/DataSource F>>
 image F closefile T closefile
 }ifelse}
@@ -1199,7 +1199,7 @@ A c S O}{L c d c 257 c - 3 y 1 - -1 0{3 y c put O}for O O c
 O 0 c ;}i}loop B{6 * H c 6 ; 3 y p O 6 +}forall O O R}false 3 colorimage
 d O A read O O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-/F T/RunLengthDecode filter def<</ImageType 1/Width `w/Height `h
+/F T/RunLengthDecode filter def<<`n/ImageType 1/Width `w/Height `h
 /BitsPerComponent `b/ImageMatrix[1 0 0 -1 0 `h]/Decode[`D]/DataSource F>>
 image F closefile T closefile
 }ifelse}
@@ -1235,7 +1235,7 @@ c - ;/Ex c E O exit}{2 y c y O ? 2 y c ? c - ;}i A read O u 128 le{L c 0 c 1 +
 O 0 c ;}i}loop B{6 * H c 6 ; 3 y p O 6 +}forall O O R}false 3 colorimage
 A read O O}bind exec}{
 O[/Indexed/DeviceRGB `# 1 - A `p " S O]setcolorspace
-/F A/RunLengthDecode filter def<</ImageType 1/Width `w/Height `h
+/F A/RunLengthDecode filter def<<`n/ImageType 1/Width `w/Height `h
 /BitsPerComponent `b/ImageMatrix[1 0 0 -1 0 `h]/Decode[`D]/DataSource F>>
 image F closefile}ifelse}
 %%BeginData:;
@@ -1273,7 +1273,7 @@ eq{22}{S 8 -}i}i E}i}E
 {6 * H c 6 ; 3 y p O 6 +}forall O O R}false 3 colorimage
 d O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-<</ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
+<<`n/ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
 `h]/Decode[`D]/DataSource T>>image T closefile}ifelse}
 %%BeginData:;
 exec
@@ -1306,7 +1306,7 @@ A 48 " u/B c E 0 `p ; S O O/H 1536 " E/R 0 E
 {6 * H c 6 ; 3 y p O 6 +}forall O O R}false 3 colorimage
 A read O O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-<</ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
+<<`n/ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
 `h]/Decode[`D]/DataSource T>>image T closefile}ifelse}
 %%BeginData:;
 exec
@@ -1345,7 +1345,7 @@ c - ;/Ex c E O exit}{2 y c y O ? 2 y c ? c - ;}i d u 128 le{L c 0 c 1 + ; u ? 1
 O 0 c ;}i}loop B{3 * H c 3 ; 3 y p O 3 +}forall O O R}false 3 colorimage
 d O d O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-/F T/RunLengthDecode filter def<</ImageType 1/Width `w/Height `h
+/F T/RunLengthDecode filter def<<`n/ImageType 1/Width `w/Height `h
 /BitsPerComponent `b/ImageMatrix[1 0 0 -1 0 `h]/Decode[`D]/DataSource F>>
 image F closefile T closefile
 }ifelse}
@@ -1380,7 +1380,7 @@ A c S O}{L c d c 257 c - 3 y 1 - -1 0{3 y c put O}for O O c
 O 0 c ;}i}loop B{3 * H c 3 ; 3 y p O 3 +}forall O O R}false 3 colorimage
 d O A read O O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-/F T/RunLengthDecode filter def<</ImageType 1/Width `w/Height `h
+/F T/RunLengthDecode filter def<<`n/ImageType 1/Width `w/Height `h
 /BitsPerComponent `b/ImageMatrix[1 0 0 -1 0 `h]/Decode[`D]/DataSource F>>
 image F closefile T closefile
 }ifelse}
@@ -1413,7 +1413,7 @@ c - ;/Ex c E O exit}{2 y c y O ? 2 y c ? c - ;}i A read O u 128 le{L c 0 c 1 +
 O 0 c ;}i}loop B{3 * H c 3 ; 3 y p O 3 +}forall O O R}false 3 colorimage
 A read O O}bind exec}{
 O[/Indexed/DeviceRGB `# 1 - A `p " S O]setcolorspace
-/F A/RunLengthDecode filter def<</ImageType 1/Width `w/Height `h
+/F A/RunLengthDecode filter def<<`n/ImageType 1/Width `w/Height `h
 /BitsPerComponent `b/ImageMatrix[1 0 0 -1 0 `h]/Decode[`D]/DataSource F>>
 image F closefile}ifelse}
 %%BeginData:;
@@ -1449,7 +1449,7 @@ eq{22}{S 8 -}i}i E}i}E
 {3 * H c 3 ; 3 y p O 3 +}forall O O R}false 3 colorimage
 d O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-<</ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
+<<`n/ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
 `h]/Decode[`D]/DataSource T>>image T closefile}ifelse}
 %%BeginData:;
 exec
@@ -1479,7 +1479,7 @@ A 768 " u/H c E 0 `p ; d O O/B `w " E/R `w 3 *
 {3 * H c 3 ; 3 y p O 3 +}forall O O R}false 3 colorimage
 A read O O}bind exec}{
 [/Indexed/DeviceRGB `# 1 - T `p " readstring O]setcolorspace
-<</ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
+<<`n/ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
 `h]/Decode[`D]/DataSource T>>image T closefile}ifelse}
 %%BeginData:;
 exec
@@ -1512,7 +1512,7 @@ u -2 b 3 and B c 3 * 3 ; H c R c p/R R 3 + E
 `w `h 8[1 0 0 -1 0 `h]{B3 0 A B S O
 {12 * H c 12 ; 3 y p O 12 +}forall O O R}false 3 colorimage}bind exec}{
 O[/Indexed/DeviceRGB `# 1 - A `p " S O]setcolorspace
-<</ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
+<<`n/ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
 `h]/Decode[`D]/DataSource A>>image}ifelse}
 %%BeginData:;
 exec
@@ -1543,7 +1543,7 @@ A 48 " u/B c E 0 `p ; S O O/H 1536 " E/R 0 E
 `w `h 8[1 0 0 -1 0 `h]{B3 0 A B S O
 {6 * H c 6 ; 3 y p O 6 +}forall O O R}false 3 colorimage}bind exec}{
 O[/Indexed/DeviceRGB `# 1 - A `p " S O]setcolorspace
-<</ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
+<<`n/ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
 `h]/Decode[`D]/DataSource A>>image}ifelse}
 %%BeginData:;
 exec
@@ -1572,7 +1572,7 @@ A 768 " u/H c E 0 `p ; d O O/B `w " E/R `w 3 *
 " E `w `h 8[1 0 0 -1 0 `h]{R 0 A B d O
 {3 * H c 3 ; 3 y p O 3 +}forall O O R}false 3 colorimage}bind exec}{
 O[/Indexed/DeviceRGB `# 1 - A `p " d O]setcolorspace
-<</ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
+<<`n/ImageType 1/Width `w/Height `h/BitsPerComponent `b/ImageMatrix[1 0 0 -1 0
 `h]/Decode[`D]/DataSource A>>image}ifelse}
 %%BeginData:;
 exec

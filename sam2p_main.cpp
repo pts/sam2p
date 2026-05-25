@@ -175,7 +175,8 @@ static const unsigned
   OPT_Scale=0x101,
   OPT_Margins=0x112,
   OPT_Transparent=0x122,
-  OPT_TmpRemove=0x132;
+  OPT_TmpRemove=0x132,
+  OPT_Interpolate=0x142;
 
 /** @param s an option (lower/upper case intact), without leading `-'s
  * @param slen length of option 
@@ -193,6 +194,7 @@ static unsigned sam2p_optval(char const* s, slen_t slen) {
      case 't': return OPT_TransferEncoding;
      case 'f': return OPT_TransferEncodingF;
      case 'c': return OPT_Compression;
+     case 'I': return OPT_Interpolate;
      // case 'a': return OPT_Asis; /* disabled, automatic! */
      case '1': return OPT_PSL1;
      case '2': return OPT_PSL2;
@@ -213,6 +215,7 @@ static unsigned sam2p_optval(char const* s, slen_t slen) {
     if (0==strcmp(buf, "loadhints")) return OPT_LoadHints;
     if (0==strcmp(buf, "tmpremove")) return OPT_TmpRemove;
     if (0==strcmp(buf, "transparent")) return OPT_Transparent;
+    if (0==strcmp(buf, "interpolate")) return OPT_Interpolate;
     if (0==strcmp(buf, "hints")) return OPT_Hints;
     if (0==strcmp(buf, "ps")
      || 0==strcmp(buf, "eps")) return OPT_PS;
@@ -300,6 +303,7 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
              *LowerMargin=(char const*)NULLP, *ImageDPI=(char const*)NULLP;
   bool negLowerMargin=false;
   Rule::CacheHints::sc_t Scale=Rule::CacheHints::SC_default;
+  Rule::Cache::ip_t Interpolate=Rule::Cache::IP_default;
   #define APPEND_sf(val) do { if (sfx[val]==0) { sfx[val]=1; sft[sflen++]=val; } } while (0)
   Image::sf_t sft[Image::SF_max+1];       char sfx[Image::SF_max+1]; memset(sfx, 0, sizeof(sfx)); unsigned sflen=0;
   #define APPEND_co(val) do { if (cox[val]==0) { cox[val]=1; cot[colen++]=val; } } while (0)
@@ -404,6 +408,15 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
         else Scale=(Rule::CacheHints::sc_t)(GenBuffer::parseBool(param, paramlen) ? 0+Rule::CacheHints::SC_OK : 0+Rule::CacheHints::SC_None);
         /* ^^^ Imp: better error report */
         /* ^^^ +0: pacify g++-3.1 */
+        break;
+       case OPT_Interpolate:
+             if (0==GenBuffer::nocase_strcmp(param, "yes")
+              || 0==GenBuffer::nocase_strcmp(param, "true")
+              || 0==GenBuffer::nocase_strcmp(param, "on"))   Interpolate=Rule::Cache::IP_Yes;
+        else if (0==GenBuffer::nocase_strcmp(param, "no")
+              || 0==GenBuffer::nocase_strcmp(param, "false")
+              || 0==GenBuffer::nocase_strcmp(param, "off"))  Interpolate=Rule::Cache::IP_No;
+        else goto inv_par;
         break;
        case OPT_TransferEncoding:
              if (0==GenBuffer::nocase_strcmp(param, "bin"))  TransferEncoding=Rule::Cache::TE_Binary;
@@ -896,6 +909,9 @@ static bool one_liner(SimBuffer::B &jobss, char const *const* a) {
                   prc > 1 ? Rule::Cache::PR_PNGAuto+0 /* 15 */ :
                   Predictor == Rule::Cache::PR_PNGAutoMaybe ? Rule::Cache::PR_None+0 : Predictor)
               << "\n  /Hints << " << Hints << " >>";
+        if (Interpolate!=Rule::Cache::IP_default) {
+          jobss << "\n  /Interpolate /" << (Interpolate==Rule::Cache::IP_Yes ? "Yes" : "No");
+        }
         // jobss << "  /Transparent (\377\377\377)\n";
         if (Transparent!=NULL) {
           jobss << "\n  /Transparent ";

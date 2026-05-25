@@ -397,6 +397,9 @@ Options (case insensitive):
 -- -c:g3:2d                : [pts] equivalent to -c:fax:-2
 -- -c:jai                  : [pts] hint /Compression/JAI
 
+-- -I:yes -I:true -I:on    : [pts] hint /Interpolate/Yes (emit /Interpolate true in EPS/PDF image dict so viewers smooth scaled-up pixels)
+-- -I:no -I:false -I:off   : [pts] hint /Interpolate/No (emit /Interpolate false in EPS/PDF image dict)
+
 -- -m:dpi:(dimen)      : set /ImageDPI to `dimen'
 -- -m:(dimen) \        : set all margins (/TopMargin,/BottomMargin, /LeftMargin, /RightMargin) to `dimen'
    -m:all:(dimen) \    :                  /LeftMargin, /RightMargin) to `dimen'

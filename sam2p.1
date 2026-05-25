@@ -134,6 +134,37 @@ set output EPS or PDF to resolution \fIres\fP dpi
 select compression type (support depends on output format)
 .sp 1
 .TP
+.B \-I:yes, \-I:no
+set the
+.B /Interpolate
+flag in the image dictionary of EPS (PSL2/PSL3) and PDF output.
+.B yes
+(also
+.BR true ,
+.BR on )
+emits
+.B /Interpolate true
+so PostScript/PDF viewers smooth pixels when the image is scaled up.
+.B no
+(also
+.BR false ,
+.BR off )
+emits
+.BR "/Interpolate false" .
+Omitting
+.B \-I
+leaves the key absent from EPS dicts and from the JPEG-passthrough PDF dict,
+and emitted as
+.B /Interpolate false
+elsewhere in PDF.
+PSL1 output cannot carry the flag.
+The same key is accepted inside a job-file Profile as
+.BR "/Interpolate /Yes" ,
+.BR /No ,
+or
+.BR /Default .
+.sp 1
+.TP
 .B \-j:quiet
 print only error and fatal error messages, suppress warnings, notices etc.
 Must be put at the beginning of the command line to suppress initial banners, too.
