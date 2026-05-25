@@ -16,7 +16,9 @@ extern "C" int _l_stat(const char *file_name, struct stat *buf);
 /* OK: Imp: not in ANSI C, but we cannot emulate it! */
 extern "C" int _v_s_n_printf ( char *str, size_t n, const char *format, va_list ap );
 #else
-#undef __STRICT_ANSI__ /* for __MINGW32__ */
+#ifdef __MINGW32__
+#undef __STRICT_ANSI__
+#endif
 #define _BSD_SOURCE 1 /* vsnprintf(); may be emulated with fixup_vsnprintf() */
 #ifndef __APPLE__ /* SUXX: Max OS X has #ifndef _POSIX_SOURCE around lstat() :-( */
 #define _POSIX_SOURCE 1 /* also popen() */

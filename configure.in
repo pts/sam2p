@@ -20,7 +20,7 @@ AC_PTS_ENABLE_DEBUG
 
 AC_MSG_CHECKING([for --enable-lzw])
 AC_ARG_ENABLE(lzw,
-  [  --enable-lzw            enable built-in LZW (de)compression (def: no)],
+  [  --enable-lzw            enable built-in LZW (de)compression (def: yes)],
   [], [])
 if test x1 = x"`perl -e 'print time>1056165811'`"; then
   # After 19 June 2003: default: yes
@@ -67,15 +67,14 @@ fi
 
 AC_MSG_CHECKING([for --enable-gif])
 AC_ARG_ENABLE(gif,
-  [  --enable-gif            enable reading and writing GIF images (def: no)],
+  [  --enable-gif            enable reading and writing GIF images (def: yes)],
   [], [])
-if test x"$enable_gif" = x"yes"; then
+if test x"$enable_gif" = x"no"; then
+  AC_MSG_RESULT(no)
+else
   AC_MSG_RESULT(yes)
   AC_DEFINE(USE_IN_GIF)
   AC_DEFINE(USE_OUT_GIF)
-  AC_MSG_WARN(GIF is a resistered trademark of Compuserve; ask permission from them to use it!)
-else
-  AC_MSG_RESULT(no)
 fi
 
 dnl Checks for programs.
@@ -215,10 +214,7 @@ dnl AC_OUTPUT(config.h) -- bad!!
 dnl skipping AC_OUTPUT -- bad!!
 AC_OUTPUT(Makehelp)
 
-dnl AC_PTS_RUN_OK([perl -x -S ./ccdep.pl $CXX], [], [AC_MSG_ERROR(cannot compute depends)])
-rm -f Makedep
-AC_PTS_RUN_OK([${MAKE:-make} Makedep.force], [], [AC_MSG_ERROR(cannot compute depends)])
 AC_PTS_OK
-echo "configure done. Now you should run: $MAKE; $MAKE install"
+echo "configure done. Now you should run: ${MAKE:-make}; ${MAKE:-make} install"
 
 dnl end of configure.in

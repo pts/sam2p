@@ -7,3 +7,4 @@ GFLAG=@GFLAG@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
+mandir=@mandir@

@@ -803,10 +803,10 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-debug=val    val: no, assert(default), yes, checker
-  --enable-lzw            enable built-in LZW (de)compression (def: no)
+  --enable-lzw            enable built-in LZW (de)compression (def: yes)
   --enable-zip            enable built-in ZIP compression (def: yes)
   --enable-fax            enable built-in Fax compression (def: yes)
-  --enable-gif            enable reading and writing GIF images (def: no)
+  --enable-gif            enable reading and writing GIF images (def: yes)
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -1338,7 +1338,10 @@ if test "${enable_gif+set}" = set; then
   enableval="$enable_gif"
 
 fi;
-if test x"$enable_gif" = x"yes"; then
+if test x"$enable_gif" = x"no"; then
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+else
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
   cat >>confdefs.h <<\_ACEOF
@@ -1349,11 +1352,6 @@ _ACEOF
 #define USE_OUT_GIF 1
 _ACEOF
 
-  { echo "$as_me:$LINENO: WARNING: GIF is a resistered trademark of Compuserve; ask permission from them to use it!" >&5
-echo "$as_me: WARNING: GIF is a resistered trademark of Compuserve; ask permission from them to use it!" >&2;}
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
 fi
 
 ac_ext=cc
@@ -7471,23 +7469,7 @@ if test "$no_create" != yes; then
 fi
 
 
-rm -f Makedep
-ac_n="${ac_n:-$ECHO_N}"
-echo $ac_n "running ${MAKE:-make} Makedep.force""... $ac_c" 1>&6
-echo "configure:7504: running ${MAKE:-make} Makedep.force" >&5
-if >&5 2>&5 ${MAKE:-make} Makedep.force; then :
-  echo "$as_me:$LINENO: result: ok" >&5
-echo "${ECHO_T}ok" >&6
-
-else
-  echo "$as_me:$LINENO: result: error" >&5
-echo "${ECHO_T}error" >&6
-  { { echo "$as_me:$LINENO: error: cannot compute depends" >&5
-echo "$as_me: error: cannot compute depends" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
 echo "configure:7517: all OK" >&5
 
-echo "configure done. Now you should run: $MAKE; $MAKE install"
+echo "configure done. Now you should run: ${MAKE:-make}; ${MAKE:-make} install"
 

@@ -620,14 +620,14 @@ the ./compile_*.sh scripts.
 
 If you want to use the ./configure script, run
 
-	#sh configure --enable-gif --enable-lzw  # optional, make does it
+	#sh configure  # optional, make does it
 	make
 	# the stand-alone utility `./sam2p' is now built
 	make install  # optional, may not work
 
 If you have GNU Make as gmake on the $PATH, run this:
 
-	sh configure MAKE=gmake --enable-gif --enable-lzw  # optional, gmake does it
+	sh configure MAKE=gmake  # optional, gmake does it
 	gmake
 	# the stand-alone utility `./sam2p' is now built
 	gmake install  # optional, may not work
@@ -772,7 +772,7 @@ To build sam2p:
 
 8. Run
 
-	./configure --enable-gif --enable-lzw
+	./configure
 	make
 
 9. The file sam2p.exe is now created in the current directory. Use it. You
@@ -1649,10 +1649,11 @@ A3. Check that sam2p has been compiled with GIF support: run sam2p, and
 
 	Available Loaders: ... GIF ...
 
-    If GIF doesn't appear in the line, please recompile sam2p with:
+    GIF and LZW are enabled by default. If your binary was built with
+    --disable-gif, recompile without that flag:
 
 	make clean
-	./configure --enable-gif --enable-lzw
+	./configure
 	make
 	cp sam2p /usr/local/bin
 
@@ -2017,17 +2018,12 @@ A16. Please send an e-mail to the author (pts@fazekas.hu, see more in
      -- if you have a similar input image, for which sam2p works fine,
         attach it to the bug report
 
-Q17. How long does the LZW patent held by Unisys last?
+Q17. How long did the LZW patent held by Unisys last?
 
-A17. mcb@cloanto.com (author of http://lzw.info) wrote:
-
-     Thank you for your interest and mail. I must stress that the "exact"
-     answers you may be looking for may come only from lawyers and courts,
-     and I am none of these. If you consider the IBM, the BT and Unisys US
-     patents, then the last of the three would be the Unisys one, expiring,
-     as the article I think mentions, on June 19, 2003, 24:00. There cannot
-     be other (new) patents on LZW, as far as I know. Please let me know if
-     you find different information.
+A17. The patents have expired worldwide. The Unisys US patent expired on
+     June 20, 2003; the corresponding patents in Europe, Japan and Canada
+     expired during 2004. IBM and BT held earlier patents, both already
+     expired by then. There are no known active patents on LZW.
 
 Q18. I want to create an RGB PostScript image, but sam2p creates a Gray one,
      or it gives me an error message.
@@ -2298,15 +2294,16 @@ A36. Yes, it can, but usually not directly. GIF allows a maximum of 256
      From out1.gif and out2.gif keep the one with the smaller file size. It
      is common that convert(1) creates huge GIF files because LZW compression
      is disabled inside it. sam2p should be compiled with LZW compression
-     and GIF input/output enabled. To check this, run sam2p, and
-     examine its console output. It should contain a line:
+     and GIF input/output enabled (both are on by default). To check this,
+     run sam2p, and examine its console output. It should contain a line:
 
 	Available Appliers: ... GIF89a+LZW ...
 
-     If GIF89a+LZW doesn't appear in the line, please recompile sam2p with:
+     If GIF89a+LZW doesn't appear in the line, your binary was built with
+     --disable-gif and/or --disable-lzw. Recompile without those flags:
 
 	make clean
-	./configure --enable-gif --enable-lzw
+	./configure
 	make
 	cp sam2p /usr/local/bin
 
@@ -2473,7 +2470,7 @@ A45. Yes, it is. Use `-m:dpi:144' to have the output EPS or PDF scaled to
 
 Q46. Is it legal to use LZW compression?
 
-A46. I think so. Also look at Q17.
+A46. Yes. The Unisys patents expired worldwide by mid-2004; see Q17.
 
 Q47. Help! I cannot compile it on SunOS/Solaris. I get
 
