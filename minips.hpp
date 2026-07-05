@@ -220,7 +220,10 @@ class MiniPS {
   static inline Real*   RREAL(VALUE v)  { return static_cast<Real*>((void*)v); }
   static inline Sname*  RSNAME(VALUE v) { return static_cast<Sname*>((void*)v); }
   static inline Ename*  RENAME(VALUE v) { return static_cast<Ename*>((void*)v); }
-  static inline bool isDirect(VALUE v) { return (v&1)!=0 || v<=Qmax_; }
+  static inline bool isDirect(VALUE v) {
+    unsigned long uv = (unsigned long)v;
+    return (uv & 1UL) != 0 || uv <= (unsigned long)Qmax_;
+  }
   /** T_NULL .. T_DICT */
   static unsigned getType(VALUE v);
   /** "null" .. "dict", "name" (T_SNAME), "ename" (T_ENAME, non-std-PS) */
